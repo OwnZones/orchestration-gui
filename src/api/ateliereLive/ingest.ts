@@ -5,6 +5,7 @@ import {
 } from '../../../types/ateliere-live';
 import { LIVE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
+import { ResourcesSourceResponse } from '../../../types/agile-live';
 
 // TODO: create proper cache...
 const INGEST_UUID_CACHE: Map<string, string> = new Map();
@@ -57,6 +58,24 @@ export async function getSourceIdFromSourceName(
 }
 
 export async function getIngests(): Promise<ResourcesCompactIngestResponse[]> {
+  const response = await fetch(
+    new URL(LIVE_BASE_API_PATH + `/ingests?expand=true`, process.env.LIVE_URL),
+    {
+      headers: {
+        authorization: getAuthorizationHeader()
+      },
+      next: {
+        revalidate: 0
+      }
+    }
+  );
+  if (response.ok) {
+    return response.json();
+  }
+  throw await response.json();
+}
+
+export async function getCompleteIngests(): Promise<ResourcesIngestResponse[]> {
   const response = await fetch(
     new URL(LIVE_BASE_API_PATH + `/ingests?expand=true`, process.env.LIVE_URL),
     {
