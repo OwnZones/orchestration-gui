@@ -78,27 +78,6 @@ export async function getIngests(): Promise<ResourcesCompactIngestResponse[]> {
   throw await response.json();
 }
 
-export async function getCompleteIngests(): Promise<ResourcesIngestResponse[]> {
-  const response = await fetch(
-    new URL(
-      AGILE_BASE_API_PATH + `/ingests?expand=true`,
-      process.env.AGILE_URL
-    ),
-    {
-      headers: {
-        authorization: getAuthorizationHeader()
-      },
-      next: {
-        revalidate: 0
-      }
-    }
-  );
-  if (response.ok) {
-    return response.json();
-  }
-  throw await response.json();
-}
-
 export async function getIngest(
   uuid: string
 ): Promise<ResourcesIngestResponse> {

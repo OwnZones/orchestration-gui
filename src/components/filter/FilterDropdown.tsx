@@ -10,9 +10,9 @@ function FilterDropdown({
   isLocationHidden,
   showConfigSources,
   selectedTags,
-  showConfigNdiType,
-  showConfigBmdType,
-  showConfigSrtType,
+  showNdiType,
+  showBmdType,
+  showSrtType,
   setIsTypeHidden,
   setIsLocationHidden,
   setSelectedTags,
@@ -29,9 +29,9 @@ function FilterDropdown({
   isLocationHidden: boolean;
   showConfigSources: boolean;
   selectedTags: Set<string>;
-  showConfigNdiType: boolean;
-  showConfigSrtType: boolean;
-  showConfigBmdType: boolean;
+  showNdiType: boolean;
+  showSrtType: boolean;
+  showBmdType: boolean;
   setIsTypeHidden: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLocationHidden: React.Dispatch<React.SetStateAction<boolean>>;
   setOnlyShowActiveSources: React.Dispatch<React.SetStateAction<boolean>>;
@@ -60,16 +60,34 @@ function FilterDropdown({
     setOnlyShowConfigSources(!showConfigSources);
   };
 
-  const showSelectedConfigNdiType = () => {
-    setOnlyShowNdiSources(!showConfigNdiType);
+  const showSelectedNdiType = () => {
+    if (!showNdiType) {
+      setOnlyShowNdiSources(true);
+      setOnlyShowBmdSources(false);
+      setOnlyShowSrtSources(false);
+    } else {
+      setOnlyShowNdiSources(false);
+    }
   };
 
-  const showSelectedConfigBmdType = () => {
-    setOnlyShowBmdSources(!showConfigBmdType);
+  const showSelectedSrtType = () => {
+    if (!showSrtType) {
+      setOnlyShowSrtSources(true);
+      setOnlyShowNdiSources(false);
+      setOnlyShowBmdSources(false);
+    } else {
+      setOnlyShowSrtSources(false);
+    }
   };
 
-  const showSelectedConfigSrtType = () => {
-    setOnlyShowSrtSources(!showConfigSrtType);
+  const showSelectedBmdType = () => {
+    if (!showBmdType) {
+      setOnlyShowBmdSources(true);
+      setOnlyShowNdiSources(false);
+      setOnlyShowSrtSources(false);
+    } else {
+      setOnlyShowBmdSources(false);
+    }
   };
 
   const deleteTag = (value: string) => {
@@ -122,6 +140,9 @@ function FilterDropdown({
   const handleClear = () => {
     setSelectedTags(new Set<string>());
     setOnlyShowConfigSources(false);
+    setOnlyShowBmdSources(false);
+    setOnlyShowNdiSources(false);
+    setOnlyShowSrtSources(false);
   };
 
   const typesSearch = (event: ChangeEvent<HTMLInputElement>) => {
@@ -262,8 +283,8 @@ function FilterDropdown({
                 id="showNdiCheckbox"
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
-                checked={showConfigNdiType}
-                onChange={showSelectedConfigNdiType}
+                checked={showNdiType}
+                onChange={showSelectedNdiType}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
@@ -277,8 +298,8 @@ function FilterDropdown({
                 id="showSelectedCheckbox"
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
-                checked={showConfigSrtType}
-                onChange={showSelectedConfigSrtType}
+                checked={showSrtType}
+                onChange={showSelectedSrtType}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
@@ -292,8 +313,8 @@ function FilterDropdown({
                 id="showSelectedCheckbox"
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
-                checked={showConfigBmdType}
-                onChange={showSelectedConfigBmdType}
+                checked={showBmdType}
+                onChange={showSelectedBmdType}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"

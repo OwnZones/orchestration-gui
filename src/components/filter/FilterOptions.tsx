@@ -43,8 +43,7 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
 
     handleSearch();
     handleTags();
-    handleShowActiveSources();
-    filterOnSourceType();
+    filterSources();
 
     onFilteredSources(tempSet);
     tempSet.clear();
@@ -106,36 +105,38 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
     }
   };
 
-  const handleShowActiveSources = () => {
-    if (onlyShowActiveSources) {
-      for (const source of tempSet.values()) {
-        if (source.status === 'gone') {
-          tempSet.delete(source._id.toString());
-        }
-      }
-    }
-  };
-
-  const filterOnSourceType = async () => {
+  const filterSources = async () => {
     for (const source of tempSet.values()) {
       const correspondingResource = resources.find(
         (resource) => resource.name === source.ingest_source_name
       );
       if (correspondingResource) {
-        if (onlyShowNdiSources) {
-          if (correspondingResource.type.toUpperCase() !== 'NDI') {
-            tempSet.delete(source._id.toString());
-          }
+        let shouldDelete = false;
+        if (
+          onlyShowNdiSources &&
+          correspondingResource.type.toUpperCase() !== 'NDI'
+        ) {
+          shouldDelete = true;
         }
-        if (onlyShowBmdSources) {
-          if (correspondingResource.type.toUpperCase() !== 'BMD') {
-            tempSet.delete(source._id.toString());
-          }
+        if (
+          onlyShowBmdSources &&
+          correspondingResource.type.toUpperCase() !== 'BMD'
+        ) {
+          shouldDelete = true;
         }
-        if (onlyShowSrtSources) {
-          if (correspondingResource.type.toUpperCase() !== 'SRT') {
-            tempSet.delete(source._id.toString());
-          }
+        if (
+          onlyShowSrtSources &&
+          correspondingResource.type.toUpperCase() !== 'SRT'
+        ) {
+          shouldDelete = true;
+        }
+
+        if (onlyShowActiveSources && source.status === 'gone') {
+          shouldDelete = true;
+        }
+
+        if (shouldDelete) {
+          tempSet.delete(source._id.toString());
         }
       }
     }
@@ -171,9 +172,9 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
           setOnlyShowNdiSources={setOnlyShowNdiSources}
           setOnlyShowBmdSources={setOnlyShowBmdSources}
           setOnlyShowSrtSources={setOnlyShowSrtSources}
-          showConfigBmdType={onlyShowBmdSources}
-          showConfigNdiType={onlyShowNdiSources}
-          showConfigSrtType={onlyShowSrtSources}
+          showBmdType={onlyShowBmdSources}
+          showNdiType={onlyShowNdiSources}
+          showSrtType={onlyShowSrtSources}
         />
       </div>
     </ClickAwayListener>
