@@ -277,7 +277,7 @@ function FilterDropdown({
             </div>
             <div className="flex flex-row">
               <input
-                id="showSelectedCheckbox"
+                id="showSrtCheckbox"
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showSrtType}
@@ -285,14 +285,14 @@ function FilterDropdown({
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
-                htmlFor="showSelectedCheckbox"
+                htmlFor="showSrtCheckbox"
               >
                 SRT
               </label>
             </div>
             <div className="flex flex-row">
               <input
-                id="showSelectedCheckbox"
+                id="showBmdCheckbox"
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showBmdType}
@@ -300,7 +300,7 @@ function FilterDropdown({
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
-                htmlFor="showSelectedCheckbox"
+                htmlFor="showBmdCheckbox"
               >
                 SDI/HDMI
               </label>
