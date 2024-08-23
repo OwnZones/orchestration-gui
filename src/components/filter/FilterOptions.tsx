@@ -5,14 +5,20 @@ import FilterDropdown from './FilterDropdown';
 import { ClickAwayListener } from '@mui/base';
 import { SourceWithId } from '../../interfaces/Source';
 import { FilterContext } from '../inventory/FilterContext';
+import { useResources } from '../../hooks/sources/useResources';
 
-function FilterOptions({
-  onFilteredSources
-}: {
+type FilterOptionsProps = {
   onFilteredSources: (sources: Map<string, SourceWithId>) => void;
-}) {
+};
+
+function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
   const { locations, types, sources } = useContext(FilterContext);
+  const [resources] = useResources();
+
   const [onlyShowActiveSources, setOnlyShowActiveSources] = useState(false);
+  const [onlyShowNdiSources, setOnlyShowNdiSources] = useState(false);
+  const [onlyShowBmdSources, setOnlyShowBmdSources] = useState(false);
+  const [onlyShowSrtSources, setOnlyShowSrtSources] = useState(false);
   const [isFilterHidden, setIsFilterHidden] = useState(true);
   const [isTypeHidden, setIsTypeHidden] = useState(true);
   const [isLocationHidden, setIsLocationHidden] = useState(true);
@@ -20,14 +26,16 @@ function FilterOptions({
   const [selectedTags, setSelectedTags] = useState<Set<string>>(
     new Set<string>()
   );
-
   let tempSet = new Map<string, SourceWithId>(sources);
 
   useEffect(() => {
     if (
       selectedTags.size === 0 &&
       searchString.length === 0 &&
-      !onlyShowActiveSources
+      !onlyShowActiveSources &&
+      !onlyShowNdiSources &&
+      !onlyShowBmdSources &&
+      !onlyShowSrtSources
     ) {
       resetFilter();
       return;
@@ -36,11 +44,19 @@ function FilterOptions({
     handleSearch();
     handleTags();
     handleShowActiveSources();
+    filterOnSourceType();
 
     onFilteredSources(tempSet);
     tempSet.clear();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchString, selectedTags, onlyShowActiveSources]);
+  }, [
+    searchString,
+    selectedTags,
+    onlyShowActiveSources,
+    onlyShowNdiSources,
+    onlyShowBmdSources,
+    onlyShowSrtSources
+  ]);
 
   const resetFilter = () => {
     tempSet = new Map<string, SourceWithId>(sources);
@@ -100,6 +116,31 @@ function FilterOptions({
     }
   };
 
+  const filterOnSourceType = async () => {
+    for (const source of tempSet.values()) {
+      const correspondingResource = resources.find(
+        (resource) => resource.name === source.ingest_source_name
+      );
+      if (correspondingResource) {
+        if (onlyShowNdiSources) {
+          if (correspondingResource.type.toUpperCase() !== 'NDI') {
+            tempSet.delete(source._id.toString());
+          }
+        }
+        if (onlyShowBmdSources) {
+          if (correspondingResource.type.toUpperCase() !== 'BMD') {
+            tempSet.delete(source._id.toString());
+          }
+        }
+        if (onlyShowSrtSources) {
+          if (correspondingResource.type.toUpperCase() !== 'SRT') {
+            tempSet.delete(source._id.toString());
+          }
+        }
+      }
+    }
+  };
+
   return (
     <ClickAwayListener
       onClickAway={() => {
@@ -127,6 +168,12 @@ function FilterOptions({
           setIsLocationHidden={setIsLocationHidden}
           setSelectedTags={setSelectedTags}
           setOnlyShowActiveSources={setOnlyShowActiveSources}
+          setOnlyShowNdiSources={setOnlyShowNdiSources}
+          setOnlyShowBmdSources={setOnlyShowBmdSources}
+          setOnlyShowSrtSources={setOnlyShowSrtSources}
+          showConfigBmdType={onlyShowBmdSources}
+          showConfigNdiType={onlyShowNdiSources}
+          showConfigSrtType={onlyShowSrtSources}
         />
       </div>
     </ClickAwayListener>

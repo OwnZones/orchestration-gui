@@ -10,10 +10,16 @@ function FilterDropdown({
   isLocationHidden,
   showConfigSources,
   selectedTags,
+  showConfigNdiType,
+  showConfigBmdType,
+  showConfigSrtType,
   setIsTypeHidden,
   setIsLocationHidden,
   setSelectedTags,
-  setOnlyShowActiveSources: setOnlyShowConfigSources
+  setOnlyShowActiveSources: setOnlyShowConfigSources,
+  setOnlyShowNdiSources: setOnlyShowNdiSources,
+  setOnlyShowBmdSources: setOnlyShowBmdSources,
+  setOnlyShowSrtSources: setOnlyShowSrtSources
 }: {
   close: () => void;
   types: string[];
@@ -23,10 +29,16 @@ function FilterDropdown({
   isLocationHidden: boolean;
   showConfigSources: boolean;
   selectedTags: Set<string>;
+  showConfigNdiType: boolean;
+  showConfigSrtType: boolean;
+  showConfigBmdType: boolean;
   setIsTypeHidden: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLocationHidden: React.Dispatch<React.SetStateAction<boolean>>;
   setOnlyShowActiveSources: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedTags: React.Dispatch<React.SetStateAction<Set<string>>>;
+  setOnlyShowNdiSources: React.Dispatch<React.SetStateAction<boolean>>;
+  setOnlyShowBmdSources: React.Dispatch<React.SetStateAction<boolean>>;
+  setOnlyShowSrtSources: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [searchedTypes, setSearchedTypes] = useState<string[]>([]);
   const [searchedLocations, setSearchedLocations] = useState<string[]>([]);
@@ -46,6 +58,18 @@ function FilterDropdown({
 
   const showSelectedConfigSources = () => {
     setOnlyShowConfigSources(!showConfigSources);
+  };
+
+  const showSelectedConfigNdiType = () => {
+    setOnlyShowNdiSources(!showConfigNdiType);
+  };
+
+  const showSelectedConfigBmdType = () => {
+    setOnlyShowBmdSources(!showConfigBmdType);
+  };
+
+  const showSelectedConfigSrtType = () => {
+    setOnlyShowSrtSources(!showConfigSrtType);
   };
 
   const deleteTag = (value: string) => {
@@ -222,17 +246,64 @@ function FilterDropdown({
               <input
                 id="showSelectedCheckbox"
                 type="checkbox"
-                className="flex ml-2 mb-2 w-4 justify-center rounded-lg text-zinc-300"
+                className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showConfigSources}
                 onChange={showSelectedConfigSources}
               />
               <label
-                className="ml-2 mt-2 text-left text-zinc-300"
+                className="ml-2 mt-1 text-left text-zinc-300"
                 htmlFor="showSelectedCheckbox"
               >
                 {t('inventory_list.active_sources')}
               </label>
             </div>
+            <div className="flex flex-row">
+              <input
+                id="showNdiCheckbox"
+                type="checkbox"
+                className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
+                checked={showConfigNdiType}
+                onChange={showSelectedConfigNdiType}
+              />
+              <label
+                className="ml-2 mt-1 text-left text-zinc-300"
+                htmlFor="showNdiCheckbox"
+              >
+                NDI
+              </label>
+            </div>
+            <div className="flex flex-row">
+              <input
+                id="showSelectedCheckbox"
+                type="checkbox"
+                className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
+                checked={showConfigSrtType}
+                onChange={showSelectedConfigSrtType}
+              />
+              <label
+                className="ml-2 mt-1 text-left text-zinc-300"
+                htmlFor="showSelectedCheckbox"
+              >
+                SRT
+              </label>
+            </div>
+            <div className="flex flex-row">
+              <input
+                id="showSelectedCheckbox"
+                type="checkbox"
+                className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
+                checked={showConfigBmdType}
+                onChange={showSelectedConfigBmdType}
+              />
+              <label
+                className="ml-2 mt-1 text-left text-zinc-300"
+                htmlFor="showSelectedCheckbox"
+              >
+                SDI/HTML
+              </label>
+            </div>
+          </div>
+          <div className="flex self-end justify-end mt-4">
             <button
               onClick={handleClear}
               id="dropdownCheckboxButton"
