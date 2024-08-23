@@ -5,7 +5,6 @@ import {
 } from '../../../types/ateliere-live';
 import { LIVE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
-import { ResourcesSourceResponse } from '../../../types/agile-live';
 
 // TODO: create proper cache...
 const INGEST_UUID_CACHE: Map<string, string> = new Map();

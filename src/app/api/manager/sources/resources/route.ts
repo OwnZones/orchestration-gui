@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { getCompleteIngests } from '../../../../../api/agileLive/ingest';
+import { getIngests } from '../../../../../api/agileLive/ingest';
 
 
 export async function GET(): Promise<NextResponse> {
@@ -11,7 +11,7 @@ export async function GET(): Promise<NextResponse> {
     }
   
   try {
-      return NextResponse.json(await getCompleteIngests());
+      return NextResponse.json(await getIngests());
     } catch (e) {
         return new NextResponse(e?.toString(), { status: 404 })
     }
