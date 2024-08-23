@@ -61,33 +61,15 @@ function FilterDropdown({
   };
 
   const showSelectedNdiType = () => {
-    if (!showNdiType) {
-      setOnlyShowNdiSources(true);
-      setOnlyShowBmdSources(false);
-      setOnlyShowSrtSources(false);
-    } else {
-      setOnlyShowNdiSources(false);
-    }
+    setOnlyShowNdiSources(!showNdiType);
   };
 
   const showSelectedSrtType = () => {
-    if (!showSrtType) {
-      setOnlyShowSrtSources(true);
-      setOnlyShowNdiSources(false);
-      setOnlyShowBmdSources(false);
-    } else {
-      setOnlyShowSrtSources(false);
-    }
+    setOnlyShowSrtSources(!showSrtType);
   };
 
   const showSelectedBmdType = () => {
-    if (!showBmdType) {
-      setOnlyShowBmdSources(true);
-      setOnlyShowNdiSources(false);
-      setOnlyShowSrtSources(false);
-    } else {
-      setOnlyShowBmdSources(false);
-    }
+    setOnlyShowBmdSources(!showBmdType);
   };
 
   const deleteTag = (value: string) => {
@@ -320,7 +302,7 @@ function FilterDropdown({
                 className="ml-2 mt-1 text-left text-zinc-300"
                 htmlFor="showSelectedCheckbox"
               >
-                SDI/HTML
+                SDI/HDMI
               </label>
             </div>
           </div>

@@ -110,23 +110,24 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
       const correspondingResource = resources.find(
         (resource) => resource.name === source.ingest_source_name
       );
+
       if (correspondingResource) {
         let shouldDelete = false;
-        if (
+        const isNdiSelected =
           onlyShowNdiSources &&
-          correspondingResource.type.toUpperCase() !== 'NDI'
-        ) {
-          shouldDelete = true;
-        }
-        if (
+          correspondingResource.type.toUpperCase() === 'NDI';
+        const isBmdSelected =
           onlyShowBmdSources &&
-          correspondingResource.type.toUpperCase() !== 'BMD'
-        ) {
-          shouldDelete = true;
-        }
-        if (
+          correspondingResource.type.toUpperCase() === 'BMD';
+        const isSrtSelected =
           onlyShowSrtSources &&
-          correspondingResource.type.toUpperCase() !== 'SRT'
+          correspondingResource.type.toUpperCase() === 'SRT';
+
+        if (
+          (onlyShowNdiSources || onlyShowBmdSources || onlyShowSrtSources) &&
+          !isNdiSelected &&
+          !isBmdSelected &&
+          !isSrtSelected
         ) {
           shouldDelete = true;
         }
