@@ -5,7 +5,6 @@ import {
 } from '../../../types/agile-live';
 import { AGILE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
-import { ResourcesSourceResponse } from '../../../types/agile-live';
 
 // TODO: create proper cache...
 const INGEST_UUID_CACHE: Map<string, string> = new Map();
@@ -131,7 +130,10 @@ export async function getSourceThumbnail(
 
 export async function getIngestSources(uuid: string) {
   const response = await fetch(
-    new URL(AGILE_BASE_API_PATH + `/ingests/${uuid}/sources?expand=true`, process.env.AGILE_URL),
+    new URL(
+      AGILE_BASE_API_PATH + `/ingests/${uuid}/sources?expand=true`,
+      process.env.AGILE_URL
+    ),
     {
       headers: {
         authorization: getAuthorizationHeader()
