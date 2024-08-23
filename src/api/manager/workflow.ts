@@ -49,6 +49,8 @@ import { Result } from '../../interfaces/result';
 import { Monitoring } from '../../interfaces/monitoring';
 import { getDatabase } from '../mongoClient/dbClient';
 import { updatedMonitoringForProduction } from './job/syncMonitoring';
+import { createControlPanelWebSocket } from '../ateliereLive/websocket';
+import { ObjectId } from 'mongodb';
 
 const isUsed = (pipeline: ResourcesPipelineResponse) => {
   const hasStreams = pipeline.streams.length > 0;
@@ -89,7 +91,7 @@ async function connectIngestSources(
       source.ingest_source_name,
       false
     );
-    const audioSettings = await getAudioMapping(source._id);
+    const audioSettings = await getAudioMapping(new ObjectId(source._id));
     const newAudioMapping = audioSettings?.audio_stream?.audio_mapping;
     const audioMapping = newAudioMapping?.length ? newAudioMapping : [[0, 1]];
 
@@ -308,6 +310,14 @@ export async function stopProduction(
     (p) => p.pipeline_id
   );
 
+  const controlPanelWS = await createControlPanelWebSocket();
+  const htmlSources = production.sources.filter(
+    (source) => source.type === 'html'
+  );
+  const mediaPlayerSources = production.sources.filter(
+    (source) => source.type === 'mediaplayer'
+  );
+
   for (const source of production.sources) {
     for (const stream_uuid of source.stream_uuids || []) {
       await deleteStreamByUuid(stream_uuid).catch((error) => {
@@ -315,6 +325,11 @@ export async function stopProduction(
       });
     }
   }
+
+  htmlSources.map((source) => controlPanelWS.closeHtml(source.input_slot));
+  mediaPlayerSources.map((source) =>
+    controlPanelWS.closeMediaplayer(source.input_slot)
+  );
 
   for (const id of pipelineIds) {
     Log().info(`Stopping pipeline '${id}'`);
@@ -449,10 +464,30 @@ export async function startProduction(
   // Try to setup streams from ingest(s) to pipeline(s) start
   try {
     // Get sources from the DB
+    // Skapa en createHtmlWebSocket, spara
+    const controlPanelWS = await createControlPanelWebSocket();
+    const htmlSources = production.sources.filter(
+      (source) => source.type === 'html'
+    );
+    const mediaPlayerSources = production.sources.filter(
+      (source) => source.type === 'mediaplayer'
+    );
+
+    htmlSources.map((source) => controlPanelWS.createHtml(source.input_slot));
+    mediaPlayerSources.map((source) =>
+      controlPanelWS.createMediaplayer(source.input_slot)
+    );
+
+    controlPanelWS.close();
+
+    // Nedan behöver göras efter att vi har skapat en produktion
+    // TODO: Hämta production.sources, för varje html-reference --> create i createHtmlWebSocket, för varje mediaplayer i production.sources skapa en createWebSocket
     const sources = await getSourcesByIds(
-      production.sources.map((source) => {
-        return source._id.toString();
-      })
+      production.sources
+        .filter((source) => source._id !== undefined)
+        .map((source) => {
+          return source._id!.toString();
+        })
     ).catch((error) => {
       if (error === "Can't connect to Database") {
         throw "Can't connect to Database";
@@ -720,7 +755,7 @@ export async function startProduction(
       ...production,
       sources: production.sources.map((source) => {
         const streamsForSource = streams?.filter(
-          (stream) => stream.source_id === source._id.toString()
+          (stream) => stream.source_id === source._id?.toString()
         );
         return {
           ...source,

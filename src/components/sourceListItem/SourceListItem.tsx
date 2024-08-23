@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Source, SourceWithId } from '../../interfaces/Source';
+import { Source, SourceReference, SourceWithId } from '../../interfaces/Source';
 import { PreviewThumbnail } from './PreviewThumbnail';
 import { getSourceThumbnail } from '../../utils/source';
 import videoSettings from '../../utils/videoSettings';
@@ -95,7 +95,7 @@ function InventoryListItem({
           : []
       );
     }
-  }, [source.audio_stream.audio_mapping]);
+  }, [source?.audio_stream.audio_mapping]);
 
   return (
     <li

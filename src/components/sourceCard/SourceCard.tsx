@@ -2,20 +2,22 @@
 
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
-import { SourceReference } from '../../interfaces/Source';
+import { SourceReference, Type } from '../../interfaces/Source';
 import { SourceThumbnail } from './SourceThumbnail';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
 
 type SourceCardProps = {
-  source: ISource;
+  source?: ISource;
   label: string;
-  onSourceUpdate: (source: SourceReference, sourceItem: ISource) => void;
+  onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
   onSelectingText: (bool: boolean) => void;
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
-  src: string;
+  src?: string;
+  sourceRef?: SourceReference;
+  type: Type;
 };
 
 export default function SourceCard({
@@ -26,9 +28,13 @@ export default function SourceCard({
   onSelectingText,
   forwardedRef,
   src,
-  style
+  style,
+  sourceRef,
+  type
 }: SourceCardProps) {
-  const [sourceLabel, setSourceLabel] = useState(label ? label : source.name);
+  const [sourceLabel, setSourceLabel] = useState(
+    sourceRef?.label || source?.name
+  );
 
   const t = useTranslate();
 
@@ -37,20 +43,29 @@ export default function SourceCard({
   };
   const saveText = () => {
     onSelectingText(false);
-    // if (source.name === label) {
-    //   return;
-    // }
-    if (sourceLabel.length === 0) {
-      setSourceLabel(source.name);
+    if (sourceLabel?.length === 0) {
+      if (source) {
+        setSourceLabel(source.name);
+      } else if (sourceRef) {
+        setSourceLabel(sourceRef.label);
+      }
     }
-    onSourceUpdate(
-      {
+
+    if (source) {
+      onSourceUpdate({
         _id: source._id.toString(),
-        label: sourceLabel,
+        type: 'ingest_source',
+        label: sourceLabel || source.name,
         input_slot: source.input_slot
-      },
-      source
-    );
+      });
+    } else if (sourceRef) {
+      onSourceUpdate({
+        _id: sourceRef._id,
+        type: sourceRef.type,
+        label: sourceLabel || sourceRef.label,
+        input_slot: sourceRef.input_slot
+      });
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -77,25 +92,59 @@ export default function SourceCard({
           onBlur={saveText}
         />
       </div>
-      <SourceThumbnail source={source} src={src} />
-      <h2 className="absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
-        {t('source.ingest', {
-          ingest: source.ingest_name
-        })}
-      </h2>
-      <button
-        className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg"
-        onClick={() => {
-          onSourceRemoval({
-            _id: source._id.toString(),
-            label: source.label,
-            input_slot: source.input_slot,
-            stream_uuids: source.stream_uuids
-          });
-        }}
-      >
-        <IconTrash className="text-p w-4 h-4" />
-      </button>
+      {source && source.src && (
+        <SourceThumbnail source={source} src={src} type={type} />
+      )}
+      {!source && sourceRef && <SourceThumbnail type={sourceRef.type} />}
+      {(sourceRef || source) && (
+        <h2
+          className={`${
+            source && 'absolute bottom-4'
+          } p-1 text-p text-xs bg-zinc-900 w-full bg-opacity-90 ${
+            sourceRef && !source && 'absolute bottom-0'
+          }`}
+        >
+          {t('source.input_slot', {
+            input_slot:
+              sourceRef?.input_slot?.toString() ||
+              source?.input_slot?.toString() ||
+              ''
+          })}
+        </h2>
+      )}
+
+      {source && (
+        <h2 className="absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
+          {t('source.ingest', {
+            ingest: source.ingest_name
+          })}
+        </h2>
+      )}
+      {(source || sourceRef) && (
+        <button
+          className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg"
+          onClick={() => {
+            if (source) {
+              onSourceRemoval({
+                _id: source._id.toString(),
+                type: 'ingest_source',
+                label: sourceLabel || source.name,
+                input_slot: source.input_slot,
+                stream_uuids: source.stream_uuids
+              });
+            } else if (sourceRef && !source) {
+              onSourceRemoval({
+                _id: sourceRef._id,
+                type: sourceRef.type,
+                label: sourceRef.label,
+                input_slot: sourceRef.input_slot
+              });
+            }
+          }}
+        >
+          <IconTrash className="text-p w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }

@@ -1,11 +1,12 @@
-import React, { ReactElement, memo, useRef } from 'react';
+import React, { ReactElement, memo, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { SourceReference } from '../../interfaces/Source';
 import { ObjectId } from 'mongodb';
 import { Production } from '../../interfaces/production';
+import { v4 as uuidv4 } from 'uuid';
 
 interface IDrag {
-  id: ObjectId;
+  id: ObjectId | string;
   selectingText: boolean;
   onMoveItem: (currentId: string, nextId: string) => void;
   children: ReactElement;
@@ -14,11 +15,10 @@ interface IDrag {
   updateProduction: (updated: Production) => void;
   productionSetup: Production;
 }
-
 const DragItem: React.FC<IDrag> = memo(
   ({
     id,
-    selectingText: selectingText,
+    selectingText,
     onMoveItem,
     children,
     previousOrder,
@@ -28,34 +28,41 @@ const DragItem: React.FC<IDrag> = memo(
   }) => {
     const ref = useRef(null);
 
+    const oid = typeof id === 'string' ? id : id.toString();
+
     const [{ isDragging }, connectDrag] = useDrag({
       canDrag: !selectingText,
       type: 'Card',
-      item: { id },
-      collect: (monitor) => {
-        return {
-          isDragging: monitor.isDragging()
-        };
-      }
+      item: { oid },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging()
+      })
     });
 
     const [, connectDrop] = useDrop({
       accept: 'Card',
-      hover(hoveredOverItem: { id: ObjectId }) {
-        if (hoveredOverItem.id !== id && id) {
-          onMoveItem(hoveredOverItem.id.toString(), id.toString());
+      hover(hoveredOverItem: { oid: string }) {
+        if (hoveredOverItem.oid !== oid) {
+          onMoveItem(hoveredOverItem.oid.toString(), oid.toString());
         }
       },
       drop() {
-        const isSame = previousOrder.every(
-          (item, index) => item._id === currentOrder[index]._id
-        );
+        const isSameLength = previousOrder.length === currentOrder.length;
+        const isSame = isSameLength
+          ? previousOrder.every(
+              (item, index) => item._id === currentOrder[index]?._id
+            )
+          : false;
+
         if (!isSame) {
-          console.log('ORDER CHANGED');
           const updatedProduction = {
             ...productionSetup,
-            sources: currentOrder
+            sources: currentOrder.map((source) => ({
+              ...source,
+              _id: source._id || uuidv4() // Ensure ID consistency
+            }))
           };
+
           updateProduction(updatedProduction);
         }
       }
@@ -68,12 +75,12 @@ const DragItem: React.FC<IDrag> = memo(
 
     return (
       <>
-        {React.Children.map(children, (child) => {
-          return React.cloneElement(child, {
+        {React.Children.map(children, (child) =>
+          React.cloneElement(child, {
             forwardedRef: ref,
             style: containerStyle
-          });
-        })}
+          })
+        )}
       </>
     );
   }

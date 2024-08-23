@@ -11,7 +11,8 @@ export function usePostProduction() {
         isActive: false,
         name,
         sources: [],
-        selectedPresetRef: undefined
+        html: [],
+        mediaplayers: []
       })
     });
     if (response.ok) {

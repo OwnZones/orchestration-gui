@@ -2,6 +2,7 @@ import { Db, ObjectId, UpdateResult } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
 import { Production, ProductionWithId } from '../../interfaces/production';
 import { Log } from '../logger';
+import { SourceReference, Type } from '../../interfaces/Source';
 
 export async function getProductions(): Promise<Production[]> {
   const db = await getDatabase();
