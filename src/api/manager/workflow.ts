@@ -77,6 +77,10 @@ async function connectIngestSources(
   let input_slot = 0;
   const sourceToPipelineStreams: SourceToPipelineStream[] = [];
 
+  console.log('connectIngestSources - productionSettings', productionSettings);
+  console.log('connectIngestSources - sources', sources);
+  console.log('connectIngestSources - usedPorts', usedPorts);
+
   for (const source of sources) {
     input_slot = input_slot + 1;
     const ingestUuid = await getUuidFromIngestName(
@@ -460,6 +464,8 @@ export async function startProduction(
 
   await initDedicatedPorts();
 
+  console.log('startProduction - production', production);
+
   let streams: SourceToPipelineStream[] = [];
   // Try to setup streams from ingest(s) to pipeline(s) start
   try {
@@ -479,6 +485,7 @@ export async function startProduction(
     );
 
     controlPanelWS.close();
+    console.log('startProduction - production', production);
 
     // Nedan behöver göras efter att vi har skapat en produktion
     // TODO: Hämta production.sources, för varje html-reference --> create i createHtmlWebSocket, för varje mediaplayer i production.sources skapa en createWebSocket
@@ -496,11 +503,13 @@ export async function startProduction(
       throw "Can't get source!";
     });
 
+    console.log('startProduction - production', production);
     // Lookup pipeline UUIDs from pipeline names and insert to production_settings
     await insertPipelineUuid(production_settings).catch((error) => {
       throw error;
     });
 
+    console.log('startProduction - production', production);
     // Fetch expanded pipeline objects from Ateliere Live
     const pipelinesToUsePromises = production_settings.pipelines.map(
       (pipeline) => {
@@ -508,11 +517,13 @@ export async function startProduction(
       }
     );
     const pipelinesToUse = await Promise.all(pipelinesToUsePromises);
+    console.log('startProduction - pipelinesToUse', pipelinesToUse);
 
     // Check if pipelines are already in use by another production
     const hasAlreadyUsedPipeline = pipelinesToUse.filter((pipeline) =>
       isUsed(pipeline)
     );
+    console.log('startProduction - production', production);
 
     if (hasAlreadyUsedPipeline.length > 0) {
       Log().error(
@@ -524,6 +535,7 @@ export async function startProduction(
         (p) => p.name
       )}`;
     }
+    console.log('startProduction - hasAlreadyUsedPipeline', hasAlreadyUsedPipeline);
 
     const resetPipelinePromises = production_settings.pipelines.map(
       (pipeline) => {
@@ -533,6 +545,7 @@ export async function startProduction(
     await Promise.all(resetPipelinePromises).catch((error) => {
       throw `Failed to reset pipelines: ${error}`;
     });
+    console.log('startProduction - resetPipelinePromises', resetPipelinePromises);
 
     // Fetch all control panels from Ateliere Live
     const allControlPanels = await getControlPanels();
@@ -546,6 +559,7 @@ export async function startProduction(
     const hasAlreadyUsedControlPanel = controlPanelsToUse.filter(
       (controlPanel) => controlPanel.outgoing_connections.length > 0
     );
+    console.log('startProduction - hasAlreadyUsedControlPanel', hasAlreadyUsedControlPanel);
 
     if (hasAlreadyUsedControlPanel.length > 0) {
       Log().error(
@@ -572,6 +586,7 @@ export async function startProduction(
         return pipeline.uuid;
       })
     );
+    console.log('startProduction - stopPipelines', production_settings.pipelines);
 
     streams = await connectIngestSources(
       production_settings,
@@ -596,6 +611,7 @@ export async function startProduction(
         error: 'Could not setup streams: Unexpected error occured'
       };
     }
+    console.log('startProduction - streams', streams);
     return {
       ok: false,
       value: [
