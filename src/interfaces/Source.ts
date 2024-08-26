@@ -26,6 +26,7 @@ export interface Source {
   };
   ingest_name: string;
   ingest_source_name: string;
+  ingest_type: string;
   video_stream: VideoStream;
   audio_stream: AudioStream;
 }

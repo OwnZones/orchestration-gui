@@ -5,7 +5,6 @@ import FilterDropdown from './FilterDropdown';
 import { ClickAwayListener } from '@mui/base';
 import { SourceWithId } from '../../interfaces/Source';
 import { FilterContext } from '../inventory/FilterContext';
-import { useResources } from '../../hooks/sources/useResources';
 
 type FilterOptionsProps = {
   onFilteredSources: (sources: Map<string, SourceWithId>) => void;
@@ -13,7 +12,6 @@ type FilterOptionsProps = {
 
 function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
   const { locations, types, sources } = useContext(FilterContext);
-  const [resources] = useResources();
 
   const [onlyShowActiveSources, setOnlyShowActiveSources] = useState(false);
   const [onlyShowNdiSources, setOnlyShowNdiSources] = useState(false);
@@ -107,21 +105,15 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
 
   const filterSources = async () => {
     for (const source of tempSet.values()) {
-      const correspondingResource = resources.find(
-        (resource) => resource.name === source.ingest_source_name
-      );
+      let shouldDelete = false;
 
-      if (correspondingResource) {
-        let shouldDelete = false;
+      if (source.ingest_type) {
         const isNdiSelected =
-          onlyShowNdiSources &&
-          correspondingResource.type.toUpperCase() === 'NDI';
+          onlyShowNdiSources && source.ingest_type.toUpperCase() === 'NDI';
         const isBmdSelected =
-          onlyShowBmdSources &&
-          correspondingResource.type.toUpperCase() === 'BMD';
+          onlyShowBmdSources && source.ingest_type.toUpperCase() === 'BMD';
         const isSrtSelected =
-          onlyShowSrtSources &&
-          correspondingResource.type.toUpperCase() === 'SRT';
+          onlyShowSrtSources && source.ingest_type.toUpperCase() === 'SRT';
 
         if (
           (onlyShowNdiSources || onlyShowBmdSources || onlyShowSrtSources) &&
@@ -131,14 +123,14 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
         ) {
           shouldDelete = true;
         }
+      }
 
-        if (onlyShowActiveSources && source.status === 'gone') {
-          shouldDelete = true;
-        }
+      if (onlyShowActiveSources && source.status === 'gone') {
+        shouldDelete = true;
+      }
 
-        if (shouldDelete) {
-          tempSet.delete(source._id.toString());
-        }
+      if (shouldDelete) {
+        tempSet.delete(source._id.toString());
       }
     }
   };

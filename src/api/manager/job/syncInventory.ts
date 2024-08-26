@@ -27,6 +27,7 @@ async function getSourcesFromAPI() {
           },
           ingest_name: ingest.name,
           ingest_source_name: source.name,
+          ingest_type: source.type,
           video_stream: {
             width: source?.video_stream?.width,
             height: source?.video_stream?.height,
@@ -60,7 +61,8 @@ export async function runSyncInventory() {
     const apiSource = apiSources.find((source) => {
       return (
         source.ingest_name === inventorySource.ingest_name &&
-        source.ingest_source_name === inventorySource.ingest_source_name
+        source.ingest_source_name === inventorySource.ingest_source_name &&
+        source.ingest_type === inventorySource.type
       );
     });
     if (!apiSource) {
@@ -81,7 +83,8 @@ export async function runSyncInventory() {
       (inventorySource) => {
         return (
           source.ingest_name === inventorySource.ingest_name &&
-          source.ingest_source_name === inventorySource.ingest_source_name
+          source.ingest_source_name === inventorySource.ingest_source_name &&
+          source.ingest_type === inventorySource.ingest_type
         );
       }
     );
