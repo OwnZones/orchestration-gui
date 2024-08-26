@@ -5,7 +5,6 @@ import FilterDropdown from './FilterDropdown';
 import { ClickAwayListener } from '@mui/base';
 import { SourceWithId } from '../../interfaces/Source';
 import { FilterContext } from '../inventory/FilterContext';
-import { useResources } from '../../hooks/sources/useResources';
 
 type FilterOptionsProps = {
   onFilteredSources: (sources: Map<string, SourceWithId>) => void;
