@@ -512,7 +512,9 @@ export const sv = {
     locations: 'Plats',
     active_sources: 'Aktiva källor',
     add: 'Lägg till',
-    edit: 'Redigera'
+    edit: 'Redigera',
+    sort_by: 'Sortera på',
+    no_sorting_applied: 'Ingen sortering vald'
   },
   clear: 'Rensa',
   apply: 'Applicera',

@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslate } from '../../i18n/useTranslate';
+import { SortSelect } from './SortSelect';
 
 function FilterDropdown({
   close,
@@ -30,6 +31,11 @@ function FilterDropdown({
 }) {
   const [searchedTypes, setSearchedTypes] = useState<string[]>([]);
   const [searchedLocations, setSearchedLocations] = useState<string[]>([]);
+  const [selectedValue, setSelectedValue] = useState<string>();
+
+  useEffect(() => {
+    console.log('selected: ', selectedValue);
+  }, [selectedValue]);
 
   useEffect(() => {
     setSearchedTypes(types);
@@ -53,6 +59,10 @@ function FilterDropdown({
     temp.delete(value);
     setSelectedTags(new Set<string>(temp));
   };
+
+  // const handleChangeSorting = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedValue(event.target.value);
+  // };
 
   function addFilterComponent(type: string, component: string, index: number) {
     const id = `${type}-${component}-id`;
@@ -214,6 +224,18 @@ function FilterDropdown({
                 return addFilterComponent('location', item, index);
               })}
             </ul>
+          </div>
+          <div className="flex items-center">
+            <span className="flex min-w-[20%] mr-5">
+              {t('inventory_list.sort_by')}
+            </span>
+            <SortSelect
+              value={selectedValue || t('inventory_list.no_sorting_applied')}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setSelectedValue(e.target.value)
+              }
+              options={['Newest', 'Oldest']}
+            />
           </div>
         </li>
         <li className="relative rounded w-full px-3">

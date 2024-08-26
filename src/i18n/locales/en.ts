@@ -510,7 +510,9 @@ export const en = {
     locations: 'Location',
     active_sources: 'Active Sources',
     add: 'Add',
-    edit: 'Edit'
+    edit: 'Edit',
+    sort_by: 'Sort by',
+    no_sorting_applied: 'No sorting selected'
   },
   clear: 'Clear',
   apply: 'Apply',
