@@ -249,7 +249,6 @@ function FilterDropdown({
               value={selectedValue}
               onChange={(e) => {
                 setSelectedValue(e.target.value);
-                handleSorting(reverseSortOrder);
               }}
               options={[
                 t('inventory_list.no_sorting_applied'),
