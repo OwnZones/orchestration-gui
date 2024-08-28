@@ -512,7 +512,8 @@ export const en = {
     add: 'Add',
     edit: 'Edit',
     sort_by: 'Sort by',
-    no_sorting_applied: 'No sorting selected'
+    no_sorting_applied: 'No sorting selected',
+    most_recent_connection: 'Most recent connection'
   },
   clear: 'Clear',
   apply: 'Apply',

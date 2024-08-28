@@ -514,7 +514,8 @@ export const sv = {
     add: 'Lägg till',
     edit: 'Redigera',
     sort_by: 'Sortera på',
-    no_sorting_applied: 'Ingen sortering vald'
+    no_sorting_applied: 'Ingen sortering vald',
+    most_recent_connection: 'Senast anslutning'
   },
   clear: 'Rensa',
   apply: 'Applicera',

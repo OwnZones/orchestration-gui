@@ -5,6 +5,9 @@ import { upsertSource } from '../sources';
 import { getDatabase } from '../../mongoClient/dbClient';
 import { WithId } from 'mongodb';
 
+type SourceWithoutLastConnected = Omit<Source, 'lastConnected'>;
+
+// TODO: getSourcesFromAPI should return ResourcesSourceResponse and changed to our model later
 async function getSourcesFromAPI() {
   const ingests = await getIngests();
   const resolvedIngests = (
@@ -15,32 +18,35 @@ async function getSourcesFromAPI() {
         result.status === 'fulfilled'
     )
     .map((result) => result.value);
-  const sources: Source[] = resolvedIngests.flatMap((ingest) => {
-    return ingest.sources.map(
-      (source) =>
-        ({
-          status: source.active ? 'new' : 'gone',
-          name: source.name,
-          type: 'camera',
-          tags: {
-            location: 'Unknown'
-          },
-          ingest_name: ingest.name,
-          ingest_source_name: source.name,
-          video_stream: {
-            width: source?.video_stream?.width,
-            height: source?.video_stream?.height,
-            frame_rate:
-              source?.video_stream?.frame_rate_n /
-              source?.video_stream?.frame_rate_d
-          },
-          audio_stream: {
-            number_of_channels: source?.audio_stream?.number_of_channels,
-            sample_rate: source?.audio_stream?.sample_rate
-          }
-        } satisfies Source)
-    );
-  });
+
+  const sources: SourceWithoutLastConnected[] = resolvedIngests.flatMap(
+    (ingest) => {
+      return ingest.sources.map(
+        (source) =>
+          ({
+            status: source.active ? 'new' : 'gone',
+            name: source.name,
+            type: 'camera',
+            tags: {
+              location: 'Unknown'
+            },
+            ingest_name: ingest.name,
+            ingest_source_name: source.name,
+            video_stream: {
+              width: source?.video_stream?.width,
+              height: source?.video_stream?.height,
+              frame_rate:
+                source?.video_stream?.frame_rate_n /
+                source?.video_stream?.frame_rate_d
+            },
+            audio_stream: {
+              number_of_channels: source?.audio_stream?.number_of_channels,
+              sample_rate: source?.audio_stream?.sample_rate
+            }
+          } satisfies SourceWithoutLastConnected)
+      );
+    }
+  );
   return sources;
 }
 
@@ -67,26 +73,30 @@ export async function runSyncInventory() {
       // If source was not found in response from API, always mark it as gone
       return { ...inventorySource, status: 'gone' } satisfies WithId<Source>;
     }
-    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
+    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status and set the lastConnected to the current date
     return {
       ...inventorySource,
-      status: apiSource.status
+      status: apiSource.status,
+      lastConnected: new Date()
     } satisfies WithId<Source>;
   });
 
   // Look for new sources that doesn't already exist in the inventory,
   // these should all be added to the inventory, status of these are set in getSourcesFromAPI.
-  const newSourcesToUpsert = apiSources.filter((source) => {
-    const existingSource = dbInventoryWithCorrectStatus.find(
-      (inventorySource) => {
-        return (
-          source.ingest_name === inventorySource.ingest_name &&
-          source.ingest_source_name === inventorySource.ingest_source_name
-        );
-      }
-    );
-    return !existingSource;
-  });
+
+  const newSourcesToUpsert = apiSources
+    .filter((source) => {
+      const existingSource = dbInventoryWithCorrectStatus.find(
+        (inventorySource) => {
+          return (
+            source.ingest_name === inventorySource.ingest_name &&
+            source.ingest_source_name === inventorySource.ingest_source_name
+          );
+        }
+      );
+      return !existingSource;
+    })
+    .map((source) => ({ ...source, lastConnected: new Date() }));
 
   const sourcesToUpsert = [
     ...newSourcesToUpsert,
