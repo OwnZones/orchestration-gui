@@ -75,7 +75,7 @@ export default function GeneralSettings() {
           {t('source.last_connected')}
         </h2>
         <div className="flex-col">
-          <p>{new Date(input.location).toLocaleString()}</p>
+          <p>{new Date(input.lastConnected).toLocaleString()}</p>
         </div>
       </div>
 
