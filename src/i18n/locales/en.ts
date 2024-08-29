@@ -45,7 +45,8 @@ export const en = {
     audio: 'Audio: {{audio}}',
     orig: 'Original Name: {{name}}',
     metadata: 'Source Metadata',
-    location_unknown: 'Unknown'
+    location_unknown: 'Unknown',
+    last_connected: 'Last connection'
   },
   delete_source_status: {
     delete_stream: 'Delete stream',

@@ -47,7 +47,8 @@ export const sv = {
     audio: 'Ljud: {{audio}}',
     orig: 'Enhetsnamn: {{name}}',
     metadata: 'Käll-metadata',
-    location_unknown: 'Okänd'
+    location_unknown: 'Okänd',
+    last_connected: 'Senast uppkoppling'
   },
   delete_source_status: {
     delete_stream: 'Radera ström',
