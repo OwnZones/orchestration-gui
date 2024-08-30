@@ -77,7 +77,7 @@ export async function runSyncInventory() {
     return {
       ...inventorySource,
       status: apiSource.status,
-      lastConnected: new Date()
+      lastConnected: apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
     } satisfies WithId<Source>;
   });
 
