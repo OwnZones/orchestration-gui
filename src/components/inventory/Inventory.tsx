@@ -8,6 +8,7 @@ import SourceListItem from '../../components/sourceListItem/SourceListItem';
 import { SourceWithId } from '../../interfaces/Source';
 import EditView from './editView/EditView';
 import FilterContext from './FilterContext';
+import { useDeleteSource } from '../../hooks/sources/useDeleteSource';
 import styles from './Inventory.module.scss';
 
 export default function Inventory() {
@@ -82,7 +83,7 @@ export default function Inventory() {
             <ul
               className={`flex flex-col border-t border-gray-600 overflow-scroll h-[95%] ${styles.no_scrollbar}`}
             >
-              {getSourcesToDisplay(filteredSources)}
+              {loading ? '' : getSourcesToDisplay(filteredSources)}
             </ul>
           </div>
         </div>

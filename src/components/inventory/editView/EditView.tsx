@@ -1,13 +1,12 @@
 import Image from 'next/image';
 import { getSourceThumbnail } from '../../../utils/source';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import EditViewContext from '../EditViewContext';
 import GeneralSettings from './GeneralSettings';
 import { SourceWithId } from '../../../interfaces/Source';
 import UpdateButtons from './UpdateButtons';
 import AudioChannels from './AudioChannels/AudioChannels';
 import { IconExclamationCircle } from '@tabler/icons-react';
-import { useDeleteSource } from '../../../hooks/sources/useDeleteSource';
 
 export default function EditView({
   source,
@@ -21,7 +20,6 @@ export default function EditView({
   removeInventorySource: (source: SourceWithId) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<SourceWithId | null>(null);
   const src = useMemo(() => getSourceThumbnail(source), [source]);
 
   return (
