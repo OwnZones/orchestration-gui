@@ -41,7 +41,8 @@ async function getSourcesFromAPI(): Promise<SourceWithoutLastConnected[]> {
             audio_stream: {
               number_of_channels: source?.audio_stream?.number_of_channels,
               sample_rate: source?.audio_stream?.sample_rate
-            }
+            },
+          createdAt: new Date()
           } satisfies SourceWithoutLastConnected)
       );
     }
