@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
+import { CallbackHook } from '../types';
 
-export function useDeleteSource(source: SourceWithId | null) {
-  const [loading, setLoading] = useState(true);
+export function useDeleteSource(): CallbackHook<
+  (source: SourceWithId) => void
+> {
   const [deleteComplete, setDeleteComplete] = useState(false);
 
-  useEffect(() => {
+  const setSourceToPurge = (source: SourceWithId) => {
     if (source && source.status === 'gone') {
-      setLoading(true);
       setDeleteComplete(false);
 
       fetch(`/api/manager/inventory/${source._id}`, {
@@ -17,22 +18,19 @@ export function useDeleteSource(source: SourceWithId | null) {
       })
         .then((response) => {
           if (!response.ok) {
-            setLoading(false);
             setDeleteComplete(true);
             return response.text().then((message) => {
               throw new Error(`Error ${response.status}: ${message}`);
             });
           }
-          setLoading(false);
           setDeleteComplete(true);
         })
         .catch((e) => {
           console.log(`Failed to delete source-item: ${e}`);
         });
     } else {
-      setLoading(false);
       setDeleteComplete(false);
     }
-  }, [source]);
-  return [loading, deleteComplete];
+  };
+  return [setSourceToPurge, deleteComplete];
 }
