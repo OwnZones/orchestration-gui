@@ -679,8 +679,15 @@ export async function startProduction(
     Log().info(
       `Production '${production.name}' with preset '${production_settings.name}' started`
     );
-    production.production_settings.pipelines[0].multiview.multiview_id =
-      multiviewId;
+    // ! What is the consequence of this? Cannot see the effect ->
+    // production.production_settings.pipelines[0].multiview.multiview_id =
+    //   multiviewId;
+    production.production_settings.pipelines[0].multiview.map(
+      (singleMultiview) => {
+        return (singleMultiview.multiview_id = multiviewId);
+      }
+    );
+    // ! <-
   } catch (e) {
     Log().error('Could not start multiviews');
     Log().error(e);

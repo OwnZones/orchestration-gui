@@ -9,6 +9,7 @@ import { getSourcesByIds } from '../../../manager/sources';
 import { Log } from '../../../logger';
 import { ProductionSettings } from '../../../../interfaces/production';
 import { AGILE_BASE_API_PATH } from '../../../../constants';
+import { MultiviewSettings } from '../../../../interfaces/multiview';
 
 export async function getMultiviewsForPipeline(
   pipelineUUID: string
@@ -38,9 +39,16 @@ export async function createMultiviewForPipeline(
   sourceRefs: SourceReference[]
 ): Promise<ResourcesPipelineMultiviewResponse> {
   // const multiviewPresets = await getMultiviewPresets();
-  const multiviewIndex = productionSettings.pipelines.find(
-    (p) => p.multiview?.for_pipeline_idx !== undefined
-  )?.multiview?.for_pipeline_idx;
+
+  const pipeline = productionSettings.pipelines.find((p) =>
+    p.multiview ? p.multiview?.length > 0 : undefined
+  );
+  const multiviewIndexArray = pipeline?.multiview
+    ? pipeline.multiview.map((p) => p.for_pipeline_idx)
+    : undefined;
+
+  const multiviewIndex = multiviewIndexArray?.find((p) => p !== undefined);
+
   if (multiviewIndex === undefined) {
     Log().error(`Did not find a specified pipeline in multiview settings`);
     throw `Did not find a specified pipeline in multiview settings`;
@@ -52,6 +60,7 @@ export async function createMultiviewForPipeline(
     throw `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`;
   }
   const pipelineUUID =
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     productionSettings.pipelines[multiviewIndex].pipeline_id!;
   const sources = await getSourcesByIds(
     sourceRefs.map((ref) => ref._id.toString())
@@ -65,14 +74,11 @@ export async function createMultiviewForPipeline(
     }
     return ref;
   });
-  Log().info(
-    `Creating a multiview for pipeline '${pipelineUUID}' from preset '${productionSettings.pipelines[multiviewIndex].multiview?.name}'`
-  );
+  Log().info(`Creating a multiview for pipeline '${pipelineUUID}' from preset`);
 
-  const multiview = createMultiview(
-    sourceRefsWithLabels,
-    productionSettings.pipelines[multiviewIndex].multiview
-  );
+  const multiviewSettings: MultiviewSettings[] =
+    productionSettings.pipelines[multiviewIndex].multiview ?? [];
+  const multiview = createMultiview(sourceRefsWithLabels, ...multiviewSettings);
 
   let payload = {};
 

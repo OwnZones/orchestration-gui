@@ -2,25 +2,33 @@ import { useState } from 'react';
 import { SourceReference } from '../interfaces/Source';
 import { CallbackHook } from './types';
 import { Production } from '../interfaces/production';
+import { MultiviewSettings } from '../interfaces/multiview';
 
 export function useMultiviews(): CallbackHook<
-  (pipelineId: string, production: Production, source: SourceReference) => void
+  (
+    pipelineId: string,
+    production: Production,
+    source: SourceReference,
+    singleMultiview: MultiviewSettings
+  ) => void
 > {
   const [loading, setLoading] = useState(true);
 
   const putMultiviewView = (
     pipelineId: string,
     production: Production,
-    source: SourceReference
+    source: SourceReference,
+    singleMultiview: MultiviewSettings
   ) => {
     setLoading(true);
 
-    const multiview = production.production_settings.pipelines[0].multiview;
-    if (!multiview) throw 'no multiview';
-    const rest = multiview.layout.views.filter(
+    if (!singleMultiview) throw 'no multiview';
+
+    const rest = singleMultiview.layout.views.filter(
       (v) => v.input_slot !== source.input_slot
     );
-    const viewsToUpdate = multiview.layout.views.filter(
+
+    const viewsToUpdate = singleMultiview.layout.views.filter(
       (v) => v.input_slot === source.input_slot
     );
     console.log(viewsToUpdate);
@@ -30,6 +38,7 @@ export function useMultiviews(): CallbackHook<
         label: source.label
       };
     });
+
     const restWithLabels = rest.map((view) => {
       const sourceForView = production.sources.find(
         (s) => s.input_slot === view.input_slot
@@ -40,15 +49,18 @@ export function useMultiviews(): CallbackHook<
       }
       return view;
     });
+
     if (!viewsToUpdate) {
       setLoading(false);
       return;
     }
+
     const updatedMultiviewViews = [
       ...restWithLabels,
       ...updatedViewsWithLabels
     ];
-    fetch(`/api/manager/multiviews/${multiview.multiview_id}`, {
+
+    fetch(`/api/manager/multiviews/${singleMultiview.multiview_id}`, {
       method: 'PUT',
       headers: [['x-api-key', `Bearer apisecretkey`]],
       body: JSON.stringify({
@@ -63,5 +75,6 @@ export function useMultiviews(): CallbackHook<
       })
       .finally(() => setLoading(false));
   };
+
   return [putMultiviewView, loading];
 }
