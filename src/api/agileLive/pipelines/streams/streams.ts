@@ -5,6 +5,7 @@ import {
   SourceToPipelineStream,
   SourceWithId
 } from '../../../../interfaces/Source';
+import { MultiviewSettings } from '../../../../interfaces/multiview';
 import { PipelineStreamSettings } from '../../../../interfaces/pipeline';
 import { Production } from '../../../../interfaces/production';
 import { Result } from '../../../../interfaces/result';
@@ -200,11 +201,32 @@ export async function createStream(
     const multiviews = await getMultiviewsForPipeline(
       production.production_settings.pipelines[0].pipeline_id
     );
-    const multiview = multiviews.find(
-      (multiview) =>
-        multiview.id ===
-        production.production_settings.pipelines[0].multiview?.multiview_id
-    );
+    // ! What is the consequence of this? Cannot see the effect ->
+    // const multiview = multiviews.find(
+    //   (multiview) =>
+    //     multiview.id ===
+    //     production.production_settings.pipelines[0].multiview?.multiview_id
+    // );
+
+    // filter instead of find
+    const multiview = multiviews.find((multiview) => {
+      const pipeline = production.production_settings.pipelines[0];
+      const multiviewArray = pipeline.multiview;
+
+      if (Array.isArray(multiviewArray)) {
+        return multiviewArray.some(
+          (item) => item.multiview_id === multiview.id
+        );
+      } else if (multiviewArray) {
+        return (
+          (multiviewArray as MultiviewSettings).multiview_id === multiview.id
+        );
+      }
+
+      return false;
+    });
+    // ! <-
+
     if (!multiview) {
       Log().error(
         `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`

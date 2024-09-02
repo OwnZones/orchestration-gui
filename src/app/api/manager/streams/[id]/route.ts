@@ -18,13 +18,13 @@ export async function DELETE(
     });
   }
   const body = await request.json();
-  const multiview = body.multiview as MultiviewSettings;
+  const multiview = body.multiview as MultiviewSettings[];
   try {
     await deleteStream(params.id).catch((e) => {
       Log().error(`Failed to delete stream: ${params.id}: ${e.message}`);
       throw `Failed to delete stream: ${params.id}: ${e.message}`;
     });
-    if (!multiview) {
+    if (!multiview || multiview.length === 0) {
       return new NextResponse(
         JSON.stringify({
           ok: true,
@@ -68,17 +68,34 @@ export async function DELETE(
     );
   }
   try {
-    if (!multiview.multiview_id) {
-      throw `The provided multiview settings did not contain any multiview id`;
-    }
+    // ! What is the consequence of this? Cannot see the effect ->
+    // if (!multiview.multiview_id) {
+    //   throw `The provided multiview settings did not contain any multiview id`;
+    // }
 
-    await updateMultiviewForPipeline(
-      body.pipelineUUID,
-      multiview.multiview_id,
-      multiview.layout.views
-    ).catch((e) => {
-      throw `Error when updating multiview: ${e.message}`;
+    // await updateMultiviewForPipeline(
+    //   body.pipelineUUID,
+    //   multiview.multiview_id,
+    //   multiview.layout.views
+    // ).catch((e) => {
+    //   throw `Error when updating multiview: ${e.message}`;
+
+    const multiviewUpdates = multiview.map(async (singleMultiview) => {
+      if (!singleMultiview.multiview_id) {
+        throw `The provided multiview settings did not contain any multiview id`;
+      }
+      return updateMultiviewForPipeline(
+        body.pipelineUUID,
+        singleMultiview.multiview_id,
+        singleMultiview.layout.views
+      ).catch((e) => {
+        throw `Error when updating multiview: ${e.message}`;
+      });
     });
+
+    await Promise.all(multiviewUpdates);
+    // ! <-
+
     return new NextResponse(
       JSON.stringify({
         ok: true,

@@ -17,6 +17,7 @@ export function useCreateStream(): CallbackHook<
   ) => Promise<Result<AddSourceResult>>
 > {
   const [loading, setLoading] = useState(false);
+
   const createStream = async (
     source: SourceWithId,
     production: Production,
@@ -59,13 +60,26 @@ export function useDeleteStream(): CallbackHook<
     input_slot: number
   ): Promise<Result<DeleteSourceStep[]>> => {
     setLoading(true);
+
     const pipelineUUID =
       production.production_settings.pipelines[0].pipeline_id;
+    // ! What is the consequence of this? Cannot see the effect ->
+    // const multiviewViews =
+    //   production.production_settings.pipelines[0].multiview?.layout.views;
+    // const multiviewsToUpdate = multiviewViews?.filter(
+    //   (v) => v.input_slot === input_slot
+    // );
     const multiviewViews =
-      production.production_settings.pipelines[0].multiview?.layout.views;
+      production.production_settings.pipelines[0].multiview?.flatMap(
+        (singleMultiview) => {
+          return singleMultiview.layout.views;
+        }
+      );
     const multiviewsToUpdate = multiviewViews?.filter(
       (v) => v.input_slot === input_slot
     );
+    // ! <-
+
     if (!multiviewsToUpdate || multiviewsToUpdate.length === 0) {
       const streamRequests = streamUuids.map((streamUuid) => {
         return fetch(`/api/manager/streams/${streamUuid}`, {
@@ -111,16 +125,21 @@ export function useDeleteStream(): CallbackHook<
       const sourceForView = production.sources.find(
         (s) => s.input_slot === v.input_slot
       );
+
       if (sourceForView) {
         return { ...v, label: sourceForView.label };
       }
+
       return v;
     });
+
     if (
       !restWithLabels ||
       !updatedMultiviews ||
       updatedMultiviews.length === 0 ||
-      !production.production_settings.pipelines[0].multiview?.layout
+      !production.production_settings.pipelines[0].multiview?.forEach(
+        (singleMultiview) => singleMultiview.layout
+      )
     ) {
       setLoading(false);
       return {
@@ -131,13 +150,32 @@ export function useDeleteStream(): CallbackHook<
 
     const multiviewsWithLabels = [...restWithLabels, ...updatedMultiviews];
 
-    const multiview = {
-      ...production.production_settings.pipelines[0].multiview,
-      layout: {
-        ...production.production_settings.pipelines[0].multiview?.layout,
-        views: multiviewsWithLabels
-      }
-    } satisfies MultiviewSettings;
+    // ! What is the consequence of this? Cannot see the effect ->
+    // const multiview = [
+    //   {
+    //     ...production.production_settings.pipelines[0].multiview,
+    //     layout: {
+    //       ...production.production_settings.pipelines[0].multiview?.layout,
+    //       views: multiviewsWithLabels
+    //     }
+    //   }
+    // ];
+
+    const multiviewArr = production.production_settings.pipelines[0].multiview;
+
+    const multiview: MultiviewSettings[] = multiviewArr.map(
+      (singleMultiview, index) => ({
+        ...singleMultiview,
+        layout: {
+          ...singleMultiview.layout,
+          views: multiviewsWithLabels
+        },
+        for_pipeline_idx: index,
+        multiviewId: index + 1
+      })
+    );
+    // ! <-
+
     const streamRequests = streamUuids.map((streamUuid) => {
       return fetch(`/api/manager/streams/${streamUuid}`, {
         method: 'DELETE',
