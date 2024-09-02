@@ -129,6 +129,10 @@ function InventoryListItem({
                     : capitalize(source.tags.location)
               })}
             </h2>
+            <h2 className="text-sm">
+              {t('source.last_connected')}:{' '}
+              {new Date(source.lastConnected).toLocaleString()}
+            </h2>
             <h2 className="text-xs">
               {t('source.ingest', {
                 ingest: source.ingest_name

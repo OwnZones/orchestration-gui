@@ -22,6 +22,7 @@ export interface IInput {
   name: string;
   location: string;
   type: SourceType | '';
+  lastConnected: Date | '';
   audioMapping?: Numbers[];
 }
 
@@ -41,7 +42,10 @@ interface IContext {
 }
 
 export const EditViewContext = createContext<IContext>({
-  input: [{ name: '', location: '', type: '', audioMapping: [] }, () => null],
+  input: [
+    { name: '', location: '', type: '', lastConnected: '', audioMapping: [] },
+    () => null
+  ],
   saved: [undefined, () => null],
   loading: false,
   isSame: true,
@@ -66,6 +70,7 @@ export default function Context({
     name: source.name,
     location: source.tags.location,
     type: source.type,
+    lastConnected: source.lastConnected,
     // audioMapping: source?.stream_settings?.audio_mapping || []
     audioMapping: source?.audio_stream.audio_mapping || []
   });
@@ -81,6 +86,7 @@ export default function Context({
         name: source.name,
         location: source.tags.location,
         type: source.type,
+        lastConnected: source.lastConnected,
         // audioMapping: source?.stream_settings?.audio_mapping || []
         audioMapping: source?.audio_stream.audio_mapping || []
       }));

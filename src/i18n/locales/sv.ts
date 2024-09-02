@@ -47,7 +47,8 @@ export const sv = {
     audio: 'Ljud: {{audio}}',
     orig: 'Enhetsnamn: {{name}}',
     metadata: 'Käll-metadata',
-    location_unknown: 'Okänd'
+    location_unknown: 'Okänd',
+    last_connected: 'Senast uppkoppling'
   },
   delete_source_status: {
     delete_stream: 'Radera ström',
@@ -512,7 +513,10 @@ export const sv = {
     locations: 'Plats',
     active_sources: 'Aktiva källor',
     add: 'Lägg till',
-    edit: 'Redigera'
+    edit: 'Redigera',
+    sort_by: 'Sortera på',
+    no_sorting_applied: 'Ingen sortering vald',
+    most_recent_connection: 'Senast anslutning'
   },
   clear: 'Rensa',
   apply: 'Applicera',

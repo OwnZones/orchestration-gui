@@ -45,7 +45,8 @@ export const en = {
     audio: 'Audio: {{audio}}',
     orig: 'Original Name: {{name}}',
     metadata: 'Source Metadata',
-    location_unknown: 'Unknown'
+    location_unknown: 'Unknown',
+    last_connected: 'Last connection'
   },
   delete_source_status: {
     delete_stream: 'Delete stream',
@@ -510,7 +511,10 @@ export const en = {
     locations: 'Location',
     active_sources: 'Active Sources',
     add: 'Add',
-    edit: 'Edit'
+    edit: 'Edit',
+    sort_by: 'Sort by',
+    no_sorting_applied: 'No sorting selected',
+    most_recent_connection: 'Most recent connection'
   },
   clear: 'Clear',
   apply: 'Apply',

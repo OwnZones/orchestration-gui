@@ -28,6 +28,7 @@ export interface Source {
   ingest_source_name: string;
   video_stream: VideoStream;
   audio_stream: AudioStream;
+  lastConnected: Date;
 }
 
 export interface SourceReference {
