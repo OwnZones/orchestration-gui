@@ -106,7 +106,7 @@ export function StartProductionButton({
             ),
             {
               ...pipelineToUpdateMultiview,
-              multiview: { ...multiviewPresets[0], for_pipeline_idx: 0 }
+              multiview: [{ ...multiviewPresets[0], for_pipeline_idx: 0 }]
             }
           ]
         }
