@@ -243,6 +243,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       refreshProduction();
     });
   };
+
   const updateProduction = (id: string, productionSetup: Production) => {
     setProductionSetup(productionSetup);
     putProduction(id, productionSetup);
@@ -256,13 +257,31 @@ export default function ProductionConfiguration({ params }: PageProps) {
     setProductionSetup(updatedSetup);
     putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
-    if (
-      pipeline.pipeline_id &&
-      pipeline.multiview &&
-      pipeline.multiview.multiview_id
-    ) {
-      updateMultiviewViews(pipeline.pipeline_id, updatedSetup, source);
-    }
+
+    // ! What is the consequence of this? Cannot see the effect ->
+    pipeline.multiview?.map((singleMultiview) => {
+      if (
+        pipeline.pipeline_id &&
+        pipeline.multiview &&
+        singleMultiview.multiview_id
+      ) {
+        updateMultiviewViews(
+          pipeline.pipeline_id,
+          updatedSetup,
+          source,
+          singleMultiview
+        );
+      }
+    });
+
+    // if (
+    //   pipeline.pipeline_id &&
+    //   pipeline.multiview &&
+    //   pipeline.multiview.multiview_id
+    // ) {
+    //   updateMultiviewViews(pipeline.pipeline_id, updatedSetup, source);
+    // }
+    // ! <-
   };
 
   const updateConfigName = (nameChange: string) => {
@@ -293,7 +312,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     const defaultMultiview = await getMultiviewPreset(
       preset?.default_multiview_reference
     );
-
     setSelectedPreset(preset);
 
     const multiview = {
@@ -329,7 +347,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         pipelines: preset.pipelines
       }
     } as Production;
-    updatedSetup.production_settings.pipelines[0].multiview = multiview;
+    updatedSetup.production_settings.pipelines[0].multiview = [multiview];
     setProductionSetup(updatedSetup);
   }
 
@@ -419,7 +437,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
       productionSetup &&
       productionSetup.isActive &&
       selectedSource &&
-      productionSetup.production_settings.pipelines[0].multiview?.layout.views
+      // ! What is the consequence of this? Cannot see the effect ->
+      (Array.isArray(
+        productionSetup?.production_settings.pipelines[0].multiview
+      )
+        ? productionSetup.production_settings.pipelines[0].multiview.some(
+            (singleMultiview) => singleMultiview?.layout?.views
+          )
+        : false)
+      // productionSetup.production_settings.pipelines[0].multiview?.layout.views
+      // ! <-
     ) {
       const firstEmptySlot = getFirstEmptySlot();
       const result = await createStream(
@@ -473,18 +500,32 @@ export default function ProductionConfiguration({ params }: PageProps) {
     ) {
       const multiview =
         productionSetup.production_settings.pipelines[0].multiview;
+
       if (!multiview) return;
-      const viewToUpdate = multiview?.layout.views.find(
-        (v) => v.input_slot === selectedSourceRef.input_slot
-      );
+
+      // ! What is the consequence of this? Cannot see the effect ->
+      // const viewToUpdate = multiview?.layout.views.find(
+      //   (v) => v.input_slot === selectedSourceRef.input_slot
+      // );
+      const viewToUpdate = multiview
+        ? multiview.map((item) => {
+            item.layout.views.find(
+              (v) => v.input_slot === selectedSourceRef.input_slot
+            );
+          })
+        : false;
+      // ! <-
+
       if (!viewToUpdate) {
         if (!productionSetup.production_settings.pipelines[0].pipeline_id)
           return;
+
         const result = await deleteStream(
           selectedSourceRef.stream_uuids,
           productionSetup,
           selectedSourceRef.input_slot
         );
+
         if (!result.ok) {
           if (!result.value) {
             setDeleteSourceStatus({
@@ -513,11 +554,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
           }
           return;
         }
+
         const updatedSetup = removeSetupItem(
           selectedSourceRef,
           productionSetup
         );
+
         if (!updatedSetup) return;
+
         setProductionSetup(updatedSetup);
         putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
           setRemoveSourceModal(false);
@@ -525,6 +569,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         });
         return;
       }
+
       const result = await deleteStream(
         selectedSourceRef.stream_uuids,
         productionSetup,
