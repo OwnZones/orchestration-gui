@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import MultiviewSettingsConfig from './MultiviewSettings';
 import PipelineSettingsConfig from './PipelineSettings';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 
 export interface OutputStream {
   name: string;
@@ -65,19 +66,31 @@ export function ConfigureOutputModal({
   const [outputstreams, setOutputStreams] = useState<OutputStream[]>(
     defaultState(preset.pipelines)
   );
+  const [multiviews, setMultiviews] = useState<MultiviewSettings[]>([]);
+  const t = useTranslate();
+
+  useEffect(() => {
+    if (preset.pipelines[0].multiview) {
+      if (!Array.isArray(preset.pipelines[0].multiview)) {
+        setMultiviews([preset.pipelines[0].multiview]);
+      } else {
+        setMultiviews(preset.pipelines[0].multiview);
+      }
+    }
+  }, [preset.pipelines]);
+
   useEffect(() => {
     setOutputStreams(defaultState(preset.pipelines));
   }, [preset]);
-  const [multiview, setMultiview] = useState<MultiviewSettings | undefined>(
-    preset.pipelines[0].multiview
-  );
 
-  const t = useTranslate();
   const clearInputs = () => {
-    setMultiview(preset.pipelines[0].multiview);
+    setMultiviews(
+      preset.pipelines[0].multiview ? preset.pipelines[0].multiview : []
+    );
     setOutputStreams(defaultState(preset.pipelines));
     onClose();
   };
+
   const onSave = () => {
     const presetToUpdate = {
       ...preset,
@@ -91,16 +104,22 @@ export function ConfigureOutputModal({
         };
       })
     };
-    if (!multiview) {
+
+    if (!multiviews) {
       toast.error(t('preset.no_multiview_selected'));
       return;
     }
-    presetToUpdate.pipelines[0].multiview = {
-      ...multiview
-    };
+
+    presetToUpdate.pipelines[0].multiview = multiviews.map(
+      (singleMultiview) => {
+        return singleMultiview;
+      }
+    );
+
     updatePreset(presetToUpdate);
     onClose();
   };
+
   const streamsToProgramOutputs = (
     pipelineIndex: number,
     outputStreams?: OutputStream[]
@@ -117,6 +136,7 @@ export function ConfigureOutputModal({
       srt_passphrase: stream.srtPassphrase
     })) satisfies ProgramOutput[];
   };
+
   const addStream = (stream: OutputStream) => {
     const streams = outputstreams.filter(
       (o) => o.pipelineIndex === stream.pipelineIndex
@@ -131,6 +151,7 @@ export function ConfigureOutputModal({
       }
     ]);
   };
+
   const updateStream = (updatedStream: OutputStream) => {
     setOutputStreams(
       [
@@ -139,6 +160,7 @@ export function ConfigureOutputModal({
       ].sort((a, b) => a.name.localeCompare(b.name))
     );
   };
+
   const updateStreams = (updatedStreams: OutputStream[]) => {
     const streams = outputstreams.filter(
       (o) => !updatedStreams.some((u) => u.id === o.id)
@@ -149,6 +171,7 @@ export function ConfigureOutputModal({
       )
     );
   };
+
   const setNames = (outputstreams: OutputStream[], index: number) => {
     const streamsForPipe = outputstreams.filter(
       (o) => o.pipelineIndex === index
@@ -159,6 +182,7 @@ export function ConfigureOutputModal({
       ...rest
     ];
   };
+
   const deleteStream = (id: string, index: number) => {
     setOutputStreams(
       setNames(
@@ -167,9 +191,28 @@ export function ConfigureOutputModal({
       )
     );
   };
-  const handleUpdateMultiview = (multiview: MultiviewSettings) => {
-    setMultiview(multiview);
+
+  const handleUpdateMultiview = (
+    multiview: MultiviewSettings,
+    index: number
+  ) => {
+    const updatedMultiviews = multiviews.map((item, i) =>
+      i === index ? { ...item, ...multiview } : item
+    );
+    setMultiviews(updatedMultiviews);
   };
+
+  const addNewMultiview = (newMultiview: MultiviewSettings) => {
+    setMultiviews((prevMultiviews) =>
+      prevMultiviews ? [...prevMultiviews, newMultiview] : [newMultiview]
+    );
+  };
+
+  const removeNewMultiview = (index: number) => {
+    const newMultiviews = multiviews.filter((_, i) => i !== index);
+    setMultiviews(newMultiviews);
+  };
+
   return (
     <Modal open={open} outsideClick={() => clearInputs()}>
       <div className="flex gap-3">
@@ -190,11 +233,49 @@ export function ConfigureOutputModal({
             />
           );
         })}
-        <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
-        <MultiviewSettingsConfig
-          multiview={multiview}
-          handleUpdateMultiview={handleUpdateMultiview}
-        />
+        {multiviews &&
+          multiviews.length > 0 &&
+          multiviews.map((singleItem, index) => {
+            return (
+              <div className="flex" key={index}>
+                <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
+                <div className="flex flex-col">
+                  <MultiviewSettingsConfig
+                    multiview={singleItem}
+                    handleUpdateMultiview={(input) =>
+                      handleUpdateMultiview(input, index)
+                    }
+                  />
+                  <div
+                    className={`w-full flex ${
+                      multiviews.length > 1 ? 'justify-between' : 'justify-end'
+                    }`}
+                  >
+                    {multiviews.length > 1 && (
+                      <button
+                        type="button"
+                        title="Add another multiview"
+                        onClick={() => removeNewMultiview(index)}
+                      >
+                        <IconTrash
+                          className={`ml-4 text-button-delete hover:text-red-400`}
+                        />
+                      </button>
+                    )}
+                    {multiviews.length === index + 1 && (
+                      <button
+                        type="button"
+                        title="Add another multiview"
+                        onClick={() => addNewMultiview(singleItem)}
+                      >
+                        <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
       </div>
       <Decision onClose={() => clearInputs()} onSave={onSave} />
     </Modal>

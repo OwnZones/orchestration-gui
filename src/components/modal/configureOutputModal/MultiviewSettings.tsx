@@ -3,7 +3,6 @@ import { useMultiviewPresets } from '../../../hooks/multiviewPreset';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { MultiviewPreset } from '../../../interfaces/preset';
-
 import Input from './Input';
 import Options from './Options';
 import toast from 'react-hot-toast';
@@ -13,29 +12,34 @@ type MultiviewSettingsProps = {
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
 };
 
-export default function MultiviewOutputSettings({
+export default function MultiviewSettingsConfig({
   multiview,
   handleUpdateMultiview
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewPresets, loading] = useMultiviewPresets();
-  const [selectedMultiviewPreset, setetSelectedMultiviewPreset] = useState<
+  const [selectedMultiviewPreset, setSelectedMultiviewPreset] = useState<
     MultiviewPreset | undefined
   >(multiview);
+
   useEffect(() => {
     if (multiview) {
-      setetSelectedMultiviewPreset(multiview);
+      setSelectedMultiviewPreset(multiview);
       return;
     }
     if (multiviewPresets && multiviewPresets[0]) {
-      setetSelectedMultiviewPreset(multiviewPresets[0]);
+      setSelectedMultiviewPreset(multiviewPresets[0]);
     }
   }, [multiviewPresets, multiview]);
+
   if (!multiview) {
     if (!multiviewPresets || multiviewPresets.length === 0) {
       return null;
     }
-    handleUpdateMultiview({ ...multiviewPresets[0], for_pipeline_idx: 0 });
+    handleUpdateMultiview({
+      ...multiviewPresets[0],
+      for_pipeline_idx: 0
+    });
   }
 
   const handleSetSelectedMultiviewPreset = (name: string) => {
@@ -44,9 +48,10 @@ export default function MultiviewOutputSettings({
       toast.error(t('preset.no_multiview_found'));
       return;
     }
-    setetSelectedMultiviewPreset(selected);
+    setSelectedMultiviewPreset(selected);
     handleUpdateMultiview({ ...selected, for_pipeline_idx: 0 });
   };
+
   const getNumber = (val: string, prev: number) => {
     if (Number.isNaN(parseInt(val))) {
       return prev;
@@ -133,9 +138,12 @@ export default function MultiviewOutputSettings({
     : [];
 
   const multiviewOrPreset = multiview ? multiview : selectedMultiviewPreset;
+
   return (
     <div className="flex flex-col gap-2 rounded p-4">
-      <h1 className="font-bold">{t('preset.multiview_output_settings')}</h1>
+      <div className="flex justify-between">
+        <h1 className="font-bold">{t('preset.multiview_output_settings')}</h1>
+      </div>
       <Options
         label={t('preset.select_multiview_preset')}
         options={multiviewPresetNames}
