@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { ResourcesUUIDResponse } from '../../../../../types/agile-live';
 import { AGILE_BASE_API_PATH } from '../../../../constants';
 import {
@@ -47,6 +48,7 @@ export async function getPipelineStreams(
   }
   throw await response.json();
 }
+
 export async function createStream(
   source: SourceWithId,
   production: Production,
@@ -198,20 +200,15 @@ export async function createStream(
       );
       throw `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`;
     }
-    const multiviews = await getMultiviewsForPipeline(
+    const multiviewsResponse = await getMultiviewsForPipeline(
       production.production_settings.pipelines[0].pipeline_id
     );
-    // ! What is the consequence of this? Cannot see the effect ->
-    // const multiview = multiviews.find(
-    //   (multiview) =>
-    //     multiview.id ===
-    //     production.production_settings.pipelines[0].multiview?.multiview_id
-    // );
 
-    // filter instead of find
-    const multiview = multiviews.find((multiview) => {
+    const multiviews = multiviewsResponse.filter((multiview) => {
       const pipeline = production.production_settings.pipelines[0];
       const multiviewArray = pipeline.multiview;
+      console.log('test multiview', multiview);
+      console.log('test multiviewArray', multiviewArray);
 
       if (Array.isArray(multiviewArray)) {
         return multiviewArray.some(
@@ -225,53 +222,57 @@ export async function createStream(
 
       return false;
     });
-    // ! <-
 
-    if (!multiview) {
+    if (multiviews.length === 0) {
       Log().error(
         `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`
       );
       throw `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`;
     }
-    const views = multiview.layout.views;
-    const viewsForSource = views.filter(
-      (view) => view.input_slot === input_slot
-    );
-    if (!viewsForSource || viewsForSource.length === 0) {
-      Log().info(
-        `No view found for input slot: ${input_slot}. Will not connect source to  view`
+    multiviews.map(async (multiview) => {
+      const views = multiview.layout.views;
+      const viewsForSource = views.filter(
+        (view) => view.input_slot === input_slot
       );
-      return {
-        ok: true,
-        value: {
-          success: true,
-          steps: [
-            {
-              step: 'add_stream',
-              success: true
-            },
-            {
-              step: 'update_multiview',
-              success: true
-            }
-          ],
-          streams: sourceToPipelineStreams
-        }
-      };
-      // return sourceToPipelineStreams;
-    }
-    const updatedViewsForSource = viewsForSource.map((v) => {
-      return { ...v, label: source.name };
+      if (!viewsForSource || viewsForSource.length === 0) {
+        Log().info(
+          `No view found for input slot: ${input_slot}. Will not connect source to  view`
+        );
+        return {
+          ok: true,
+          value: {
+            success: true,
+            steps: [
+              {
+                step: 'add_stream',
+                success: true
+              },
+              {
+                step: 'update_multiview',
+                success: true
+              }
+            ],
+            streams: sourceToPipelineStreams
+          }
+        };
+        // TODO Check if this can be cleaned out. This is an old code and dont know the purpose of it, therefor I dont want to remove it yet.
+        // return sourceToPipelineStreams;
+      }
+      const updatedViewsForSource = viewsForSource.map((v) => {
+        return { ...v, label: source.name };
+      });
+
+      const updatedViews = [
+        ...views.filter((view) => view.input_slot !== input_slot),
+        ...updatedViewsForSource
+      ];
+
+      await updateMultiviewForPipeline(
+        production.production_settings.pipelines[0].pipeline_id!,
+        multiview.id,
+        updatedViews
+      );
     });
-    const updatedViews = [
-      ...views.filter((view) => view.input_slot !== input_slot),
-      ...updatedViewsForSource
-    ];
-    await updateMultiviewForPipeline(
-      production.production_settings.pipelines[0].pipeline_id!,
-      multiview.id,
-      updatedViews
-    );
   } catch (e) {
     Log().error('Could not update multiview after adding stream');
     Log().error(e);
