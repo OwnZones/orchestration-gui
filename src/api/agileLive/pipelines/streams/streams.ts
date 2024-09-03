@@ -207,8 +207,6 @@ export async function createStream(
     const multiviews = multiviewsResponse.filter((multiview) => {
       const pipeline = production.production_settings.pipelines[0];
       const multiviewArray = pipeline.multiview;
-      console.log('test multiview', multiview);
-      console.log('test multiviewArray', multiviewArray);
 
       if (Array.isArray(multiviewArray)) {
         return multiviewArray.some(
