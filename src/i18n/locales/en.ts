@@ -603,7 +603,8 @@ export const en = {
     multiview_output_settings: 'Multiview output',
     select_multiview_preset: 'Preset',
     no_multiview_selected: 'No multiview selected',
-    no_multiview_found: 'No multiview found'
+    no_multiview_found: 'No multiview found',
+    no_port_selected: 'Unique port needed'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

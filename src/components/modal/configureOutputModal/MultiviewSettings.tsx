@@ -10,11 +10,13 @@ import toast from 'react-hot-toast';
 type MultiviewSettingsProps = {
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
+  portDuplicateError: boolean;
 };
 
 export default function MultiviewSettingsConfig({
   multiview,
-  handleUpdateMultiview
+  handleUpdateMultiview,
+  portDuplicateError
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewPresets, loading] = useMultiviewPresets();
@@ -183,6 +185,7 @@ export default function MultiviewSettingsConfig({
         />
         <Input
           label={t('preset.port')}
+          inputError={portDuplicateError}
           value={
             multiviewOrPreset?.output.local_port
               ? multiviewOrPreset?.output.local_port

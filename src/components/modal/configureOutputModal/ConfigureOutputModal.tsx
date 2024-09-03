@@ -67,6 +67,9 @@ export function ConfigureOutputModal({
     defaultState(preset.pipelines)
   );
   const [multiviews, setMultiviews] = useState<MultiviewSettings[]>([]);
+  const [portDuplicateIndexes, setPortDuplicateIndexes] = useState<number[]>(
+    []
+  );
   const t = useTranslate();
 
   useEffect(() => {
@@ -107,6 +110,11 @@ export function ConfigureOutputModal({
 
     if (!multiviews) {
       toast.error(t('preset.no_multiview_selected'));
+      return;
+    }
+
+    if (portDuplicateIndexes.length > 0) {
+      toast.error(t('preset.no_port_selected'));
       return;
     }
 
@@ -192,6 +200,30 @@ export function ConfigureOutputModal({
     );
   };
 
+  const findDuplicateValues = (data: MultiviewSettings[]) => {
+    const ports = data.map(
+      (item: MultiviewSettings) =>
+        item.output.local_ip + ':' + item.output.local_port.toString()
+    );
+    const duplicateIndices: number[] = [];
+    const seenPorts = new Set();
+
+    ports.forEach((port, index) => {
+      if (seenPorts.has(port)) {
+        duplicateIndices.push(index);
+        // Also include the first occurrence if it's not already included
+        const firstIndex = ports.indexOf(port);
+        if (!duplicateIndices.includes(firstIndex)) {
+          duplicateIndices.push(firstIndex);
+        }
+      } else {
+        seenPorts.add(port);
+      }
+    });
+
+    return duplicateIndices;
+  };
+
   const handleUpdateMultiview = (
     multiview: MultiviewSettings,
     index: number
@@ -199,6 +231,17 @@ export function ConfigureOutputModal({
     const updatedMultiviews = multiviews.map((item, i) =>
       i === index ? { ...item, ...multiview } : item
     );
+
+    const hasDuplicates = findDuplicateValues(updatedMultiviews);
+
+    if (hasDuplicates.length > 0) {
+      setPortDuplicateIndexes(hasDuplicates);
+    }
+
+    if (hasDuplicates.length === 0) {
+      setPortDuplicateIndexes([]);
+    }
+
     setMultiviews(updatedMultiviews);
   };
 
@@ -244,6 +287,11 @@ export function ConfigureOutputModal({
                     multiview={singleItem}
                     handleUpdateMultiview={(input) =>
                       handleUpdateMultiview(input, index)
+                    }
+                    portDuplicateError={
+                      portDuplicateIndexes.length > 0
+                        ? portDuplicateIndexes.includes(index)
+                        : false
                     }
                   />
                   <div
