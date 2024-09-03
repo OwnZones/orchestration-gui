@@ -83,7 +83,7 @@ export default function SourceCard({
       <div className="relative">
         <input
           className={`absolute bg-zinc-900 text-center hover:border focus:hover:border-none w-full text-p bg-opacity-90 focus:bg-opacity-100`}
-          value={sourceLabel}
+          value={source ? source.label : sourceRef?.label}
           onChange={updateText}
           onKeyDown={handleKeyDown}
           onSelect={() => {

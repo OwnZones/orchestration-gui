@@ -521,11 +521,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
     }
   };
 
+  // TODO: HTML och MEDIA PLAYER KÄLLOR TAS INTE BORT
   const handleRemoveSource = async () => {
     if (
       productionSetup &&
       productionSetup.isActive &&
       selectedSourceRef &&
+      // Gör det här att sourcen inte tas bort ordentligt?
       selectedSourceRef.stream_uuids
     ) {
       const multiviews =

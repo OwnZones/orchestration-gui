@@ -41,6 +41,31 @@ export function useDragableItems(
     })
   );
 
+  const [refItems, setRefItems] = useState<SourceReference[]>(
+    sources.flatMap((ref) => {
+      return {... ref}
+    })
+  );
+
+  const [allItems, setAllItems] = useState<(SourceReference | ISource)[]>(
+    sources.flatMap((ref) => {
+      if (ref.type === 'ingest_source') {
+        const source = inventorySources.get(ref._id);
+        if (!source) return [];
+        return {
+          ...source,
+          _id: ref._id,
+          label: ref.label,
+          input_slot: ref.input_slot,
+          stream_uuids: ref.stream_uuids,
+          src: getSourceThumbnail(source),
+        };
+      } else {
+        return {...ref}
+      }
+    })
+  )
+
   useEffect(() => {
     const updatedItems = sources.map((ref) => {
       const source = inventorySources.get(ref._id);
@@ -67,6 +92,52 @@ export function useDragableItems(
     setItems(updatedItems);
   }, [sources, inventorySources]);
 
+  useEffect(() => {
+    setAllItems(
+      sources.flatMap((ref) => {
+        if (ref.type === 'ingest_source') {
+          const source = inventorySources.get(ref._id);
+          if (!source) return [];
+          return {
+            ...source,
+            _id: ref._id,
+            label: ref.label,
+            input_slot: ref.input_slot,
+            stream_uuids: ref.stream_uuids,
+            src: getSourceThumbnail(source),
+          };
+        } else {
+          return {...ref}
+        }
+      })
+    )
+  })
+
+  // useEffect(() => {
+  //   setIngestSources(
+  //     sources.flatMap((ref) => {
+  //       const source = inventorySources.get(ref._id);
+  //       if (!source) return [];
+  //       return {
+  //         ...source,
+  //         _id: ref._id,
+  //         label: ref.label,
+  //         input_slot: ref.input_slot,
+  //         stream_uuids: ref.stream_uuids,
+  //         src: getSourceThumbnail(source),
+  //       };
+  //     })
+  //   );
+  // }, [sources, inventorySources]);
+
+  // useEffect(() => {
+  //   setRefSources(sources.filter((ref) => ref.type !== 'ingest_source'));
+  // }, [sources])
+
+  // useEffect(() => {
+  //   setAllSources([...refSources, ...ingestSources]);
+  // }, [refSources, ingestSources]);
+
   const moveItem = (originId: string, destinationId: string) => {
     const originSource = items.find((item) => item._id.toString() === originId);
     const destinationSource = items.find(
@@ -88,5 +159,5 @@ export function useDragableItems(
     setItems(updatedItems);
   };
 
-  return [items, moveItem, loading];
+  return [allItems, moveItems, loading];
 }
