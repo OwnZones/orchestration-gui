@@ -258,7 +258,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
 
-    // ! What is the consequence of this? Cannot see the effect ->
     pipeline.multiview?.map((singleMultiview) => {
       if (
         pipeline.pipeline_id &&
@@ -273,15 +272,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
         );
       }
     });
-
-    // if (
-    //   pipeline.pipeline_id &&
-    //   pipeline.multiview &&
-    //   pipeline.multiview.multiview_id
-    // ) {
-    //   updateMultiviewViews(pipeline.pipeline_id, updatedSetup, source);
-    // }
-    // ! <-
   };
 
   const updateConfigName = (nameChange: string) => {
@@ -437,7 +427,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
       productionSetup &&
       productionSetup.isActive &&
       selectedSource &&
-      // ! What is the consequence of this? Cannot see the effect ->
       (Array.isArray(
         productionSetup?.production_settings.pipelines[0].multiview
       )
@@ -445,8 +434,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
             (singleMultiview) => singleMultiview?.layout?.views
           )
         : false)
-      // productionSetup.production_settings.pipelines[0].multiview?.layout.views
-      // ! <-
     ) {
       const firstEmptySlot = getFirstEmptySlot();
       const result = await createStream(
@@ -498,23 +485,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
       selectedSourceRef &&
       selectedSourceRef.stream_uuids
     ) {
-      const multiview =
+      const multiviews =
         productionSetup.production_settings.pipelines[0].multiview;
 
-      if (!multiview) return;
+      if (!multiviews || multiviews.length === 0) return;
 
-      // ! What is the consequence of this? Cannot see the effect ->
-      // const viewToUpdate = multiview?.layout.views.find(
-      //   (v) => v.input_slot === selectedSourceRef.input_slot
-      // );
-      const viewToUpdate = multiview
-        ? multiview.map((item) => {
-            item.layout.views.find(
-              (v) => v.input_slot === selectedSourceRef.input_slot
-            );
-          })
-        : false;
-      // ! <-
+      const viewToUpdate = multiviews.some((multiview) =>
+        multiview.layout.views.find(
+          (v) => v.input_slot === selectedSourceRef.input_slot
+        )
+      );
 
       if (!viewToUpdate) {
         if (!productionSetup.production_settings.pipelines[0].pipeline_id)
