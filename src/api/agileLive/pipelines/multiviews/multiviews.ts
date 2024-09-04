@@ -37,7 +37,7 @@ export async function getMultiviewsForPipeline(
 export async function createMultiviewForPipeline(
   productionSettings: ProductionSettings,
   sourceRefs: SourceReference[]
-): Promise<ResourcesPipelineMultiviewResponse> {
+): Promise<ResourcesPipelineMultiviewResponse[]> {
   // const multiviewPresets = await getMultiviewPresets();
 
   const pipeline = productionSettings.pipelines.find((p) =>
@@ -53,7 +53,10 @@ export async function createMultiviewForPipeline(
     Log().error(`Did not find a specified pipeline in multiview settings`);
     throw `Did not find a specified pipeline in multiview settings`;
   }
-  if (!productionSettings.pipelines[multiviewIndex].multiview) {
+  if (
+    !productionSettings.pipelines[multiviewIndex].multiview ||
+    productionSettings.pipelines[multiviewIndex].multiview.length === 0
+  ) {
     Log().error(
       `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`
     );
@@ -76,70 +79,79 @@ export async function createMultiviewForPipeline(
   });
   Log().info(`Creating a multiview for pipeline '${pipelineUUID}' from preset`);
 
-  const multiviewSettings: MultiviewSettings[] =
+  const multiviewsSettings: MultiviewSettings[] =
     productionSettings.pipelines[multiviewIndex].multiview ?? [];
-  const multiview = createMultiview(sourceRefsWithLabels, ...multiviewSettings);
 
-  let payload = {};
+  const createEachMultiviewer = multiviewsSettings.map(
+    async (singleMultiviewSettings) => {
+      const multiview = createMultiview(
+        sourceRefsWithLabels,
+        singleMultiviewSettings
+      );
 
-  if (multiview.output.srt_mode === 'listener') {
-    payload = {
-      ...multiview,
-      output: {
-        format: multiview.output.format,
-        frame_rate_d: multiview.output.frame_rate_d,
-        frame_rate_n: multiview.output.frame_rate_n,
-        local_ip: multiview.output.local_ip,
-        local_port: multiview.output.local_port,
-        srt_mode: multiview.output.srt_mode,
-        srt_latency_ms: multiview.output.srt_latency_ms,
-        srt_passphrase: multiview.output.srt_passphrase,
-        video_format: multiview.output.video_format,
-        video_kilobit_rate: multiview.output.video_kilobit_rate
+      let payload = {};
+
+      if (multiview.output.srt_mode === 'listener') {
+        payload = {
+          ...multiview,
+          output: {
+            format: multiview.output.format,
+            frame_rate_d: multiview.output.frame_rate_d,
+            frame_rate_n: multiview.output.frame_rate_n,
+            local_ip: multiview.output.local_ip,
+            local_port: multiview.output.local_port,
+            srt_mode: multiview.output.srt_mode,
+            srt_latency_ms: multiview.output.srt_latency_ms,
+            srt_passphrase: multiview.output.srt_passphrase,
+            video_format: multiview.output.video_format,
+            video_kilobit_rate: multiview.output.video_kilobit_rate
+          }
+        };
       }
-    };
-  }
-  if (multiview.output.srt_mode === 'caller') {
-    payload = {
-      ...multiview,
-      output: {
-        format: multiview.output.format,
-        frame_rate_d: multiview.output.frame_rate_d,
-        frame_rate_n: multiview.output.frame_rate_n,
-        local_ip: '0.0.0.0',
-        local_port: 0,
-        remote_ip: multiview.output.remote_ip,
-        remote_port: multiview.output.remote_port,
-        srt_mode: multiview.output.srt_mode,
-        srt_latency_ms: multiview.output.srt_latency_ms,
-        srt_passphrase: multiview.output.srt_passphrase,
-        video_format: multiview.output.video_format,
-        video_kilobit_rate: multiview.output.video_kilobit_rate
+      if (multiview.output.srt_mode === 'caller') {
+        payload = {
+          ...multiview,
+          output: {
+            format: multiview.output.format,
+            frame_rate_d: multiview.output.frame_rate_d,
+            frame_rate_n: multiview.output.frame_rate_n,
+            local_ip: '0.0.0.0',
+            local_port: 0,
+            remote_ip: multiview.output.remote_ip,
+            remote_port: multiview.output.remote_port,
+            srt_mode: multiview.output.srt_mode,
+            srt_latency_ms: multiview.output.srt_latency_ms,
+            srt_passphrase: multiview.output.srt_passphrase,
+            video_format: multiview.output.video_format,
+            video_kilobit_rate: multiview.output.video_kilobit_rate
+          }
+        };
       }
-    };
-  }
+      const response = await fetch(
+        new URL(
+          AGILE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews`,
+          process.env.AGILE_URL
+        ),
+        {
+          method: 'POST',
+          headers: {
+            authorization: getAuthorizationHeader()
+          },
+          next: {
+            revalidate: 0
+          },
+          body: JSON.stringify(payload)
+        }
+      );
 
-  const response = await fetch(
-    new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews`,
-      process.env.AGILE_URL
-    ),
-    {
-      method: 'POST',
-      headers: {
-        authorization: getAuthorizationHeader()
-      },
-      next: {
-        revalidate: 0
-      },
-      body: JSON.stringify(payload)
+      if (response.ok) {
+        return await response.json();
+      }
+      throw await response.text();
     }
   );
 
-  if (response.ok) {
-    return await response.json();
-  }
-  throw await response.text();
+  return Promise.all(createEachMultiviewer);
 }
 
 export async function deleteMultiviewFromPipeline(
