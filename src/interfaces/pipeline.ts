@@ -62,7 +62,7 @@ export interface PipelineSettings {
   audio_mapping: string;
   program_output_port: number; // deprecated but kept for backward compatibility
   program_output: ProgramOutput[];
-  multiview?: MultiviewSettings[];
+  multiviews?: MultiviewSettings[];
   interfaces: [
     {
       commit_rate: number;

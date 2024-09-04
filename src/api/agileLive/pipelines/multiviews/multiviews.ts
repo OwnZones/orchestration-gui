@@ -38,13 +38,14 @@ export async function createMultiviewForPipeline(
   productionSettings: ProductionSettings,
   sourceRefs: SourceReference[]
 ): Promise<ResourcesPipelineMultiviewResponse[]> {
+  // TODO Check if this can be cleaned out. This is an old code and dont know the purpose of it, therefor I dont want to remove it yet.
   // const multiviewPresets = await getMultiviewPresets();
 
   const pipeline = productionSettings.pipelines.find((p) =>
-    p.multiview ? p.multiview?.length > 0 : undefined
+    p.multiviews ? p.multiviews?.length > 0 : undefined
   );
-  const multiviewIndexArray = pipeline?.multiview
-    ? pipeline.multiview.map((p) => p.for_pipeline_idx)
+  const multiviewIndexArray = pipeline?.multiviews
+    ? pipeline.multiviews.map((p) => p.for_pipeline_idx)
     : undefined;
 
   const multiviewIndex = multiviewIndexArray?.find((p) => p !== undefined);
@@ -54,8 +55,8 @@ export async function createMultiviewForPipeline(
     throw `Did not find a specified pipeline in multiview settings`;
   }
   if (
-    !productionSettings.pipelines[multiviewIndex].multiview ||
-    productionSettings.pipelines[multiviewIndex].multiview?.length === 0
+    !productionSettings.pipelines[multiviewIndex].multiviews ||
+    productionSettings.pipelines[multiviewIndex].multiviews?.length === 0
   ) {
     Log().error(
       `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`
@@ -80,7 +81,7 @@ export async function createMultiviewForPipeline(
   Log().info(`Creating a multiview for pipeline '${pipelineUUID}' from preset`);
 
   const multiviewsSettings: MultiviewSettings[] =
-    productionSettings.pipelines[multiviewIndex].multiview ?? [];
+    productionSettings.pipelines[multiviewIndex].multiviews ?? [];
 
   const createEachMultiviewer = multiviewsSettings.map(
     async (singleMultiviewSettings) => {

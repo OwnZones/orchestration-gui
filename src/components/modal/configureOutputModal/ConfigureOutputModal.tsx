@@ -73,11 +73,11 @@ export function ConfigureOutputModal({
   const t = useTranslate();
 
   useEffect(() => {
-    if (preset.pipelines[0].multiview) {
-      if (!Array.isArray(preset.pipelines[0].multiview)) {
-        setMultiviews([preset.pipelines[0].multiview]);
+    if (preset.pipelines[0].multiviews) {
+      if (!Array.isArray(preset.pipelines[0].multiviews)) {
+        setMultiviews([preset.pipelines[0].multiviews]);
       } else {
-        setMultiviews(preset.pipelines[0].multiview);
+        setMultiviews(preset.pipelines[0].multiviews);
       }
     }
   }, [preset.pipelines]);
@@ -88,7 +88,7 @@ export function ConfigureOutputModal({
 
   const clearInputs = () => {
     setMultiviews(
-      preset.pipelines[0].multiview ? preset.pipelines[0].multiview : []
+      preset.pipelines[0].multiviews ? preset.pipelines[0].multiviews : []
     );
     setOutputStreams(defaultState(preset.pipelines));
     onClose();
@@ -122,7 +122,7 @@ export function ConfigureOutputModal({
       return;
     }
 
-    presetToUpdate.pipelines[0].multiview = multiviews.map(
+    presetToUpdate.pipelines[0].multiviews = multiviews.map(
       (singleMultiview) => {
         return { ...singleMultiview };
       }

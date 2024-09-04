@@ -258,10 +258,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
     putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
 
-    pipeline.multiview?.map((singleMultiview) => {
+    pipeline.multiviews?.map((singleMultiview) => {
       if (
         pipeline.pipeline_id &&
-        pipeline.multiview &&
+        pipeline.multiviews &&
         singleMultiview.multiview_id
       ) {
         updateMultiviewViews(
@@ -337,7 +337,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         pipelines: preset.pipelines
       }
     } as Production;
-    updatedSetup.production_settings.pipelines[0].multiview = [multiview];
+    updatedSetup.production_settings.pipelines[0].multiviews = [multiview];
     setProductionSetup(updatedSetup);
   }
 
@@ -428,9 +428,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
       productionSetup.isActive &&
       selectedSource &&
       (Array.isArray(
-        productionSetup?.production_settings.pipelines[0].multiview
+        productionSetup?.production_settings.pipelines[0].multiviews
       )
-        ? productionSetup.production_settings.pipelines[0].multiview.some(
+        ? productionSetup.production_settings.pipelines[0].multiviews.some(
             (singleMultiview) => singleMultiview?.layout?.views
           )
         : false)
@@ -486,7 +486,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       selectedSourceRef.stream_uuids
     ) {
       const multiviews =
-        productionSetup.production_settings.pipelines[0].multiview;
+        productionSetup.production_settings.pipelines[0].multiviews;
 
       if (!multiviews || multiviews.length === 0) return;
 
@@ -555,6 +555,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         productionSetup,
         selectedSourceRef.input_slot
       );
+
       if (!result.ok) {
         if (!result.value) {
           setDeleteSourceStatus({

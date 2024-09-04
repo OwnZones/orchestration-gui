@@ -651,7 +651,7 @@ export async function startProduction(
 
   // Try to setup multiviews start
   try {
-    if (!production.production_settings.pipelines[0].multiview) {
+    if (!production.production_settings.pipelines[0].multiviews) {
       Log().error(
         `No multiview settings specified for production: ${production.name}`
       );
@@ -676,7 +676,7 @@ export async function startProduction(
     });
 
     runtimeMultiviews.flatMap((runtimeMultiview, index) => {
-      const multiview = production.production_settings.pipelines[0].multiview;
+      const multiview = production.production_settings.pipelines[0].multiviews;
       if (multiview && multiview[index]) {
         return (multiview[index].multiview_id = runtimeMultiview.id);
       }

@@ -85,7 +85,7 @@ export function StartProductionButton({
       return;
     }
     let productionToStart: Production;
-    if (!production.production_settings.pipelines[0].multiview) {
+    if (!production.production_settings.pipelines[0].multiviews) {
       if (!multiviewPresets || multiviewPresets.length === 0) {
         toast.error(t('start_production_status.unexpected'));
         return;
@@ -106,7 +106,7 @@ export function StartProductionButton({
             ),
             {
               ...pipelineToUpdateMultiview,
-              multiview: [{ ...multiviewPresets[0], for_pipeline_idx: 0 }]
+              multiviews: [{ ...multiviewPresets[0], for_pipeline_idx: 0 }]
             }
           ]
         }

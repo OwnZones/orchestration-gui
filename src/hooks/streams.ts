@@ -64,7 +64,7 @@ export function useDeleteStream(): CallbackHook<
     const pipelineUUID =
       production.production_settings.pipelines[0].pipeline_id;
 
-    const multiviews = production.production_settings.pipelines[0].multiview;
+    const multiviews = production.production_settings.pipelines[0].multiviews;
     const multiviewViews = multiviews?.flatMap((singleMultiview) => {
       return singleMultiview.layout.views;
     });

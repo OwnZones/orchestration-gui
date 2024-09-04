@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { ResourcesUUIDResponse } from '../../../../../types/agile-live';
 import { AGILE_BASE_API_PATH } from '../../../../constants';
 import {
@@ -206,7 +205,7 @@ export async function createStream(
 
     const multiviews = multiviewsResponse.filter((multiview) => {
       const pipeline = production.production_settings.pipelines[0];
-      const multiviewArray = pipeline.multiview;
+      const multiviewArray = pipeline.multiviews;
 
       if (Array.isArray(multiviewArray)) {
         return multiviewArray.some(
