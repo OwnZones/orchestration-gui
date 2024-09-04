@@ -55,7 +55,7 @@ export async function createMultiviewForPipeline(
   }
   if (
     !productionSettings.pipelines[multiviewIndex].multiview ||
-    productionSettings.pipelines[multiviewIndex].multiview.length === 0
+    productionSettings.pipelines[multiviewIndex].multiview?.length === 0
   ) {
     Log().error(
       `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`
