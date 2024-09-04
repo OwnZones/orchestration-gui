@@ -94,6 +94,10 @@ export function ConfigureOutputModal({
     onClose();
   };
 
+  useEffect(() => {
+    runDuplicateCheck(multiviews);
+  }, [multiviews]);
+
   const onSave = () => {
     const presetToUpdate = {
       ...preset,
@@ -120,7 +124,7 @@ export function ConfigureOutputModal({
 
     presetToUpdate.pipelines[0].multiview = multiviews.map(
       (singleMultiview) => {
-        return singleMultiview;
+        return { ...singleMultiview };
       }
     );
 
@@ -200,8 +204,8 @@ export function ConfigureOutputModal({
     );
   };
 
-  const findDuplicateValues = (data: MultiviewSettings[]) => {
-    const ports = data.map(
+  const findDuplicateValues = (mvs: MultiviewSettings[]) => {
+    const ports = mvs.map(
       (item: MultiviewSettings) =>
         item.output.local_ip + ':' + item.output.local_port.toString()
     );
@@ -224,15 +228,8 @@ export function ConfigureOutputModal({
     return duplicateIndices;
   };
 
-  const handleUpdateMultiview = (
-    multiview: MultiviewSettings,
-    index: number
-  ) => {
-    const updatedMultiviews = multiviews.map((item, i) =>
-      i === index ? { ...item, ...multiview } : item
-    );
-
-    const hasDuplicates = findDuplicateValues(updatedMultiviews);
+  const runDuplicateCheck = (mvs: MultiviewSettings[]) => {
+    const hasDuplicates = findDuplicateValues(mvs);
 
     if (hasDuplicates.length > 0) {
       setPortDuplicateIndexes(hasDuplicates);
@@ -241,6 +238,17 @@ export function ConfigureOutputModal({
     if (hasDuplicates.length === 0) {
       setPortDuplicateIndexes([]);
     }
+  };
+
+  const handleUpdateMultiview = (
+    multiview: MultiviewSettings,
+    index: number
+  ) => {
+    const updatedMultiviews = multiviews.map((item, i) =>
+      i === index ? { ...item, ...multiview } : item
+    );
+
+    runDuplicateCheck(multiviews);
 
     setMultiviews(updatedMultiviews);
   };
