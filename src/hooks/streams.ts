@@ -63,22 +63,14 @@ export function useDeleteStream(): CallbackHook<
 
     const pipelineUUID =
       production.production_settings.pipelines[0].pipeline_id;
-    // ! What is the consequence of this? Cannot see the effect ->
-    // const multiviewViews =
-    //   production.production_settings.pipelines[0].multiview?.layout.views;
-    // const multiviewsToUpdate = multiviewViews?.filter(
-    //   (v) => v.input_slot === input_slot
-    // );
-    const multiviewViews =
-      production.production_settings.pipelines[0].multiview?.flatMap(
-        (singleMultiview) => {
-          return singleMultiview.layout.views;
-        }
-      );
+
+    const multiviews = production.production_settings.pipelines[0].multiview;
+    const multiviewViews = multiviews?.flatMap((singleMultiview) => {
+      return singleMultiview.layout.views;
+    });
     const multiviewsToUpdate = multiviewViews?.filter(
       (v) => v.input_slot === input_slot
     );
-    // ! <-
 
     if (!multiviewsToUpdate || multiviewsToUpdate.length === 0) {
       const streamRequests = streamUuids.map((streamUuid) => {
@@ -112,7 +104,7 @@ export function useDeleteStream(): CallbackHook<
       };
     }
 
-    const updatedMultiviews = multiviewsToUpdate.map((view) => {
+    const updatedMultiviews = multiviewsToUpdate?.map((view) => {
       return {
         ...view,
         label: view.label
@@ -137,9 +129,7 @@ export function useDeleteStream(): CallbackHook<
       !restWithLabels ||
       !updatedMultiviews ||
       updatedMultiviews.length === 0 ||
-      !production.production_settings.pipelines[0].multiview?.forEach(
-        (singleMultiview) => singleMultiview.layout
-      )
+      !multiviews?.some((singleMultiview) => singleMultiview.layout)
     ) {
       setLoading(false);
       return {
@@ -150,20 +140,7 @@ export function useDeleteStream(): CallbackHook<
 
     const multiviewsWithLabels = [...restWithLabels, ...updatedMultiviews];
 
-    // ! What is the consequence of this? Cannot see the effect ->
-    // const multiview = [
-    //   {
-    //     ...production.production_settings.pipelines[0].multiview,
-    //     layout: {
-    //       ...production.production_settings.pipelines[0].multiview?.layout,
-    //       views: multiviewsWithLabels
-    //     }
-    //   }
-    // ];
-
-    const multiviewArr = production.production_settings.pipelines[0].multiview;
-
-    const multiview: MultiviewSettings[] = multiviewArr.map(
+    const multiview: MultiviewSettings[] = multiviews.map(
       (singleMultiview, index) => ({
         ...singleMultiview,
         layout: {
@@ -174,7 +151,6 @@ export function useDeleteStream(): CallbackHook<
         multiviewId: index + 1
       })
     );
-    // ! <-
 
     const streamRequests = streamUuids.map((streamUuid) => {
       return fetch(`/api/manager/streams/${streamUuid}`, {
