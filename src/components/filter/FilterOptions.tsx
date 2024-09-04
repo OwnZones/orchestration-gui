@@ -107,16 +107,20 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
     for (const source of tempSet.values()) {
       let shouldDelete = false;
 
-      if (source.ingest_type) {
-        const isNdiSelected =
-          onlyShowNdiSources && source.ingest_type.toUpperCase() === 'NDI';
-        const isBmdSelected =
-          onlyShowBmdSources && source.ingest_type.toUpperCase() === 'BMD';
-        const isSrtSelected =
-          onlyShowSrtSources && source.ingest_type.toUpperCase() === 'SRT';
+      const isFilteringByType =
+        onlyShowNdiSources || onlyShowBmdSources || onlyShowSrtSources;
+
+      if (isFilteringByType && !source.ingest_type) {
+        shouldDelete = true;
+      } else if (source.ingest_type) {
+        const ingestType = source.ingest_type.toUpperCase();
+
+        const isNdiSelected = onlyShowNdiSources && ingestType === 'NDI';
+        const isBmdSelected = onlyShowBmdSources && ingestType === 'BMD';
+        const isSrtSelected = onlyShowSrtSources && ingestType === 'SRT';
 
         if (
-          (onlyShowNdiSources || onlyShowBmdSources || onlyShowSrtSources) &&
+          isFilteringByType &&
           !isNdiSelected &&
           !isBmdSelected &&
           !isSrtSelected

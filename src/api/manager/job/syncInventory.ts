@@ -94,7 +94,7 @@ export async function runSyncInventory() {
       }
     );
     return !existingSource;
-  });
+  }).map((source) => ({ ...source, lastConnected: new Date() }));
 
   const sourcesToUpsert = [
     ...newSourcesToUpsert,
