@@ -123,7 +123,7 @@ export async function getSourceThumbnail(
   );
   if (response.ok) {
     const json = (await response.json()) as ResourcesThumbnailResponse;
-    return json?.data;
+    return json.data;
   }
   throw await response.json();
 }

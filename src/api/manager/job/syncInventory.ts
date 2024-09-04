@@ -18,7 +18,6 @@ async function getSourcesFromAPI() {
         result.status === 'fulfilled'
     )
     .map((result) => result.value);
-
   const sources: SourceWithoutLastConnected[] = resolvedIngests.flatMap(
     (ingest) => {
       return ingest.sources.map(
@@ -32,6 +31,7 @@ async function getSourcesFromAPI() {
             },
             ingest_name: ingest.name,
             ingest_source_name: source.name,
+            ingest_type: source.type,
             video_stream: {
               width: source?.video_stream?.width,
               height: source?.video_stream?.height,
@@ -66,7 +66,8 @@ export async function runSyncInventory() {
     const apiSource = apiSources.find((source) => {
       return (
         source.ingest_name === inventorySource.ingest_name &&
-        source.ingest_source_name === inventorySource.ingest_source_name
+        source.ingest_source_name === inventorySource.ingest_source_name &&
+        source.ingest_type === inventorySource.type
       );
     });
     if (!apiSource) {
@@ -84,14 +85,14 @@ export async function runSyncInventory() {
 
   // Look for new sources that doesn't already exist in the inventory,
   // these should all be added to the inventory, status of these are set in getSourcesFromAPI.
-
   const newSourcesToUpsert = apiSources
     .filter((source) => {
       const existingSource = dbInventoryWithCorrectStatus.find(
         (inventorySource) => {
           return (
             source.ingest_name === inventorySource.ingest_name &&
-            source.ingest_source_name === inventorySource.ingest_source_name
+            source.ingest_source_name === inventorySource.ingest_source_name &&
+            source.ingest_type === inventorySource.ingest_type
           );
         }
       );
