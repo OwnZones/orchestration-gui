@@ -19,8 +19,7 @@ export default function SourceCards({
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
 }) {
-  const [items, moveItems] = useDragableItems(productionSetup.sources);
-  const referenceItems = productionSetup.sources;
+  const [items, moveItem, loading] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);
 
   if (loading || !items) return null;
