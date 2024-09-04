@@ -70,6 +70,15 @@ export default function GeneralSettings() {
         </div>
       </div>
 
+      <div className="flex mb-5">
+        <h2 className="flex w-[100px] items-center">
+          {t('source.last_connected')}
+        </h2>
+        <div className="flex-col">
+          <p>{new Date(input.lastConnected).toLocaleString()}</p>
+        </div>
+      </div>
+
       {height && width && (
         <div className="flex mb-5">
           <h2 className="flex w-[100px] items-center">{t('video')}</h2>

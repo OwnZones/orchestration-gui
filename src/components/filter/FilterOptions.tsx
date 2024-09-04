@@ -135,6 +135,18 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
     }
   };
 
+  const handleSorting = (reversedOrder: boolean) => {
+    const sortedSourcesArray = Array.from(tempSet.values()).sort((a, b) => {
+      const dateA = new Date(a.lastConnected).getTime();
+      const dateB = new Date(b.lastConnected).getTime();
+      return reversedOrder ? dateA - dateB : dateB - dateA;
+    });
+    tempSet = new Map(
+      sortedSourcesArray.map((source) => [source._id.toString(), source])
+    );
+    onFilteredSources(tempSet);
+  };
+
   return (
     <ClickAwayListener
       onClickAway={() => {
@@ -168,6 +180,7 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
           showBmdType={onlyShowBmdSources}
           showNdiType={onlyShowNdiSources}
           showSrtType={onlyShowSrtSources}
+          handleSorting={handleSorting}
         />
       </div>
     </ClickAwayListener>

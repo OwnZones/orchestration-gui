@@ -5,6 +5,9 @@ import { upsertSource } from '../sources';
 import { getDatabase } from '../../mongoClient/dbClient';
 import { WithId } from 'mongodb';
 
+type SourceWithoutLastConnected = Omit<Source, 'lastConnected'>;
+
+// TODO: getSourcesFromAPI should return ResourcesSourceResponse and changed to our model later
 async function getSourcesFromAPI() {
   const ingests = await getIngests();
   const resolvedIngests = (
@@ -15,7 +18,7 @@ async function getSourcesFromAPI() {
         result.status === 'fulfilled'
     )
     .map((result) => result.value);
-  const sources: Source[] = resolvedIngests.flatMap((ingest) => {
+  const sources: SourceWithoutLastConnected[] = resolvedIngests.flatMap((ingest) => {
     return ingest.sources.map(
       (source) =>
         ({
@@ -39,7 +42,7 @@ async function getSourcesFromAPI() {
             number_of_channels: source?.audio_stream?.number_of_channels,
             sample_rate: source?.audio_stream?.sample_rate
           }
-        } satisfies Source)
+        } satisfies SourceWithoutLastConnected)
     );
   });
   return sources;
@@ -69,10 +72,12 @@ export async function runSyncInventory() {
       // If source was not found in response from API, always mark it as gone
       return { ...inventorySource, status: 'gone' } satisfies WithId<Source>;
     }
-    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
+    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status and set the lastConnected to the current date
     return {
       ...inventorySource,
-      status: apiSource.status
+      status: apiSource.status,
+      lastConnected:
+        apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
     } satisfies WithId<Source>;
   });
 
