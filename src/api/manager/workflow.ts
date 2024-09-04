@@ -485,8 +485,7 @@ export async function startProduction(
     );
 
     controlPanelWS.close();
-    console.log('startProduction - production', production);
-
+    
     // Nedan behöver göras efter att vi har skapat en produktion
     // TODO: Hämta production.sources, för varje html-reference --> create i createHtmlWebSocket, för varje mediaplayer i production.sources skapa en createWebSocket
     const sources = await getSourcesByIds(

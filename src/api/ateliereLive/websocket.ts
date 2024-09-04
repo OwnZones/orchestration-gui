@@ -41,5 +41,5 @@ export async function createControlPanelWebSocket() {
     close: () => {
       ws.close();
     }
-  }
+  };
 }
