@@ -87,9 +87,7 @@ export function ConfigureOutputModal({
   }, [preset]);
 
   const clearInputs = () => {
-    setMultiviews(
-      preset.pipelines[0].multiviews ? preset.pipelines[0].multiviews : []
-    );
+    setMultiviews(preset.pipelines[0].multiviews || []);
     setOutputStreams(defaultState(preset.pipelines));
     onClose();
   };

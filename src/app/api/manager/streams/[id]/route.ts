@@ -68,18 +68,6 @@ export async function DELETE(
     );
   }
   try {
-    // ! What is the consequence of this? Cannot see the effect ->
-    // if (!multiview.multiview_id) {
-    //   throw `The provided multiview settings did not contain any multiview id`;
-    // }
-
-    // await updateMultiviewForPipeline(
-    //   body.pipelineUUID,
-    //   multiview.multiview_id,
-    //   multiview.layout.views
-    // ).catch((e) => {
-    //   throw `Error when updating multiview: ${e.message}`;
-
     const multiviewUpdates = multiview.map(async (singleMultiview) => {
       if (!singleMultiview.multiview_id) {
         throw `The provided multiview settings did not contain any multiview id`;
@@ -94,7 +82,6 @@ export async function DELETE(
     });
 
     await Promise.all(multiviewUpdates);
-    // ! <-
 
     return new NextResponse(
       JSON.stringify({
