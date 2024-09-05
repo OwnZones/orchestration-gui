@@ -610,7 +610,8 @@ export const sv = {
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
     no_multiview_found: 'Hittade ingen multiview',
-    select_multiview_preset: 'Förinställningar'
+    select_multiview_preset: 'Förinställningar',
+    no_port_selected: 'Unik port krävs'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

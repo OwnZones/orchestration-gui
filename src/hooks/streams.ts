@@ -17,6 +17,7 @@ export function useCreateStream(): CallbackHook<
   ) => Promise<Result<AddSourceResult>>
 > {
   const [loading, setLoading] = useState(false);
+
   const createStream = async (
     source: SourceWithId,
     production: Production,
@@ -59,13 +60,18 @@ export function useDeleteStream(): CallbackHook<
     input_slot: number
   ): Promise<Result<DeleteSourceStep[]>> => {
     setLoading(true);
+
     const pipelineUUID =
       production.production_settings.pipelines[0].pipeline_id;
-    const multiviewViews =
-      production.production_settings.pipelines[0].multiview?.layout.views;
+
+    const multiviews = production.production_settings.pipelines[0].multiviews;
+    const multiviewViews = multiviews?.flatMap((singleMultiview) => {
+      return singleMultiview.layout.views;
+    });
     const multiviewsToUpdate = multiviewViews?.filter(
       (v) => v.input_slot === input_slot
     );
+
     if (!multiviewsToUpdate || multiviewsToUpdate.length === 0) {
       const streamRequests = streamUuids.map((streamUuid) => {
         return fetch(`/api/manager/streams/${streamUuid}`, {
@@ -98,7 +104,7 @@ export function useDeleteStream(): CallbackHook<
       };
     }
 
-    const updatedMultiviews = multiviewsToUpdate.map((view) => {
+    const updatedMultiviews = multiviewsToUpdate?.map((view) => {
       return {
         ...view,
         label: view.label
@@ -111,16 +117,19 @@ export function useDeleteStream(): CallbackHook<
       const sourceForView = production.sources.find(
         (s) => s.input_slot === v.input_slot
       );
+
       if (sourceForView) {
         return { ...v, label: sourceForView.label };
       }
+
       return v;
     });
+
     if (
       !restWithLabels ||
       !updatedMultiviews ||
       updatedMultiviews.length === 0 ||
-      !production.production_settings.pipelines[0].multiview?.layout
+      !multiviews?.some((singleMultiview) => singleMultiview.layout)
     ) {
       setLoading(false);
       return {
@@ -131,13 +140,18 @@ export function useDeleteStream(): CallbackHook<
 
     const multiviewsWithLabels = [...restWithLabels, ...updatedMultiviews];
 
-    const multiview = {
-      ...production.production_settings.pipelines[0].multiview,
-      layout: {
-        ...production.production_settings.pipelines[0].multiview?.layout,
-        views: multiviewsWithLabels
-      }
-    } satisfies MultiviewSettings;
+    const multiview: MultiviewSettings[] = multiviews.map(
+      (singleMultiview, index) => ({
+        ...singleMultiview,
+        layout: {
+          ...singleMultiview.layout,
+          views: multiviewsWithLabels
+        },
+        for_pipeline_idx: index,
+        multiviewId: index + 1
+      })
+    );
+
     const streamRequests = streamUuids.map((streamUuid) => {
       return fetch(`/api/manager/streams/${streamUuid}`, {
         method: 'DELETE',

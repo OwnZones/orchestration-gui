@@ -434,6 +434,7 @@ export async function stopProduction(
     ]
   };
 }
+
 export async function startProduction(
   production: Production
 ): Promise<Result<StartProductionStep[]>> {
@@ -650,15 +651,14 @@ export async function startProduction(
 
   // Try to setup multiviews start
   try {
-    let multiviewId = 0;
-    if (!production.production_settings.pipelines[0].multiview) {
+    if (!production.production_settings.pipelines[0].multiviews) {
       Log().error(
         `No multiview settings specified for production: ${production.name}`
       );
       throw `No multiview settings specified for production: ${production.name}`;
     }
 
-    const multiview = await createMultiviewForPipeline(
+    const runtimeMultiviews = await createMultiviewForPipeline(
       production_settings,
       production.sources
     ).catch(async (error) => {
@@ -674,13 +674,17 @@ export async function startProduction(
       });
       throw `Failed to create multiview for pipeline '${production_settings.pipelines[0].pipeline_name}/${production_settings.pipelines[0].pipeline_id}': ${error}`;
     });
-    multiviewId = multiview.id;
+
+    runtimeMultiviews.flatMap((runtimeMultiview, index) => {
+      const multiview = production.production_settings.pipelines[0].multiviews;
+      if (multiview && multiview[index]) {
+        return (multiview[index].multiview_id = runtimeMultiview.id);
+      }
+    });
 
     Log().info(
       `Production '${production.name}' with preset '${production_settings.name}' started`
     );
-    production.production_settings.pipelines[0].multiview.multiview_id =
-      multiviewId;
   } catch (e) {
     Log().error('Could not start multiviews');
     Log().error(e);

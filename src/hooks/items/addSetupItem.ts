@@ -5,8 +5,9 @@ export function addSetupItem(
   source: SourceReference,
   productionSetup: Production
 ) {
-  const multiview = productionSetup.production_settings.pipelines[0].multiview;
-  if (!multiview) return;
+  const multiviews =
+    productionSetup.production_settings.pipelines[0].multiviews;
+  if (!multiviews || multiviews.length === 0) return;
   const updatedSetup = {
     ...productionSetup,
     sources: [

@@ -243,6 +243,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       refreshProduction();
     });
   };
+
   const updateProduction = (id: string, productionSetup: Production) => {
     setProductionSetup(productionSetup);
     putProduction(id, productionSetup);
@@ -256,13 +257,21 @@ export default function ProductionConfiguration({ params }: PageProps) {
     setProductionSetup(updatedSetup);
     putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
-    if (
-      pipeline.pipeline_id &&
-      pipeline.multiview &&
-      pipeline.multiview.multiview_id
-    ) {
-      updateMultiviewViews(pipeline.pipeline_id, updatedSetup, source);
-    }
+
+    pipeline.multiviews?.map((singleMultiview) => {
+      if (
+        pipeline.pipeline_id &&
+        pipeline.multiviews &&
+        singleMultiview.multiview_id
+      ) {
+        updateMultiviewViews(
+          pipeline.pipeline_id,
+          updatedSetup,
+          source,
+          singleMultiview
+        );
+      }
+    });
   };
 
   const updateConfigName = (nameChange: string) => {
@@ -293,7 +302,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     const defaultMultiview = await getMultiviewPreset(
       preset?.default_multiview_reference
     );
-
     setSelectedPreset(preset);
 
     const multiview = {
@@ -329,7 +337,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         pipelines: preset.pipelines
       }
     } as Production;
-    updatedSetup.production_settings.pipelines[0].multiview = multiview;
+    updatedSetup.production_settings.pipelines[0].multiviews = [multiview];
     setProductionSetup(updatedSetup);
   }
 
@@ -419,7 +427,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
       productionSetup &&
       productionSetup.isActive &&
       selectedSource &&
-      productionSetup.production_settings.pipelines[0].multiview?.layout.views
+      (Array.isArray(
+        productionSetup?.production_settings.pipelines[0].multiviews
+      )
+        ? productionSetup.production_settings.pipelines[0].multiviews.some(
+            (singleMultiview) => singleMultiview?.layout?.views
+          )
+        : false)
     ) {
       const firstEmptySlot = getFirstEmptySlot();
       const result = await createStream(
@@ -471,20 +485,27 @@ export default function ProductionConfiguration({ params }: PageProps) {
       selectedSourceRef &&
       selectedSourceRef.stream_uuids
     ) {
-      const multiview =
-        productionSetup.production_settings.pipelines[0].multiview;
-      if (!multiview) return;
-      const viewToUpdate = multiview?.layout.views.find(
-        (v) => v.input_slot === selectedSourceRef.input_slot
+      const multiviews =
+        productionSetup.production_settings.pipelines[0].multiviews;
+
+      if (!multiviews || multiviews.length === 0) return;
+
+      const viewToUpdate = multiviews.some((multiview) =>
+        multiview.layout.views.find(
+          (v) => v.input_slot === selectedSourceRef.input_slot
+        )
       );
+
       if (!viewToUpdate) {
         if (!productionSetup.production_settings.pipelines[0].pipeline_id)
           return;
+
         const result = await deleteStream(
           selectedSourceRef.stream_uuids,
           productionSetup,
           selectedSourceRef.input_slot
         );
+
         if (!result.ok) {
           if (!result.value) {
             setDeleteSourceStatus({
@@ -513,11 +534,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
           }
           return;
         }
+
         const updatedSetup = removeSetupItem(
           selectedSourceRef,
           productionSetup
         );
+
         if (!updatedSetup) return;
+
         setProductionSetup(updatedSetup);
         putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
           setRemoveSourceModal(false);
@@ -525,11 +549,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
         });
         return;
       }
+
       const result = await deleteStream(
         selectedSourceRef.stream_uuids,
         productionSetup,
         selectedSourceRef.input_slot
       );
+
       if (!result.ok) {
         if (!result.value) {
           setDeleteSourceStatus({
