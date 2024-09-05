@@ -8,7 +8,6 @@ import SourceListItem from '../../components/sourceListItem/SourceListItem';
 import { SourceWithId } from '../../interfaces/Source';
 import EditView from './editView/EditView';
 import FilterContext from './FilterContext';
-import { useDeleteSource } from '../../hooks/sources/useDeleteSource';
 import styles from './Inventory.module.scss';
 
 export default function Inventory() {
