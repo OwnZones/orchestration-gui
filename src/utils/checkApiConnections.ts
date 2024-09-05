@@ -5,7 +5,7 @@ interface IObject {
 
 interface Response {
   database?: IObject;
-  agileApi?: IObject;
+  liveApi?: IObject;
   message?: string;
 }
 

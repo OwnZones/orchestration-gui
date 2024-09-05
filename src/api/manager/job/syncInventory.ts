@@ -1,6 +1,6 @@
-import { ResourcesIngestResponse } from '../../../../types/agile-live';
+import { ResourcesIngestResponse } from '../../../../types/ateliere-live';
 import { Source } from '../../../interfaces/Source';
-import { getIngests, getIngest } from '../../agileLive/ingest';
+import { getIngests, getIngest } from '../../ateliereLive/ingest';
 import { upsertSource } from '../sources';
 import { getDatabase } from '../../mongoClient/dbClient';
 import { WithId } from 'mongodb';
@@ -51,7 +51,7 @@ async function getSourcesFromAPI() {
 }
 
 /**
- * Syncs the inventory with the ingests in Agile Live.
+ * Syncs the inventory with the ingests in Ateliere Live.
  * - Adds new sources to the inventory with the status 'new'
  * - Updates the status of sources depending on wheter or not they are still present in the ingests
  */

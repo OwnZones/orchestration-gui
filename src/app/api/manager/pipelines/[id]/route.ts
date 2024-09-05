@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPipeline } from '../../../../../api/agileLive/pipelines/pipelines';
-import { isActive } from '../../../../../api/agileLive/utils/pipeline';
+import { getPipeline } from '../../../../../api/ateliereLive/pipelines/pipelines';
+import { isActive } from '../../../../../api/ateliereLive/utils/pipeline';
 import {
   getSRTMultiviews,
   getSRTOutputs,

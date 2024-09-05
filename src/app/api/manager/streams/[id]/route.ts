@@ -1,9 +1,9 @@
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { deleteStream } from '../../../../../api/agileLive/pipelines/streams/streams';
+import { deleteStream } from '../../../../../api/ateliereLive/pipelines/streams/streams';
 import { MultiviewSettings } from '../../../../../interfaces/multiview';
-import { updateMultiviewForPipeline } from '../../../../../api/agileLive/pipelines/multiviews/multiviews';
+import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
 import { DeleteSourceStep } from '../../../../../interfaces/Source';
 import { Result } from '../../../../../interfaces/result';
 import { Log } from '../../../../../api/logger';

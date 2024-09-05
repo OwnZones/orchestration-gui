@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
-productionsDb = db.getSiblingDB('agile-live-gui');
+productionsDb = db.getSiblingDB('live-gui');
 
 productionsDb.createUser({
   user: 'api',
   pwd: 'password',
-  roles: [{ role: 'readWrite', db: 'agile-live-gui' }]
+  roles: [{ role: 'readWrite', db: 'live-gui' }]
 });

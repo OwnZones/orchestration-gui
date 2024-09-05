@@ -1,7 +1,7 @@
 import {
   ResourcesCompactPipelineResponse,
   ResourcesPipelineResponse
-} from '../../../../types/agile-live';
+} from '../../../../types/ateliere-live';
 import {
   PipelineOutputSettings,
   PipelineSettings
@@ -18,15 +18,15 @@ import {
 import { getPipelineStreams } from './streams/streams';
 import { ControlConnection } from '../../../interfaces/controlConnections';
 import { Log } from '../../logger';
-import { AGILE_BASE_API_PATH } from '../../../constants';
+import { LIVE_BASE_API_PATH } from '../../../constants';
 
 export async function getPipeline(
   uuid: string
 ): Promise<ResourcesPipelineResponse> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${uuid}?expand=true`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${uuid}?expand=true`,
+      process.env.LIVE_URL
     ),
     {
       method: 'GET',
@@ -49,8 +49,8 @@ export async function getPipelineCompact(
 ): Promise<ResourcesCompactPipelineResponse> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${uuid}?expand=false`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${uuid}?expand=false`,
+      process.env.LIVE_URL
     ),
     {
       method: 'GET',
@@ -73,8 +73,8 @@ export async function getPipelines(): Promise<
 > {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines?expand=true`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines?expand=true`,
+      process.env.LIVE_URL
     ),
     {
       method: 'GET',
@@ -102,8 +102,8 @@ export async function getPipelines(): Promise<
 export async function resetPipeline(pipelineUuid: string): Promise<void> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${pipelineUuid}/reset`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${pipelineUuid}/reset`,
+      process.env.LIVE_URL
     ),
     {
       method: 'PUT',

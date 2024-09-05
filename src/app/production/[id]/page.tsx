@@ -77,7 +77,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const getMultiviewPreset = useGetMultiviewPreset();
   const [updateMultiviewViews] = useMultiviews();
 
-  //FROM AGILE API
+  //FROM LIVE API
   const [pipelines, loadingPipelines, , refreshPipelines] = usePipelines();
   const [controlPanels, loadingControlPanels, , refreshControlPanels] =
     useControlPanels();

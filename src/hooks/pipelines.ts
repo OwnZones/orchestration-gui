@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { DataHook } from './types';
-import { ResourcesCompactPipelineResponse } from '../../types/agile-live';
+import { ResourcesCompactPipelineResponse } from '../../types/ateliere-live';
 import { ManagerPipelineResponse } from '../interfaces/pipeline';
 
 const ONE_MINUTE = 1000 * 60;

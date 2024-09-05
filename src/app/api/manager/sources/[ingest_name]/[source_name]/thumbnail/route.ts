@@ -3,7 +3,7 @@ import {
   getSourceIdFromSourceName,
   getSourceThumbnail,
   getUuidFromIngestName
-} from '../../../../../../../api/agileLive/ingest';
+} from '../../../../../../../api/ateliereLive/ingest';
 import { isAuthenticated } from '../../../../../../../api/manager/auth';
 
 type Params = {

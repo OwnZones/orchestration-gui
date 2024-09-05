@@ -3,7 +3,7 @@
 import {
   ResourcesPipelineResponse,
   ResourcesOutputActiveStreamMpegTsSrt
-} from '../../types/agile-live';
+} from '../../types/ateliere-live';
 import { SrtOutput } from '../interfaces/pipeline';
 import { WhepMultiview } from '../interfaces/whep';
 import { getWhepUrlForSRT } from './whep';

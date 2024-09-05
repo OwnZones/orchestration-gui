@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ResourcesCompactPipelineResponse } from '../../../types/agile-live';
+import { ResourcesCompactPipelineResponse } from '../../../types/ateliere-live';
 import { usePipeline } from '../../hooks/pipelines';
 import { WebRTCPlayer } from '@eyevinn/webrtc-player';
 import { Loader } from '../loader/Loader';

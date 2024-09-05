@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { DataHook } from './types';
-import { ResourcesControlPanelResponse } from '../../types/agile-live';
+import { ResourcesControlPanelResponse } from '../../types/ateliere-live';
 const ONE_MINUTE = 1000 * 60;
 export function useControlPanels(): [
   ...DataHook<ResourcesControlPanelResponse[]>,

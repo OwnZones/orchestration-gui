@@ -1,2 +1,2 @@
 #!/bin/bash
-git describe --tags --dirty --match v* > gui-version.txt
+git describe --always --tags --dirty --match v* > gui-version.txt

@@ -12,39 +12,39 @@ import {
   getPipelines,
   removePipelineStreams,
   resetPipeline
-} from '../agileLive/pipelines/pipelines';
+} from '../ateliereLive/pipelines/pipelines';
 import {
   createMultiviewForPipeline,
   deleteAllMultiviewsFromPipeline
-} from '../agileLive/pipelines/multiviews/multiviews';
+} from '../ateliereLive/pipelines/multiviews/multiviews';
 import {
   getSourceIdFromSourceName,
   getUuidFromIngestName
-} from '../agileLive/ingest';
+} from '../ateliereLive/ingest';
 import { PipelineStreamSettings } from '../../interfaces/pipeline';
 import {
   connectIngestToPipeline,
   deleteStreamByUuid
-} from '../agileLive/streams';
-import { disconnectReceiver } from '../agileLive/controlconnections';
+} from '../ateliereLive/streams';
+import { disconnectReceiver } from '../ateliereLive/controlconnections';
 import {
   ResourcesCompactPipelineResponse,
   ResourcesConnectionUUIDResponse,
   ResourcesPipelineResponse,
   ResourcesReceiverNetworkEndpoint,
   ResourcesSenderNetworkEndpoint
-} from '../../../types/agile-live';
+} from '../../../types/ateliere-live';
 import { getSourcesByIds } from './sources';
 import { SourceWithId, SourceToPipelineStream } from '../../interfaces/Source';
 import {
   getAvailablePortsForIngest,
   getCurrentlyUsedPorts,
   initDedicatedPorts
-} from '../agileLive/utils/fwConfigPorts';
+} from '../ateliereLive/utils/fwConfigPorts';
 import { getAudioMapping } from './inventory';
 import { Log } from '../logger';
 import { putProduction } from './productions';
-import { getControlPanels } from '../agileLive/controlpanels';
+import { getControlPanels } from '../ateliereLive/controlpanels';
 import { Result } from '../../interfaces/result';
 import { Monitoring } from '../../interfaces/monitoring';
 import { getDatabase } from '../mongoClient/dbClient';
@@ -466,7 +466,7 @@ export async function startProduction(
       throw error;
     });
 
-    // Fetch expanded pipeline objects from Agile Live
+    // Fetch expanded pipeline objects from Ateliere Live
     const pipelinesToUsePromises = production_settings.pipelines.map(
       (pipeline) => {
         return getPipeline(pipeline.pipeline_id!);
@@ -499,7 +499,7 @@ export async function startProduction(
       throw `Failed to reset pipelines: ${error}`;
     });
 
-    // Fetch all control panels from Agile Live
+    // Fetch all control panels from Ateliere Live
     const allControlPanels = await getControlPanels();
     // Check which control panels that should be used by this production
     const controlPanelsToUse = allControlPanels.filter((controlPanel) =>
@@ -531,7 +531,7 @@ export async function startProduction(
       throw `Failed to stop pipelines during startup: ${error}`;
     });
 
-    // TODO: This will fetch the pipelines once again from Agile Live, but we already have them in pipelinesToUse
+    // TODO: This will fetch the pipelines once again from Ateliere Live, but we already have them in pipelinesToUse
     const usedPorts = await getCurrentlyUsedPorts(
       pipelinesToUse.map((pipeline) => {
         return pipeline.uuid;
@@ -573,7 +573,7 @@ export async function startProduction(
 
   // Try to connect control panels and pipeline-to-pipeline connections start
   try {
-    // TODO: This will re-fetch pipelines from the Agile Live API, but we fetched them above into pipelinesToUse
+    // TODO: This will re-fetch pipelines from the Ateliere Live API, but we fetched them above into pipelinesToUse
     await connectControlPanelToPipeline(
       production_settings.control_connection,
       production_settings.pipelines

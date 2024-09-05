@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const agileDb = db.getSiblingDB('agile-live-gui');
+const liveDb = db.getSiblingDB('live-gui');
 
 function createSource(
   name,
@@ -116,31 +116,31 @@ const sources = [
   )
 ];
 
-agileDb.inventory.insertMany(sources);
+liveDb.inventory.insertMany(sources);
 
-agileDb.users.insertOne({
+liveDb.users.insertOne({
   username: 'admin'
 });
 
-agileDb.productions.insertOne({
+liveDb.productions.insertOne({
   name: 'stockholm_podcast',
   sources,
   selectedPresetRef: undefined
 });
 
-agileDb.productions.insertOne({
+liveDb.productions.insertOne({
   name: 'umeå_podcast',
   sources: [sources[6], sources[7]],
   selectedPresetRef: undefined
 });
 
-agileDb.productions.insertOne({
+liveDb.productions.insertOne({
   name: 'Svenska Nyheter',
   sources: [sources[0], sources[1], sources[2], sources[3]],
   selectedPresetRef: undefined
 });
 
-agileDb.productions.insertOne({
+liveDb.productions.insertOne({
   name: 'Morgon Studion',
   sources: [sources[0], sources[3]],
   selectedPresetRef: undefined

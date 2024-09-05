@@ -15,12 +15,12 @@ Start mongodb docker container using `docker-compose up`. It will initialize the
 If you want to run the GUI and mongodb docker containers add this to the `docker-compose.yml` file:
 
 ```
- agileui:
+ liveui:
     build: .
     environment:
-      MONGODB_URI: mongodb://api:<API_PASSWORD>@host.docker.internal:27017/agile-live-gui
-      AGILE_URL: https://<SYSTEM_CONTROLLER_IP>:8080
-      AGILE_CREDENTIALS: <USERNAME>:<PASSWORD>
+      MONGODB_URI: mongodb://api:<API_PASSWORD>@host.docker.internal:27017/live-gui
+      LIVE_URL: https://<SYSTEM_CONTROLLER_IP>:8080
+      LIVE_CREDENTIALS: <USERNAME>:<PASSWORD>
       NODE_TLS_REJECT_UNAUTHORIZED: 0
       NEXTAUTH_SECRET: <NEXT_AUTH_SECRET>
       NEXTAUTH_URL: http://localhost:3000
@@ -34,10 +34,10 @@ If you want to run the GUI and mongodb docker containers add this to the `docker
 
 Then copy the `.env.sample` file and name it `.env`, it will contain env variables:
 
-- `MONGODB_URI` - The mongodb connection string including credentials eg. `mongodb://user123:pass123@127.0.0.1:27017/agile-live-gui`
+- `MONGODB_URI` - The mongodb connection string including credentials eg. `mongodb://user123:pass123@127.0.0.1:27017/live-gui`
 
-- `AGILE_URL` - The URL to the Agile-live system controller REST API
-- `AGILE_CREDENTIALS` - Credentials for the Agile-live system controller REST API
+- `LIVE_URL` - The URL to the Ateliere Live system controller REST API
+- `LIVE_CREDENTIALS` - Credentials for the Ateliere Live system controller REST API
 
 - `NEXTAUTH_SECRET` - The secret used to encrypt the JWT Token
 - `NEXTAUTH_URL` - The base url for the service, eg. `http://localhost:3000`, used internally by NextAuth.
@@ -64,7 +64,7 @@ Run following to run application in development environment:
 
 ### External Documentation
 
-https://docs.agilecontent.com/docs/acl/reference/3-0-0/rest_api/
+https://help.ateliere.com/live/docs/reference/7-0-0/rest_api/
 
 ### Contributing
 

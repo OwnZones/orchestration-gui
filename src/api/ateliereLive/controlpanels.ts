@@ -1,5 +1,5 @@
-import { ResourcesControlPanelResponse } from '../../../types/agile-live';
-import { AGILE_BASE_API_PATH } from '../../constants';
+import { ResourcesControlPanelResponse } from '../../../types/ateliere-live';
+import { LIVE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
 
 export async function getControlPanels(): Promise<
@@ -7,8 +7,8 @@ export async function getControlPanels(): Promise<
 > {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/controlpanels?expand=true`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/controlpanels?expand=true`,
+      process.env.LIVE_URL
     ),
     {
       method: 'GET',

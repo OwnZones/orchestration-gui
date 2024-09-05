@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPipelines } from '../../../../api/agileLive/pipelines/pipelines';
+import { getPipelines } from '../../../../api/ateliereLive/pipelines/pipelines';
 import { isAuthenticated } from '../../../../api/manager/auth';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

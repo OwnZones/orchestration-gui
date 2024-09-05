@@ -1,5 +1,5 @@
-import { ResourcesOutputStatusResponse } from '../../../../../types/agile-live';
-import { AGILE_BASE_API_PATH } from '../../../../constants';
+import { ResourcesOutputStatusResponse } from '../../../../../types/ateliere-live';
+import { LIVE_BASE_API_PATH } from '../../../../constants';
 import { PipelineOutputSettings } from '../../../../interfaces/pipeline';
 import { getAuthorizationHeader } from '../../utils/authheader';
 
@@ -8,8 +8,8 @@ export async function getPipelineOutputs(
 ): Promise<ResourcesOutputStatusResponse[]> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${pipelineId}/outputs?expand=true`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${pipelineId}/outputs?expand=true`,
+      process.env.LIVE_URL
     ),
     {
       method: 'GET',
@@ -33,8 +33,8 @@ export async function stopAllOutputStreamsByUuid(
 ) {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${pipeId}/outputs/${outputId}/streams`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${pipeId}/outputs/${outputId}/streams`,
+      process.env.LIVE_URL
     ),
     {
       method: 'DELETE',
@@ -59,9 +59,9 @@ export async function stopSingleOutputStream(
 ) {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH +
+      LIVE_BASE_API_PATH +
         `/pipelines/${pipeId}/outputs/${outputId}/streams/${outputStreamId}`,
-      process.env.AGILE_URL
+      process.env.LIVE_URL
     ),
     {
       method: 'DELETE',
@@ -87,9 +87,9 @@ export async function startPipelineStream(
   const requests = streamSettings.map((streamSetting) => {
     return fetch(
       new URL(
-        AGILE_BASE_API_PATH +
+        LIVE_BASE_API_PATH +
           `/pipelines/${pipelineId}/outputs/${outputId}/streams`,
-        process.env.AGILE_URL
+        process.env.LIVE_URL
       ),
       {
         method: 'POST',

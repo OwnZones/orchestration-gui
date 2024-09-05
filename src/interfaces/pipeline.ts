@@ -1,4 +1,4 @@
-import { ResourcesPipelineResponse } from '../../types/agile-live';
+import { ResourcesPipelineResponse } from '../../types/ateliere-live';
 import { MultiviewSettings } from './multiview';
 import { WhepMultiview } from './whep';
 

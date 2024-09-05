@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../api/manager/auth';
-import { getControlPanels } from '../../../../api/agileLive/controlpanels';
+import { getControlPanels } from '../../../../api/ateliereLive/controlpanels';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   if (!(await isAuthenticated())) {

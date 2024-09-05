@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../api/manager/auth';
 import { SourceWithId } from '../../../../interfaces/Source';
 import { Production } from '../../../../interfaces/production';
-import { createStream } from '../../../../api/agileLive/pipelines/streams/streams';
+import { createStream } from '../../../../api/ateliereLive/pipelines/streams/streams';
 import { Log } from '../../../../api/logger';
 export type CreateStreamRequestBody = {
   source: SourceWithId;

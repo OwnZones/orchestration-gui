@@ -1,5 +1,5 @@
-import { ResourcesCreateControlConnectionResponse } from '../../../types/agile-live';
-import { AGILE_BASE_API_PATH } from '../../constants';
+import { ResourcesCreateControlConnectionResponse } from '../../../types/ateliere-live';
+import { LIVE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
 
 export async function connectSenderAndReceiver(
@@ -9,7 +9,7 @@ export async function connectSenderAndReceiver(
   port: number
 ): Promise<ResourcesCreateControlConnectionResponse> {
   const response = await fetch(
-    new URL(AGILE_BASE_API_PATH + `/controlconnections`, process.env.AGILE_URL),
+    new URL(LIVE_BASE_API_PATH + `/controlconnections`, process.env.LIVE_URL),
     {
       method: 'POST',
       headers: {
@@ -35,8 +35,8 @@ export async function connectSenderAndReceiver(
 export async function disconnectReceiver(receiverId: string): Promise<void> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/controlconnections/${receiverId}`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/controlconnections/${receiverId}`,
+      process.env.LIVE_URL
     ),
     {
       method: 'DELETE',

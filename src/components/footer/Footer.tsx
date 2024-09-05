@@ -13,7 +13,7 @@ interface IObject {
 
 interface IConnection {
   database?: IObject;
-  agileApi?: IObject;
+  liveApi?: IObject;
   message?: string;
 }
 
@@ -63,7 +63,7 @@ export default function Footer() {
   }, []);
 
   const settingsDb = connection?.database;
-  const settingsAgile = connection?.agileApi;
+  const settingsLive = connection?.liveApi;
 
   return (
     <div className="flex text-p ml-10">
@@ -77,8 +77,8 @@ export default function Footer() {
           />
           <Status
             name="system_controller"
-            connected={settingsAgile?.connected}
-            adress={settingsAgile?.url}
+            connected={settingsLive?.connected}
+            adress={settingsLive?.url}
           />
           <Status
             name="database"

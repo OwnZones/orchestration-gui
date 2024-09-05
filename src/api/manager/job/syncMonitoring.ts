@@ -1,6 +1,9 @@
 import { Production } from '../../../interfaces/production';
 import { getDatabase } from '../../mongoClient/dbClient';
-import { getPipeline, getPipelines } from '../../agileLive/pipelines/pipelines';
+import {
+  getPipeline,
+  getPipelines
+} from '../../ateliereLive/pipelines/pipelines';
 import {
   ResourcesControlPanelResponse,
   ResourcesControlRequestCounter,
@@ -10,9 +13,9 @@ import {
   ResourcesPipelineResponse,
   ResourcesReceiverNetworkEndpoint,
   ResourcesSenderNetworkEndpoint
-} from '../../../../types/agile-live';
-import { getControlPanels } from '../../agileLive/controlpanels';
-import { getIngest, getIngests } from '../../agileLive/ingest';
+} from '../../../../types/ateliere-live';
+import { getControlPanels } from '../../ateliereLive/controlpanels';
+import { getIngest, getIngests } from '../../ateliereLive/ingest';
 import {
   MonitoringControlPanelStatusResponse,
   MonitoringOutputStatusResponse,
@@ -350,7 +353,7 @@ export async function updatedMonitoringForProduction(
 }
 
 /**
- * Syncs the Monitoring DB with all the active productions and compares with data in Agile Live.
+ * Syncs the Monitoring DB with all the active productions and compares with data in Ateliere Live.
  */
 export async function runSyncMonitoring() {
   const db = await getDatabase();

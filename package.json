@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "agile-live-gui",
+  "name": "ateliere-live-gui",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -15,7 +15,7 @@
     "start": "next start",
     "version:rc": "npm version prerelease --preid=rc",
     "postversion": "git push && git push --tags",
-    "generate-types:agile-live": "bash -c 'source .env && curl -O -u $AGILE_CREDENTIALS -k \"$AGILE_URL/static/swagger_docs/swagger.json\"' && swagger-typescript-api -p swagger.json -o ./types -n agile-live.d.ts --no-client"
+    "generate-types:ateliere-live": "bash -c 'source .env && curl -O -u $LIVE_CREDENTIALS -k \"$LIVE_URL/static/swagger_docs/swagger.json\"' && swagger-typescript-api -p swagger.json -o ./types -n ateliere-live.d.ts --no-client"
   },
   "license": "UNLICENSED",
   "engines": {

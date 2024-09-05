@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 import { getMultiviewPreset } from '../../../../../api/manager/presets';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
-import { updateMultiviewForPipeline } from '../../../../../api/agileLive/pipelines/multiviews/multiviews';
+import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
 import { MultiviewViews } from '../../../../../interfaces/multiview';
 
 export async function GET(
