@@ -66,8 +66,7 @@ export async function runSyncInventory() {
     const apiSource = apiSources.find((source) => {
       return (
         source.ingest_name === inventorySource.ingest_name &&
-        source.ingest_source_name === inventorySource.ingest_source_name &&
-        source.ingest_type === inventorySource.type
+        source.ingest_source_name === inventorySource.ingest_source_name
       );
     });
     if (!apiSource) {
