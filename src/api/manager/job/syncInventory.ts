@@ -41,8 +41,7 @@ async function getSourcesFromAPI(): Promise<SourceWithoutLastConnected[]> {
             audio_stream: {
               number_of_channels: source?.audio_stream?.number_of_channels,
               sample_rate: source?.audio_stream?.sample_rate
-            },
-            createdAt: new Date()
+            }
           } satisfies SourceWithoutLastConnected)
       );
     }
@@ -87,8 +86,7 @@ export async function runSyncInventory() {
     const apiSource = apiSources.find((source) => {
       return (
         source.ingest_name === inventorySource.ingest_name &&
-        source.ingest_source_name === inventorySource.ingest_source_name &&
-        source.ingest_type === inventorySource.type
+        source.ingest_source_name === inventorySource.ingest_source_name
       );
     });
     if (!apiSource) {
