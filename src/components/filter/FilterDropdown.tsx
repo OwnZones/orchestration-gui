@@ -15,6 +15,7 @@ function FilterDropdown({
   showNdiType,
   showBmdType,
   showSrtType,
+  showMediaSourceGeneratorType,
   setIsTypeHidden,
   setIsLocationHidden,
   setSelectedTags,
@@ -22,6 +23,7 @@ function FilterDropdown({
   setOnlyShowNdiSources: setOnlyShowNdiSources,
   setOnlyShowBmdSources: setOnlyShowBmdSources,
   setOnlyShowSrtSources: setOnlyShowSrtSources,
+  setOnlyShowMediaSourceGeneratorSources,
   handleSorting
 }: {
   close: () => void;
@@ -35,6 +37,7 @@ function FilterDropdown({
   showNdiType: boolean;
   showSrtType: boolean;
   showBmdType: boolean;
+  showMediaSourceGeneratorType: boolean;
   setIsTypeHidden: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLocationHidden: React.Dispatch<React.SetStateAction<boolean>>;
   setOnlyShowActiveSources: React.Dispatch<React.SetStateAction<boolean>>;
@@ -42,6 +45,9 @@ function FilterDropdown({
   setOnlyShowNdiSources: React.Dispatch<React.SetStateAction<boolean>>;
   setOnlyShowBmdSources: React.Dispatch<React.SetStateAction<boolean>>;
   setOnlyShowSrtSources: React.Dispatch<React.SetStateAction<boolean>>;
+  setOnlyShowMediaSourceGeneratorSources: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
   handleSorting: (reversedOrder: boolean) => void;
 }) {
   const t = useTranslate();
@@ -75,20 +81,24 @@ function FilterDropdown({
     setIsTypeHidden(true);
   };
 
-  const showSelectedConfigSources = () => {
+  const toggleConfigSources = () => {
     setOnlyShowConfigSources(!showConfigSources);
   };
 
-  const showSelectedNdiType = () => {
+  const toggleNdiType = () => {
     setOnlyShowNdiSources(!showNdiType);
   };
 
-  const showSelectedSrtType = () => {
+  const toggleSrtType = () => {
     setOnlyShowSrtSources(!showSrtType);
   };
 
-  const showSelectedBmdType = () => {
+  const toggleBmdType = () => {
     setOnlyShowBmdSources(!showBmdType);
+  };
+
+  const toggleMediaSourceGeneratorType = () => {
+    setOnlyShowMediaSourceGeneratorSources(!showMediaSourceGeneratorType);
   };
 
   const deleteTag = (value: string) => {
@@ -148,10 +158,11 @@ function FilterDropdown({
 
   const handleClear = () => {
     setSelectedTags(new Set<string>());
-    setOnlyShowConfigSources(false);
-    setOnlyShowBmdSources(false);
-    setOnlyShowNdiSources(false);
-    setOnlyShowSrtSources(false);
+    setOnlyShowConfigSources(true);
+    setOnlyShowBmdSources(true);
+    setOnlyShowNdiSources(true);
+    setOnlyShowSrtSources(true);
+    setOnlyShowMediaSourceGeneratorSources(false);
   };
 
   const typesSearch = (event: ChangeEvent<HTMLInputElement>) => {
@@ -259,7 +270,7 @@ function FilterDropdown({
               })}
           </div>
           <div
-            className="absolute border w-full z-20 rounded-lg shadow  divide-y bg-zinc-700 divide-gray-600"
+            className="absolute border w-full z-50 rounded-lg shadow  divide-y bg-zinc-700 divide-gray-600"
             hidden={isLocationHidden}
           >
             <ul className="px-3 pb-3 text-sm text-p">
@@ -305,7 +316,7 @@ function FilterDropdown({
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showConfigSources}
-                onChange={showSelectedConfigSources}
+                onChange={toggleConfigSources}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
@@ -320,7 +331,7 @@ function FilterDropdown({
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showNdiType}
-                onChange={showSelectedNdiType}
+                onChange={toggleNdiType}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
@@ -335,7 +346,7 @@ function FilterDropdown({
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showSrtType}
-                onChange={showSelectedSrtType}
+                onChange={toggleSrtType}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
@@ -350,7 +361,7 @@ function FilterDropdown({
                 type="checkbox"
                 className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
                 checked={showBmdType}
-                onChange={showSelectedBmdType}
+                onChange={toggleBmdType}
               />
               <label
                 className="ml-2 mt-1 text-left text-zinc-300"
@@ -359,19 +370,34 @@ function FilterDropdown({
                 SDI/HDMI
               </label>
             </div>
+            <div className="flex flex-row">
+              <input
+                id="showMediaSourceCheckbox"
+                type="checkbox"
+                className="flex ml-2 w-4 justify-center rounded-lg text-zinc-300"
+                checked={showMediaSourceGeneratorType}
+                onChange={toggleMediaSourceGeneratorType}
+              />
+              <label
+                className="ml-2 mt-1 text-left text-zinc-300"
+                htmlFor="showMediaSourceCheckbox"
+              >
+                Test pattern
+              </label>
+            </div>
           </div>
           <div className="flex self-end justify-end mt-4">
             <button
               onClick={handleClear}
               id="dropdownCheckboxButton"
-              className="flex ml-2 mb-2 min-w-[30%] justify-center font-medium rounded-lg py-2.5 text-zinc-300 bg-zinc-800  hover:ring-2 focus:outline-none bg-zink-800 hover:bg-zinc-700 opacity-70"
+              className="flex ml-2 mb-2 min-w-[30%] justify-center font-medium rounded-lg py-2.5 text-zinc-300 hover:ring-2 focus:outline-none bg-zinc-800 hover:bg-zinc-700 opacity-70"
               type="button"
             >
               {t('clear')}
             </button>
             <button
               onClick={() => close()}
-              className="flex ml-2 mb-2 min-w-[30%] justify-center font-medium rounded-lg py-2.5 text-zinc-300 bg-zinc-800  hover:ring-2 focus:outline-none bg-zink-800 hover:bg-zinc-700"
+              className="flex ml-2 mb-2 min-w-[30%] justify-center font-medium rounded-lg py-2.5 text-zinc-300 hover:ring-2 focus:outline-none bg-zinc-800 hover:bg-zinc-700"
               type="button"
             >
               {t('apply')}
