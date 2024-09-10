@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSources } from '../../hooks/sources/useSources';
 import { useSetSourceToPurge } from '../../hooks/sources/useSetSourceToPurge';
 import { SourceWithId } from '../../interfaces/Source';
-import EditView from './editView/EditView';
+import EditView from '../../../orchestration-gui/src/components/inventory/editView/EditView';
 import SourceList from '../sourceList/SourceList';
 import { useTranslate } from '../../i18n/useTranslate';
 

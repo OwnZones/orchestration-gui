@@ -8,17 +8,22 @@ import ImageComponent from '../../image/ImageComponent';
 
 export default function EditView({
   source,
+  isLocked,
   updateSource,
   close,
   removeInventorySource,
   locked
 }: {
   source: SourceWithId;
+  isLocked: boolean;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
   removeInventorySource: (source: SourceWithId) => void;
   locked: boolean;
 }) {
+  const [loaded, setLoaded] = useState(false);
+  const src = useMemo(() => getSourceThumbnail(source), [source]);
+
   return (
     <EditViewContext source={source} updateSource={updateSource}>
       <div className="flex flex-row mb-10 h-[22rem]">
@@ -32,6 +37,8 @@ export default function EditView({
         <AudioChannels source={source} locked={locked} />
       </div>
       <UpdateButtons
+        source={source}
+        isLocked={isLocked}
         close={close}
         removeInventorySource={removeInventorySource}
         source={source}

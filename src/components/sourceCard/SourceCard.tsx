@@ -20,6 +20,7 @@ type SourceCardProps = {
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   src: string;
+  isLocked: boolean;
 };
 
 export default function SourceCard({
@@ -30,7 +31,8 @@ export default function SourceCard({
   onSelectingText,
   forwardedRef,
   src,
-  style
+  style,
+  isLocked
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(label ? label : source.name);
 

@@ -57,6 +57,7 @@ export function CreateProduction() {
             className="hover:bg-button-hover-bg bg-button-bg"
             onClick={handleOpen}
             icon={<IconPlus size={16} className="mr-2" />}
+            disabled={isLocked}
           >
             {t('create_new')}
           </Button>

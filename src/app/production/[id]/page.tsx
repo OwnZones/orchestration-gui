@@ -608,6 +608,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             }
           }}
           onBlur={() => updateConfigName(configurationName)}
+          disabled={locked}
         />
         <div
           className="flex mr-2 w-fit rounded justify-end items-center gap-3"
@@ -711,6 +712,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       });
                     }
                   }}
+                  isLocked={locked}
                 />
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal
