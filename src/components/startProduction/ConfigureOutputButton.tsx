@@ -6,6 +6,7 @@ import { Preset } from '../../interfaces/preset';
 import { useTranslate } from '../../i18n/useTranslate';
 import { Button } from '../button/Button';
 import { ConfigureOutputModal } from '../modal/configureOutputModal/ConfigureOutputModal';
+
 type ConfigureOutputButtonProps = {
   preset?: Preset;
   disabled?: boolean;
@@ -30,9 +31,11 @@ export function ConfigureOutputButton({
         onClick={toggleConfigModal}
         disabled={!preset || disabled}
         hoverMessage={!preset ? t('preset.preset_necessary') : ''}
-        className={`min-w-fit`}
+        className={`min-w-fit ${
+          disabled ? 'bg-button-bg/50 pointer-events-none' : 'bg-button-bg'
+        }`}
       >
-        <IconSettings className="text-p" />
+        <IconSettings className={`${disabled ? 'text-p/50' : 'text-p'}`} />
       </Button>
       {preset && (
         <ConfigureOutputModal

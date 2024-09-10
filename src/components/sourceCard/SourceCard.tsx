@@ -16,6 +16,7 @@ type SourceCardProps = {
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   src: string;
+  isLocked: boolean;
 };
 
 export default function SourceCard({
@@ -26,7 +27,8 @@ export default function SourceCard({
   onSelectingText,
   forwardedRef,
   src,
-  style
+  style,
+  isLocked
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(label ? label : source.name);
 
@@ -75,6 +77,7 @@ export default function SourceCard({
             onSelectingText(true);
           }}
           onBlur={saveText}
+          disabled={isLocked}
         />
       </div>
       <SourceThumbnail source={source} src={src} />
@@ -84,7 +87,12 @@ export default function SourceCard({
         })}
       </h2>
       <button
-        className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg"
+        className={`${
+          isLocked
+            ? 'bg-red-500/50 text-p/50'
+            : 'text-p bg-red-700 hover:bg-red-600 hover:border-l hover:border-t'
+        } absolute bottom-0 right-0 text-p min-w-fit p-1 rounded-tl-lg`}
+        disabled={isLocked}
         onClick={() => {
           onSourceRemoval({
             _id: source._id.toString(),

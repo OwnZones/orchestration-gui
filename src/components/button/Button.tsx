@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { twMerge } from 'tailwind-merge';
+
 type ButtonProps = {
   type?: 'submit' | 'button';
   className?: string;
@@ -26,16 +27,14 @@ export function Button({
   hoverMessage,
   icon
 }: PropsWithChildren<ButtonProps>) {
-  const css = disabled
-    ? 'bg-gray-400 text-gray-600 cursor-default hover:bg-gray-400'
-    : states[state];
+  const css = !disabled && states[state];
 
   return (
     <button
       type={type}
       onClick={onClick}
       className={twMerge(
-        `font-bold py-2 px-4 rounded inline-flex items-center cursor-pointer `,
+        `font-bold py-2 px-4 rounded inline-flex items-center cursor-pointer`,
         css,
         className
       )}

@@ -11,12 +11,14 @@ type DeleteProductionButtonProps = {
   id: string;
   name: string;
   isActive: boolean;
+  isLocked: boolean;
 };
 
 export function DeleteProductionButton({
   id,
   name,
-  isActive
+  isActive,
+  isLocked
 }: DeleteProductionButtonProps) {
   const router = useRouter();
   const deleteProduction = useDeleteProduction();
@@ -38,12 +40,12 @@ export function DeleteProductionButton({
     <>
       <button
         className={`${
-          isActive
-            ? 'bg-gray-400'
-            : 'bg-button-delete hover:bg-button-hover-red-bg'
+          isActive || isLocked
+            ? 'bg-button-delete/50 text-p/50'
+            : 'bg-button-delete hover:bg-button-hover-red-bg text-p'
         } p-2 rounded`}
         onClick={onClick}
-        disabled={loading || isActive}
+        disabled={loading || isActive || isLocked}
       >
         {loading ? (
           <Loader className="w-6 h-6" />

@@ -17,8 +17,9 @@ interface IOutput {
   outputRows: IContents[][];
   rowIndex: number;
   max: number;
-  updateRows?: (e: IEvent, rowIndex: number, index: number, id: string) => void;
   small?: boolean;
+  isLocked: boolean;
+  updateRows?: (e: IEvent, rowIndex: number, index: number, id: string) => void;
 }
 
 export default function Outputs({
@@ -26,8 +27,9 @@ export default function Outputs({
   outputRows,
   rowIndex,
   max,
-  updateRows,
-  small = false
+  small = false,
+  isLocked,
+  updateRows
 }: IOutput) {
   return (
     <div className="flex">
@@ -50,7 +52,7 @@ export default function Outputs({
             } relative ${styles.checkbox}`}
           >
             <NumberInput
-              isDisabled={small || !isEnabled}
+              isDisabled={small || !isEnabled || isLocked}
               max={max}
               value={value}
               updateRows={(e: IEvent) =>

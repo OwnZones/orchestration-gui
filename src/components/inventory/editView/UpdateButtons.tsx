@@ -7,15 +7,19 @@ import { Loader } from '../../loader/Loader';
 import { SourceWithId } from '../../../interfaces/Source';
 import { IconTrash } from '@tabler/icons-react';
 
-export default function UpdateButtons({
-  close,
-  removeInventorySource,
-  source
-}: {
-  close: () => void;
-  removeInventorySource: (source: SourceWithId) => void;
+type UpdateButtonsProps = {
   source: SourceWithId;
-}) {
+  isLocked: boolean;
+  removeInventorySource: (source: SourceWithId) => void;
+  close: () => void;
+};
+
+export default function UpdateButtons({
+  source,
+  isLocked,
+  close,
+  removeInventorySource
+}: UpdateButtonsProps) {
   const t = useTranslate();
   const {
     saved: [saved],
@@ -25,7 +29,7 @@ export default function UpdateButtons({
 
   return (
     <div className="mt-2 flex mb-8 mr-8">
-      <div className="flex flex-1 justify-center justify-items-center text-confirm ">
+      <div className="flex flex-1 justify-center justify-items-center text-confirm">
         <div className={`opacity-0 ${saved ? styles.opacity : ''}`}>
           {t('saved')}
         </div>
@@ -35,16 +39,32 @@ export default function UpdateButtons({
         <Button
           type="button"
           state="warning"
-          disabled={source.status !== 'gone'}
-          className="mr-5 relative flex"
+          disabled={source.status !== 'gone' || isLocked}
+          className={`${
+            isLocked || source.status !== 'gone'
+              ? 'bg-button-delete/50 pointer-events-none'
+              : 'bg-button-delete'
+          } mr-5 relative flex`}
           onClick={() => removeInventorySource(source)}
         >
-          <IconTrash className="text-p" />
+          <IconTrash
+            className={`${
+              isLocked || source.status !== 'gone' ? 'text-p/50' : 'text-p'
+            }`}
+          />
         </Button>
         <Button state="warning" onClick={close}>
           {t('close')}
         </Button>
-        <Button className="ml-5 relative flex" type="submit" disabled={isSame}>
+        <Button
+          className={`${
+            isLocked || isSame
+              ? 'bg-button-bg/50 text-button-text/50 pointer-events-none'
+              : 'text-button-text bg-button-bg'
+          } ml-5 relative flex`}
+          type="submit"
+          disabled={isSame || isLocked}
+        >
           {loading ? (
             <Loader className="w-10 h-5" />
           ) : (

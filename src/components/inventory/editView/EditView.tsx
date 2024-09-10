@@ -8,17 +8,21 @@ import UpdateButtons from './UpdateButtons';
 import AudioChannels from './AudioChannels/AudioChannels';
 import { IconExclamationCircle } from '@tabler/icons-react';
 
-export default function EditView({
-  source,
-  updateSource,
-  close,
-  removeInventorySource
-}: {
+type EditViewProps = {
   source: SourceWithId;
+  isLocked: boolean;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
   removeInventorySource: (source: SourceWithId) => void;
-}) {
+};
+
+export default function EditView({
+  source,
+  isLocked,
+  updateSource,
+  close,
+  removeInventorySource
+}: EditViewProps) {
   const [loaded, setLoaded] = useState(false);
   const src = useMemo(() => getSourceThumbnail(source), [source]);
 
@@ -46,16 +50,17 @@ export default function EditView({
           />
         )}
 
-        <GeneralSettings />
+        <GeneralSettings isLocked={isLocked} />
       </div>
 
       <div className="flex-auto">
-        <AudioChannels source={source} />
+        <AudioChannels source={source} isLocked={isLocked} />
       </div>
       <UpdateButtons
+        source={source}
+        isLocked={isLocked}
         close={close}
         removeInventorySource={removeInventorySource}
-        source={source}
       />
     </EditViewContext>
   );

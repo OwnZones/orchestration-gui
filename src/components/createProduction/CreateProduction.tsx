@@ -3,18 +3,25 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '../button/Button';
 import { LegacyRef, useCallback, useRef, useState, KeyboardEvent } from 'react';
-import { IconServerCog } from '@tabler/icons-react';
+import { IconServerCog, IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useTranslate } from '../../i18n/useTranslate';
 import { usePostProduction } from '../../hooks/productions';
-import { IconPlus } from '@tabler/icons-react';
 import { refresh } from '../../utils/refresh';
-export function CreateProduction() {
+import { LockButton } from '../lockButton/LockButton';
+
+type CreateProductionProps = {
+  onClick: () => void;
+  isLocked: boolean;
+};
+
+export function CreateProduction({ onClick, isLocked }: CreateProductionProps) {
   const router = useRouter();
   const postProduction = usePostProduction();
 
   const inputRef: LegacyRef<HTMLInputElement> = useRef<HTMLInputElement>(null);
-  const [showing, setShowing] = useState(false);
+  const [showing, setShowing] = useState<boolean>(false);
+
   const t = useTranslate();
 
   const handleCreateNew = useCallback(async () => {
@@ -47,13 +54,19 @@ export function CreateProduction() {
           {t('production_configuration')}
         </div>
         <div className="flex mr-2 gap-3">
+          <LockButton isLocked={isLocked} onClick={onClick} />
           <Button className="hover:bg-button-hover-bg">
             <Link href="/inventory">{t('inventory')}</Link>
           </Button>
           <Button
-            className="hover:bg-button-hover-bg"
+            className={`${
+              isLocked
+                ? 'bg-button-bg/50 pointer-events-none'
+                : 'hover:bg-button-hover-bg bg-button-bg'
+            }`}
             onClick={handleOpen}
             icon={<IconPlus size={16} className="mr-2" />}
+            disabled={isLocked}
           >
             {t('create_new')}
           </Button>
@@ -92,7 +105,11 @@ export function CreateProduction() {
             </div>
             <div className="rounded">
               <Button
-                className="hover:bg-button-hover-bg"
+                className={`${
+                  isLocked
+                    ? 'bg-button-bg/50'
+                    : 'hover:bg-button-hover-bg bg-button-bg'
+                }`}
                 onClick={handleCreateNew}
               >
                 {t('create')}

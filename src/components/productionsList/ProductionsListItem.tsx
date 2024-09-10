@@ -20,21 +20,23 @@ import toast from 'react-hot-toast';
 import { refresh } from '../../utils/refresh';
 import { StopModal } from '../modal/StopModal';
 import { useState } from 'react';
-import { useDeleteMonitoring } from '../../hooks/monitoring';
 import { StartModal } from '../modal/StartModal';
 
 type ProductionListItemProps = {
   production: Production;
+  isLocked: boolean;
 };
 
-export function ProductionsListItem({ production }: ProductionListItemProps) {
+export function ProductionsListItem({
+  production,
+  isLocked
+}: ProductionListItemProps) {
   const [stopProduction, loading] = useStopProduction();
   const [startProduction, loadingStartProduction] = useStartProduction();
   const [startProductionStatus, setStartProductionStatus] =
     useState<StartProductionStatus>();
   const [stopProductionStatus, setStopProductionStatus] =
     useState<StopProductionStatus>();
-  const [deleteMonitoring] = useDeleteMonitoring();
   const [stopModalOpen, setStopModalOpen] = useState(false);
   const [startErrorModalOpen, setStartErrorModalOpen] = useState(false);
   const putProduction = usePutProduction();
@@ -141,16 +143,25 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
       </Link>
       <div className="flex space-x-4">
         {production.isActive && (
-          <MonitoringButton id={production._id.toString()} />
+          <MonitoringButton
+            id={production._id.toString()}
+            isLocked={isLocked}
+          />
         )}
         {isConfigured(production) && (
           <div
             onClick={() => handleStartStopButtonClick()}
             className={`${
-              production.isActive
+              isLocked
+                ? 'pointer-events-none bg-brand/50 text-p/50'
+                : 'pointer-events-auto'
+            } ${
+              production.isActive && !isLocked
                 ? 'bg-button-delete hover:bg-button-hover-red-bg'
                 : 'bg-brand hover:bg-button-hover-bg'
-            } p-2 rounded cursor-pointer`}
+            } 
+            ${isLocked && production.isActive && 'bg-button-delete/50'}
+            p-2 rounded cursor-pointer`}
           >
             {(loading || loadingStartProduction) && !startErrorModalOpen ? (
               <Loader className="w-6 h-6" />
@@ -183,6 +194,7 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
           isActive={production.isActive}
           id={production._id.toString()}
           name={production.name}
+          isLocked={isLocked}
         />
       </div>
     </li>

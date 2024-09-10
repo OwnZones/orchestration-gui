@@ -6,7 +6,11 @@ import SelectOptions from './SelectOptions';
 import { getHertz } from '../../../utils/stream';
 import videoSettings from '../../../utils/videoSettings';
 
-export default function GeneralSettings() {
+type GeneralSettingsProps = {
+  isLocked: boolean;
+};
+
+export default function GeneralSettings({ isLocked }: GeneralSettingsProps) {
   const {
     input: [input, setInput],
     saved: [saved, setSaved],
@@ -41,7 +45,12 @@ export default function GeneralSettings() {
           type="text"
           value={input.name}
           onChange={(e) => onChange('name', e.target.value)}
-          className="cursor-pointer ml-5 border justify-center text-sm rounded-lg w-full pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          className={`${
+            isLocked
+              ? 'pointer-events-none bg-gray-700/50 border-gray-600/50 placeholder-gray-400/50 text-p/50'
+              : 'pointer-events-auto bg-gray-700 border-gray-600 placeholder-gray-400 text-p'
+          } 'cursor-pointer ml-5 border justify-center text-sm rounded-lg w-full pl-2 pt-1 pb-1 focus:ring-blue-500 focus:border-blue-500'`}
+          disabled={isLocked}
         />
       </div>
 
@@ -50,15 +59,17 @@ export default function GeneralSettings() {
           name="type"
           options={types}
           selected={input.type}
+          disabled={isLocked}
           onChange={(e) => onChange('type', e.target.value.toLowerCase())}
         />
       </div>
       <div className="flex mb-5">
         <SelectOptions
           name="location"
-          onChange={(e) => onChange('location', e.target.value.toLowerCase())}
-          selected={input.location}
           options={locations}
+          selected={input.location}
+          disabled={isLocked}
+          onChange={(e) => onChange('location', e.target.value.toLowerCase())}
         />
       </div>
 
