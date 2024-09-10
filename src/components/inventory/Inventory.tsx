@@ -56,6 +56,7 @@ export default function Inventory({ isLocked }: InventoryProps) {
             action={(source) => {
               editSource(source);
             }}
+            isLocked={isLocked}
           />
         );
       }

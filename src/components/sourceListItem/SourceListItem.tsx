@@ -14,9 +14,10 @@ import capitalize from '../../utils/capitalize';
 
 type SourceListItemProps = {
   source: SourceWithId;
-  action: (source: SourceWithId) => void;
   edit?: boolean;
   disabled: unknown;
+  isLocked: boolean;
+  action: (source: SourceWithId) => void;
 };
 
 const getIcon = (source: Source) => {
@@ -51,7 +52,8 @@ function InventoryListItem({
   source,
   action,
   disabled,
-  edit = false
+  edit = false,
+  isLocked
 }: SourceListItemProps) {
   const t = useTranslate();
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
@@ -169,6 +171,7 @@ function InventoryListItem({
                       outputRows={outputRows}
                       rowIndex={rowIndex}
                       max={channelsInArray[channelsInArray.length - 1]}
+                      isLocked={isLocked}
                     />
                   </div>
                 ))}

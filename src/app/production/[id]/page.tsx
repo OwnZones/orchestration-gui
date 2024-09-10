@@ -374,6 +374,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           key={`${source.ingest_source_name}-${index}`}
           source={source}
           disabled={selectedProductionItems?.includes(source._id.toString())}
+          isLocked={isLocked}
           action={(source: SourceWithId) => {
             if (productionSetup && productionSetup.isActive) {
               setSelectedSource(source);
