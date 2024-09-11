@@ -118,7 +118,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
     if (!productionSetup) return;
     addSource(input, productionSetup).then((updatedSetup) => {
-
       if (!updatedSetup) return;
       setSourceReferenceToAdd(updatedSetup.sources[0]);
       setProductionSetup(updatedSetup);
@@ -720,7 +719,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             {productionSetup?.sources && sources.size > 0 && (
               <DndProvider backend={HTML5Backend}>
                 <SourceCards
-                  sourceRef={sourceReferenceToAdd}
+                  // sourceRef={sourceReferenceToAdd}
                   productionSetup={productionSetup}
                   updateProduction={(updated) => {
                     updateProduction(productionSetup._id, updated);

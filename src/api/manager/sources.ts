@@ -27,7 +27,6 @@ export async function getSourcesByIds(
   const db = await getDatabase().catch(() => {
     throw new Error("Can't connect to Database");
   });
-
   const objectIds = _ids.map((id: string) => new ObjectId(id));
 
   const sources = await db

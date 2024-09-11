@@ -82,7 +82,7 @@ export default function Inventory() {
             <ul
               className={`flex flex-col border-t border-gray-600 overflow-scroll h-[95%] ${styles.no_scrollbar}`}
             >
-              {loading ? '' : getSourcesToDisplay(filteredSources)}
+              {getSourcesToDisplay(filteredSources)}
             </ul>
           </div>
         </div>
