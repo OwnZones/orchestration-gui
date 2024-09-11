@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState, KeyboardEvent } from 'react';
 import { PageProps } from '../../../../.next/types/app/production/[id]/page';
 import SourceListItem from '../../../components/sourceListItem/SourceListItem';
@@ -42,7 +43,8 @@ import { useDeleteStream, useCreateStream } from '../../../hooks/streams';
 import { MonitoringButton } from '../../../components/button/MonitoringButton';
 import { useGetMultiviewPreset } from '../../../hooks/multiviewPreset';
 import { useMultiviews } from '../../../hooks/multiviews';
-import { v4 as uuidv4 } from 'uuid';
+import { useAddSource } from '../../../hooks/sources/useAddSource';
+import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import { Select } from '../../../components/select/Select';
 
 export default function ProductionConfiguration({ params }: PageProps) {
@@ -95,6 +97,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [deleteSourceStatus, setDeleteSourceStatus] =
     useState<DeleteSourceStatus>();
 
+  // Create source
+  const [firstEmptySlot] = useGetFirstEmptySlot();
+  const [addSource] = useAddSource();
+
   const isAddButtonDisabled =
     selectedValue !== 'HTML' && selectedValue !== 'Media Player';
 
@@ -103,29 +109,24 @@ export default function ProductionConfiguration({ params }: PageProps) {
     refreshControlPanels();
   }, [productionSetup?.isActive]);
 
-  // TODO: Väldigt lik den för ingest_source --> ändra??
   const addSourceToProduction = (type: Type) => {
-    const newSource: SourceReference = {
-      _id: uuidv4(),
+    const input: SourceReference = {
       type: type,
       label: type === 'html' ? 'HTML Input' : 'Media Player Source',
-      input_slot: getFirstEmptySlot()
+      input_slot: firstEmptySlot(productionSetup)
     };
 
-    setSourceReferenceToAdd(newSource);
-
-    if (productionSetup) {
-      const updatedSetup = addSetupItem(newSource, productionSetup);
+    if (!productionSetup) return;
+    addSource(input, productionSetup).then((updatedSetup) => {
 
       if (!updatedSetup) return;
+      setSourceReferenceToAdd(updatedSetup.sources[0]);
       setProductionSetup(updatedSetup);
-      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-        refreshProduction();
-        setAddSourceModal(false);
-        setSourceReferenceToAdd(undefined);
-      });
-      setAddSourceStatus(undefined);
-    }
+      refreshProduction();
+      setAddSourceModal(false);
+      setSelectedSource(undefined);
+    });
+    setAddSourceStatus(undefined);
   };
 
   const setSelectedControlPanel = (controlPanel: string[]) => {
@@ -403,6 +404,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
       </li>
     );
   }
+
+  // Adding source to a production, both in setup-mode and in live-mode
   function getSourcesToDisplay(
     filteredSources: Map<string, SourceWithId>
   ): React.ReactNode[] {
@@ -417,51 +420,24 @@ export default function ProductionConfiguration({ params }: PageProps) {
               setSelectedSource(source);
               setAddSourceModal(true);
             } else if (productionSetup) {
-              const updatedSetup = addSetupItem(
-                {
-                  _id: source._id.toString(),
-                  type: 'ingest_source',
-                  label: source.ingest_source_name,
-                  input_slot: getFirstEmptySlot()
-                },
-                productionSetup
-              );
-              if (!updatedSetup) return;
-              setProductionSetup(updatedSetup);
-              putProduction(updatedSetup._id.toString(), updatedSetup).then(
-                () => {
-                  setAddSourceModal(false);
-                  setSelectedSource(undefined);
-                }
-              );
+              const input: SourceReference = {
+                _id: source._id.toString(),
+                type: 'ingest_source',
+                label: source.ingest_source_name,
+                input_slot: firstEmptySlot(productionSetup)
+              };
+              addSource(input, productionSetup).then((updatedSetup) => {
+                if (!updatedSetup) return;
+                setProductionSetup(updatedSetup);
+                setAddSourceModal(false);
+                setSelectedSource(undefined);
+              });
             }
           }}
         />
       );
     });
   }
-
-  const getFirstEmptySlot = () => {
-    if (!productionSetup) throw 'no_production';
-    let firstEmptySlot = productionSetup.sources.length + 1;
-    if (productionSetup.sources.length === 0) {
-      return firstEmptySlot;
-    }
-    for (
-      let i = 0;
-      i <
-      productionSetup.sources[productionSetup.sources.length - 1].input_slot;
-      i++
-    ) {
-      if (
-        !productionSetup.sources.some((source) => source.input_slot === i + 1)
-      ) {
-        firstEmptySlot = i + 1;
-        break;
-      }
-    }
-    return firstEmptySlot;
-  };
 
   const handleAddSource = async () => {
     setAddSourceStatus(undefined);
@@ -477,11 +453,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
           )
         : false)
     ) {
-      const firstEmptySlot = getFirstEmptySlot();
       const result = await createStream(
         selectedSource,
         productionSetup,
-        firstEmptySlot ? firstEmptySlot : productionSetup.sources.length + 1
+        firstEmptySlot(productionSetup)
       );
       if (!result.ok) {
         if (!result.value) {
@@ -503,7 +478,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             type: 'ingest_source',
             label: selectedSource.name,
             stream_uuids: result.value.streams.map((r) => r.stream_uuid),
-            input_slot: getFirstEmptySlot()
+            input_slot: firstEmptySlot(productionSetup)
           };
           const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
           if (!updatedSetup) return;
@@ -521,7 +496,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     }
   };
 
-  // TODO: HTML och MEDIA PLAYER KÄLLOR TAS INTE BORT
   const handleRemoveSource = async () => {
     if (
       productionSetup &&

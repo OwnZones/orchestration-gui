@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 
 function createWebSocket(): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(`ws://${process.env.AGILE_WEBSOCKET}`);
+    const ws = new WebSocket(`ws://${process.env.CONTROL_PANEL_WS}`);
     ws.on('error', reject);
     ws.on('open', () => {
       // const send = ws.send.bind(ws);

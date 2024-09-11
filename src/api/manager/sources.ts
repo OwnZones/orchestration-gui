@@ -1,6 +1,6 @@
 import inventory from './mocks/inventory.json';
 import { Source } from '../../interfaces/Source';
-import { ObjectId, OptionalId } from 'mongodb';
+import { ObjectId, OptionalId, WithId } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
 
 export function getMockedSources() {
@@ -21,7 +21,9 @@ export async function getSources() {
   const db = await getDatabase();
   return await db.collection<Source>('inventory').find().toArray();
 }
-export async function getSourcesByIds(_ids: string[]) {
+export async function getSourcesByIds(
+  _ids: string[]
+): Promise<WithId<Source>[]> {
   const db = await getDatabase().catch(() => {
     throw new Error("Can't connect to Database");
   });

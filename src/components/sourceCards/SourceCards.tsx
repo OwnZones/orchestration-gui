@@ -6,6 +6,7 @@ import { Production } from '../../interfaces/production';
 import DragItem from '../dragElement/DragItem';
 import SourceCard from '../sourceCard/SourceCard';
 import { ISource, useDragableItems } from '../../hooks/useDragableItems';
+
 export default function SourceCards({
   productionSetup,
   sourceRef,
@@ -36,6 +37,8 @@ export default function SourceCards({
 
   const gridItems = items.map((source) => {
     const isSource = isISource(source);
+
+    if (!source._id) return;
 
     return (
       <DragItem

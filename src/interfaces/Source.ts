@@ -34,7 +34,7 @@ export interface Source {
 }
 
 export interface SourceReference {
-  _id: string;
+  _id?: string;
   type: Type;
   label: string;
   stream_uuids?: string[];

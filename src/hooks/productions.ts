@@ -37,7 +37,7 @@ export function useGetProduction() {
 }
 
 export function usePutProduction() {
-  return async (id: string, production: Production): Promise<void> => {
+  return async (id: string, production: Production): Promise<Production> => {
     const response = await fetch(`/api/manager/productions/${id}`, {
       method: 'PUT',
       // TODO: Implement api key
@@ -45,7 +45,7 @@ export function usePutProduction() {
       body: JSON.stringify(production)
     });
     if (response.ok) {
-      return;
+      return response.json();
     }
     throw await response.text();
   };
