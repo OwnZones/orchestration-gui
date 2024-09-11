@@ -3,13 +3,13 @@ import { SourceReference } from './Source';
 import { ControlConnection } from './controlConnections';
 import { PipelineSettings } from './pipeline';
 
-interface HtmlReference {
+export interface HtmlReference {
   _id: string;
   input_slot: number;
   label: string;
 }
 
-interface MediaplayerReference {
+export interface MediaplayerReference {
   _id: string;
   input_slot: number;
   label: string;

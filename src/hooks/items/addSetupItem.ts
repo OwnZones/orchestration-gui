@@ -1,5 +1,5 @@
-import { SourceReference } from '../../interfaces/Source';
-import { Production } from '../../interfaces/production';
+import { SourceReference, Type } from '../../interfaces/Source';
+import { HtmlReference, MediaplayerReference, Production } from '../../interfaces/production';
 
 export function addSetupItem(
   source: SourceReference,
@@ -15,7 +15,7 @@ export function addSetupItem(
       {
         _id: source._id,
         type: source.type,
-        label: source.label,
+        label: source.label, 
         stream_uuids: source.stream_uuids,
         input_slot: source.input_slot
       }
