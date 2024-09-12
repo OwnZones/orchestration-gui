@@ -33,7 +33,7 @@ export function useDragableItems(
         video_stream: source.video_stream,
         audio_stream: source.audio_stream,
         status: source.status,
-        type: source.type,
+        media_element: source.media_element,
         tags: source.tags,
         name: source.name
       };
@@ -49,7 +49,7 @@ export function useDragableItems(
         _id: refId,
         status: source.status,
         name: source.name,
-        type: source.type,
+        media_element: source.media_element,
         tags: source.tags,
         ingest_name: source.ingest_name,
         ingest_source_name: source.ingest_source_name,

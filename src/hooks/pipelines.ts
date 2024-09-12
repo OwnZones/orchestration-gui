@@ -33,6 +33,7 @@ export function usePipeline(
     setLoading(true);
     getPipeline(id)
       .then((pipeline) => {
+        console.log('pipeline', pipeline);
         setPipeline(pipeline);
       })
       .catch((error) => {

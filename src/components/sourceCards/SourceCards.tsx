@@ -19,12 +19,16 @@ export default function SourceCards({
   const [items, moveItem] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);
   if (!items) return null;
-  const sourceReferences = items.filter(
-    (item): item is SourceReference => item.type !== 'ingest_source'
-  );
   const isISource = (source: SourceReference | ISource): source is ISource => {
     return 'src' in source;
   };
+
+  const sourceReferences = items.filter(
+    // (item): item is SourceReference => item.type !== 'ingest_source'
+    (item) =>
+      (item as SourceReference).type === 'html' ||
+      (item as SourceReference).type === 'mediaplayer'
+  );
 
   const gridItems = items.map((source) => {
     const id = source._id ? source._id : '';

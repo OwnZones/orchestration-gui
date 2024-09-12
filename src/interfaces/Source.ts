@@ -1,5 +1,5 @@
 import { ObjectId, WithId } from 'mongodb';
-export type SourceType = 'camera' | 'graphics' | 'microphone';
+export type MediaElement = 'camera' | 'graphics' | 'microphone';
 export type SourceStatus = 'ready' | 'new' | 'gone' | 'purge';
 export type Type = 'ingest_source' | 'html' | 'mediaplayer';
 export type VideoStream = {
@@ -20,7 +20,7 @@ export interface Source {
   _id?: ObjectId | string;
   status: SourceStatus;
   name: string;
-  type: SourceType;
+  media_element: MediaElement;
   tags: {
     location: string;
     [key: string]: string | undefined;
