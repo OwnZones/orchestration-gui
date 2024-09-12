@@ -66,8 +66,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [selectedSourceRef, setSelectedSourceRef] = useState<
     SourceReference | undefined
   >();
-  const [sourceReferenceToAdd, setSourceReferenceToAdd] =
-    useState<SourceReference>();
   const [createStream, loadingCreateStream] = useCreateStream();
   const [deleteStream, loadingDeleteStream] = useDeleteStream();
   //PRODUCTION
@@ -119,7 +117,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     if (!productionSetup) return;
     addSource(input, productionSetup).then((updatedSetup) => {
       if (!updatedSetup) return;
-      setSourceReferenceToAdd(updatedSetup.sources[0]);
       setProductionSetup(updatedSetup);
       refreshProduction();
       setAddSourceModal(false);
@@ -719,7 +716,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
             {productionSetup?.sources && sources.size > 0 && (
               <DndProvider backend={HTML5Backend}>
                 <SourceCards
-                  // sourceRef={sourceReferenceToAdd}
                   productionSetup={productionSetup}
                   updateProduction={(updated) => {
                     updateProduction(productionSetup._id, updated);

@@ -1,9 +1,8 @@
-import React, { ReactElement, memo, useEffect, useRef } from 'react';
+import React, { ReactElement, memo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { SourceReference } from '../../interfaces/Source';
 import { ObjectId } from 'mongodb';
 import { Production } from '../../interfaces/production';
-import { v4 as uuidv4 } from 'uuid';
 
 interface IDrag {
   id: ObjectId | string;
@@ -59,7 +58,7 @@ const DragItem: React.FC<IDrag> = memo(
             ...productionSetup,
             sources: currentOrder.map((source) => ({
               ...source,
-              _id: source._id || uuidv4() // Ensure ID consistency
+              _id: source._id || undefined
             }))
           };
 

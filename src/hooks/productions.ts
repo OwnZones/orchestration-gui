@@ -10,9 +10,7 @@ export function usePostProduction() {
       body: JSON.stringify({
         isActive: false,
         name,
-        sources: [],
-        html: [],
-        mediaplayers: []
+        sources: []
       })
     });
     if (response.ok) {

@@ -64,8 +64,6 @@ export async function putProduction(
     name: production.name,
     isActive: production.isActive,
     sources: sources,
-    html: [],
-    mediaplayers: [],
     production_settings: production.production_settings
   };
 }

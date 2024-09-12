@@ -31,7 +31,6 @@ export function useAddSource(): CallbackHook<
     if (!updatedSetup) return;
 
     const res = await putProduction(updatedSetup._id.toString(), updatedSetup);
-    console.log('res', res);
     return res;
   };
 

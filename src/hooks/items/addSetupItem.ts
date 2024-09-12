@@ -1,9 +1,5 @@
-import { SourceReference, Type } from '../../interfaces/Source';
-import {
-  HtmlReference,
-  MediaplayerReference,
-  Production
-} from '../../interfaces/production';
+import { SourceReference } from '../../interfaces/Source';
+import { Production } from '../../interfaces/production';
 
 export function addSetupItem(
   source: SourceReference,
