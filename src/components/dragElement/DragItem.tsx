@@ -3,7 +3,6 @@ import { useDrag, useDrop } from 'react-dnd';
 import { SourceReference } from '../../interfaces/Source';
 import { ObjectId } from 'mongodb';
 import { Production } from '../../interfaces/production';
-import { ISource } from '../../hooks/useDragableItems';
 
 interface IDrag {
   id: ObjectId | string;

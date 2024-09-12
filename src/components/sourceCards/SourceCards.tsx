@@ -23,13 +23,6 @@ export default function SourceCards({
     return 'src' in source;
   };
 
-  const sourceReferences = items.filter(
-    // (item): item is SourceReference => item.type !== 'ingest_source'
-    (item) =>
-      (item as SourceReference).type === 'html' ||
-      (item as SourceReference).type === 'mediaplayer'
-  );
-
   const gridItems = items.map((source) => {
     const id = source._id ? source._id : '';
     const isSource = isISource(source);
@@ -39,7 +32,7 @@ export default function SourceCards({
         id={id}
         onMoveItem={moveItem}
         previousOrder={productionSetup.sources}
-        currentOrder={sourceReferences}
+        currentOrder={items as SourceReference[]}
         productionSetup={productionSetup}
         updateProduction={updateProduction}
         selectingText={selectingText}
