@@ -493,13 +493,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
 
   const handleRemoveSource = async () => {
-    if (
-      productionSetup &&
-      productionSetup.isActive &&
-      selectedSourceRef &&
-      // Gör det här att sourcen inte tas bort ordentligt?
-      selectedSourceRef.stream_uuids
-    ) {
+    if (productionSetup && productionSetup.isActive && selectedSourceRef) {
       const multiviews =
         productionSetup.production_settings.pipelines[0].multiviews;
 
@@ -511,9 +505,60 @@ export default function ProductionConfiguration({ params }: PageProps) {
         )
       );
 
-      if (!viewToUpdate) {
-        if (!productionSetup.production_settings.pipelines[0].pipeline_id)
+      if (selectedSourceRef.stream_uuids) {
+        if (!viewToUpdate) {
+          if (!productionSetup.production_settings.pipelines[0].pipeline_id)
+            return;
+
+          const result = await deleteStream(
+            selectedSourceRef.stream_uuids,
+            productionSetup,
+            selectedSourceRef.input_slot
+          );
+
+          if (!result.ok) {
+            if (!result.value) {
+              setDeleteSourceStatus({
+                success: false,
+                steps: [{ step: 'unexpected', success: false }]
+              });
+            } else {
+              setDeleteSourceStatus({ success: false, steps: result.value });
+              const didDeleteStream = result.value.some(
+                (step) => step.step === 'delete_stream' && step.success
+              );
+              if (didDeleteStream) {
+                const updatedSetup = removeSetupItem(
+                  selectedSourceRef,
+                  productionSetup
+                );
+                if (!updatedSetup) return;
+                setProductionSetup(updatedSetup);
+                putProduction(updatedSetup._id.toString(), updatedSetup).then(
+                  () => {
+                    setSelectedSourceRef(undefined);
+                  }
+                );
+                return;
+              }
+            }
+            return;
+          }
+
+          const updatedSetup = removeSetupItem(
+            selectedSourceRef,
+            productionSetup
+          );
+
+          if (!updatedSetup) return;
+
+          setProductionSetup(updatedSetup);
+          putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
+            setRemoveSourceModal(false);
+            setSelectedSourceRef(undefined);
+          });
           return;
+        }
 
         const result = await deleteStream(
           selectedSourceRef.stream_uuids,
@@ -539,61 +584,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
               );
               if (!updatedSetup) return;
               setProductionSetup(updatedSetup);
-              putProduction(updatedSetup._id.toString(), updatedSetup).then(
-                () => {
-                  setSelectedSourceRef(undefined);
-                }
-              );
+              putProduction(updatedSetup._id.toString(), updatedSetup);
               return;
             }
           }
           return;
         }
-
-        const updatedSetup = removeSetupItem(
-          selectedSourceRef,
-          productionSetup
-        );
-
-        if (!updatedSetup) return;
-
-        setProductionSetup(updatedSetup);
-        putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-          setRemoveSourceModal(false);
-          setSelectedSourceRef(undefined);
-        });
-        return;
-      }
-
-      const result = await deleteStream(
-        selectedSourceRef.stream_uuids,
-        productionSetup,
-        selectedSourceRef.input_slot
-      );
-
-      if (!result.ok) {
-        if (!result.value) {
-          setDeleteSourceStatus({
-            success: false,
-            steps: [{ step: 'unexpected', success: false }]
-          });
-        } else {
-          setDeleteSourceStatus({ success: false, steps: result.value });
-          const didDeleteStream = result.value.some(
-            (step) => step.step === 'delete_stream' && step.success
-          );
-          if (didDeleteStream) {
-            const updatedSetup = removeSetupItem(
-              selectedSourceRef,
-              productionSetup
-            );
-            if (!updatedSetup) return;
-            setProductionSetup(updatedSetup);
-            putProduction(updatedSetup._id.toString(), updatedSetup);
-            return;
-          }
-        }
-        return;
       }
       const updatedSetup = removeSetupItem(selectedSourceRef, productionSetup);
       if (!updatedSetup) return;
