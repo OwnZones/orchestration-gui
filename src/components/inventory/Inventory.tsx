@@ -48,7 +48,6 @@ export default function Inventory({ locked }: { locked: boolean }) {
             updateSource={(source) => setUpdatedSource(source)}
             close={() => setCurrentSource(null)}
             removeInventorySource={removeInventorySource}
-            locked={locked}
           />
         </div>
       ) : null}

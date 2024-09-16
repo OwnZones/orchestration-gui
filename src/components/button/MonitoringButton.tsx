@@ -4,8 +4,6 @@ import { useTranslate } from '../../i18n/useTranslate';
 import { useMonitoringError } from '../../hooks/monitoring';
 import { IconLoader } from '@tabler/icons-react';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
-import { useContext } from 'react';
-import { GlobalContext } from '../../contexts/GlobalContext';
 
 type MonitoringButtonProps = {
   id: string;
@@ -15,7 +13,7 @@ type MonitoringButtonProps = {
 export const MonitoringButton = ({ id, locked }: MonitoringButtonProps) => {
   const t = useTranslate();
   const [hasError, loading] = useMonitoringError(id);
-  const { locked } = useContext(GlobalContext);
+
   return (
     <Link
       className={`${
