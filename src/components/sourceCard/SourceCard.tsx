@@ -6,6 +6,10 @@ import { SourceReference } from '../../interfaces/Source';
 import { SourceThumbnail } from './SourceThumbnail';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
+import ImageComponent from '../image/ImageComponent';
+import { getSourceThumbnail } from '../../utils/source';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type SourceCardProps = {
   source: ISource;
@@ -16,7 +20,6 @@ type SourceCardProps = {
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   src: string;
-  isLocked: boolean;
 };
 
 export default function SourceCard({
@@ -27,12 +30,12 @@ export default function SourceCard({
   onSelectingText,
   forwardedRef,
   src,
-  style,
-  isLocked
+  style
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(label ? label : source.name);
 
   const t = useTranslate();
+  const { locked } = useContext(GlobalContext);
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
@@ -69,7 +72,7 @@ export default function SourceCard({
     >
       <div className="relative">
         <input
-          className={`absolute bg-zinc-900 text-center hover:border focus:hover:border-none w-full text-p bg-opacity-90 focus:bg-opacity-100`}
+          className={`absolute z-20 bg-zinc-900 text-center hover:border focus:hover:border-none w-full text-p bg-opacity-90 focus:bg-opacity-100`}
           value={sourceLabel}
           onChange={updateText}
           onKeyDown={handleKeyDown}
@@ -77,22 +80,22 @@ export default function SourceCard({
             onSelectingText(true);
           }}
           onBlur={saveText}
-          disabled={isLocked}
+          disabled={locked}
         />
       </div>
-      <SourceThumbnail source={source} src={src} />
-      <h2 className="absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
+      <ImageComponent src={getSourceThumbnail(source)} />
+      <h2 className="z-20 absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
         {t('source.ingest', {
           ingest: source.ingest_name
         })}
       </h2>
       <button
         className={`${
-          isLocked
-            ? 'bg-red-500/50 text-p/50'
-            : 'text-p bg-red-700 hover:bg-red-600 hover:border-l hover:border-t'
-        } absolute bottom-0 right-0 text-p min-w-fit p-1 rounded-tl-lg`}
-        disabled={isLocked}
+          locked
+            ? 'bg-red-700/50'
+            : 'hover:border-l hover:border-t bg-red-700 hover:bg-red-600'
+        } z-20 absolute bottom-0 right-0 text-p min-w-fit p-1 rounded-tl-lg`}
+        disabled={locked}
         onClick={() => {
           onSourceRemoval({
             _id: source._id.toString(),

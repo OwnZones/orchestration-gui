@@ -584,6 +584,7 @@ export const en = {
   },
   online: 'ONLINE',
   offline: 'OFFLINE',
+  refresh_images: 'Refresh Thumbnails',
   server_error: 'No connection with {{string}}',
   system_controller: 'System controller',
   database: 'Database',
