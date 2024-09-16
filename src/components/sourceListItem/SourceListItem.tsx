@@ -27,6 +27,7 @@ function SourceListItem({
   actionText
 }: SourceListItemProps) {
   const t = useTranslate();
+
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [outputRows, setOutputRows] = useState<
     { id: string; value: string }[][]

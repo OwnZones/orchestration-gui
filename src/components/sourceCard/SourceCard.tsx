@@ -3,7 +3,6 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { SourceReference } from '../../interfaces/Source';
-import { SourceThumbnail } from './SourceThumbnail';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
 import ImageComponent from '../image/ImageComponent';
@@ -20,7 +19,6 @@ type SourceCardProps = {
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   src: string;
-  isLocked: boolean;
 };
 
 export default function SourceCard({
@@ -31,8 +29,7 @@ export default function SourceCard({
   onSelectingText,
   forwardedRef,
   src,
-  style,
-  isLocked
+  style
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(label ? label : source.name);
 

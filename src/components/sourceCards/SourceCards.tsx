@@ -12,14 +12,12 @@ export default function SourceCards({
   productionSetup,
   updateProduction,
   onSourceUpdate,
-  onSourceRemoval,
-  isLocked
+  onSourceRemoval
 }: {
   productionSetup: Production;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference, sourceItem: ISource) => void;
   onSourceRemoval: (source: SourceReference) => void;
-  isLocked: boolean;
 }) {
   const [items, moveItem, loading] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);
@@ -74,7 +72,6 @@ export default function SourceCards({
                 onSelectingText={(isSelecting: boolean) =>
                   setSelectingText(isSelecting)
                 }
-                isLocked={isLocked}
               />
             </DragItem>
           );
@@ -90,7 +87,6 @@ export default function SourceCards({
               onSelectingText={(isSelecting: boolean) =>
                 setSelectingText(isSelecting)
               }
-              isLocked={isLocked}
             />
           );
         }

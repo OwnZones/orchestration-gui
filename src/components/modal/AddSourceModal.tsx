@@ -12,6 +12,7 @@ type AddSourceModalProps = {
   onConfirm: () => void;
   status?: AddSourceStatus;
   loading: boolean;
+  locked: boolean;
 };
 
 export function AddSourceModal({
@@ -20,7 +21,8 @@ export function AddSourceModal({
   onAbort,
   onConfirm,
   status,
-  loading
+  loading,
+  locked
 }: AddSourceModalProps) {
   const t = useTranslate();
   return (
@@ -37,7 +39,7 @@ export function AddSourceModal({
             {t('abort')}
           </Button>
 
-          <Button onClick={onConfirm} className={'min-w-fit'}>
+          <Button onClick={onConfirm} className={'min-w-fit'} disabled={locked}>
             {loading ? (
               <Loader className="w-10 h-5" />
             ) : (

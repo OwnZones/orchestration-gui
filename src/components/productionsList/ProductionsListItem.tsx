@@ -21,6 +21,8 @@ import { refresh } from '../../utils/refresh';
 import { StopModal } from '../modal/StopModal';
 import { useState } from 'react';
 import { StartModal } from '../modal/StartModal';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type ProductionListItemProps = {
   production: Production;
@@ -40,6 +42,8 @@ export function ProductionsListItem({
   const [stopModalOpen, setStopModalOpen] = useState(false);
   const [startErrorModalOpen, setStartErrorModalOpen] = useState(false);
   const putProduction = usePutProduction();
+  const { locked } = useContext(GlobalContext);
+
   const handleStopProduction = async () => {
     stopProduction(production)
       .then((status) => {

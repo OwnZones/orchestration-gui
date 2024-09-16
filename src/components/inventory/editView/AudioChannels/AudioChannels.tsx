@@ -227,8 +227,8 @@ export default function AudioChannels({ source, locked }: IAudioChannels) {
             outputRows={outputRows}
             rowIndex={rowIndex}
             max={max}
-            locked={locked}
             updateRows={updateRows}
+            locked={locked}
           />
         </div>
       ))}

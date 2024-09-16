@@ -666,6 +666,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               onConfirm={handleAddSource}
               status={addSourceStatus}
               loading={loadingCreateStream}
+              locked={locked}
             />
           )}
         </div>

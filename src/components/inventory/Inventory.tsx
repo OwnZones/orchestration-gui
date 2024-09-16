@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSources } from '../../hooks/sources/useSources';
 import { useSetSourceToPurge } from '../../hooks/sources/useSetSourceToPurge';
 import { SourceWithId } from '../../interfaces/Source';
-import EditView from '../../../orchestration-gui/src/components/inventory/editView/EditView';
+import EditView from './editView/EditView';
 import SourceList from '../sourceList/SourceList';
 import { useTranslate } from '../../i18n/useTranslate';
 
@@ -43,6 +43,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
       {currentSource ? (
         <div className={`p-3 ml-2 mt-2 bg-container rounded h-1/2 min-w-max`}>
           <EditView
+            locked={locked}
             source={currentSource}
             updateSource={(source) => setUpdatedSource(source)}
             close={() => setCurrentSource(null)}

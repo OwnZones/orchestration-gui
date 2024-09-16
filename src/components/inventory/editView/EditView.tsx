@@ -5,24 +5,23 @@ import { SourceWithId } from '../../../interfaces/Source';
 import UpdateButtons from './UpdateButtons';
 import AudioChannels from './AudioChannels/AudioChannels';
 import ImageComponent from '../../image/ImageComponent';
+import { useContext } from 'react';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 
 export default function EditView({
   source,
-  isLocked,
   updateSource,
   close,
   removeInventorySource,
   locked
 }: {
   source: SourceWithId;
-  isLocked: boolean;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
   removeInventorySource: (source: SourceWithId) => void;
   locked: boolean;
 }) {
-  const [loaded, setLoaded] = useState(false);
-  const src = useMemo(() => getSourceThumbnail(source), [source]);
+  console.log('LOCKED THREE: ', locked);
 
   return (
     <EditViewContext source={source} updateSource={updateSource}>
@@ -38,11 +37,9 @@ export default function EditView({
       </div>
       <UpdateButtons
         source={source}
-        isLocked={isLocked}
         close={close}
         removeInventorySource={removeInventorySource}
-        source={source}
-        isLocked={locked}
+        locked={locked}
       />
     </EditViewContext>
   );
