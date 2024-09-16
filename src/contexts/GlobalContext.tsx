@@ -23,6 +23,7 @@ export const GlobalContext = createContext<IGlobalContext>({
 const GlobalContextProvider = (props: PropsWithChildren) => {
   const { children } = props;
   const [locked, setLocked] = useState<boolean>(true);
+
   const [imageRefetchIndex, setImageRefetchIndex] = useState<number>(0);
 
   const incrementImageRefetchIndex = () => {

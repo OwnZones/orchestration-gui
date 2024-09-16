@@ -15,7 +15,7 @@ export default function HeaderNavigation({
   const { incrementImageRefetchIndex } = useContext(GlobalContext);
   return (
     <div className="flex flex-row justify-between">
-      <div className="m-2 rounded">
+      <div className="flex m-2 rounded align-center">
         <Link
           className="bg-button-bg hover:bg-button-hover-bg text-button-text font-bold py-2 px-4 rounded inline-flex items-center"
           href={'/'}

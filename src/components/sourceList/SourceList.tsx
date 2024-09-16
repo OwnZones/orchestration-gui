@@ -27,6 +27,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
     action,
     actionText,
     locked
+    actionText
   } = props;
 
   const [filteredSources, setFilteredSources] =

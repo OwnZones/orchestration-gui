@@ -13,6 +13,7 @@ import { SourceListItemThumbnail } from './SourceListItemThumbnail';
 
 type SourceListItemProps = {
   source: SourceWithId;
+  action?: (source: SourceWithId) => void;
   actionText?: string;
   disabled: unknown;
   action?: (source: SourceWithId) => void;

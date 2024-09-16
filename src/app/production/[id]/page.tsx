@@ -16,6 +16,8 @@ import { updateSetupItem } from '../../../hooks/items/updateSetupItem';
 import { removeSetupItem } from '../../../hooks/items/removeSetupItem';
 import { addSetupItem } from '../../../hooks/items/addSetupItem';
 import HeaderNavigation from '../../../components/headerNavigation/HeaderNavigation';
+import styles from './page.module.scss';
+import FilterProvider from '../../../contexts/FilterContext';
 import { useGetPresets } from '../../../hooks/presets';
 import { Preset } from '../../../interfaces/preset';
 import SourceCards from '../../../components/sourceCards/SourceCards';
