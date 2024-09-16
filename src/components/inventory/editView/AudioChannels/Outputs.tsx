@@ -18,7 +18,7 @@ interface IOutput {
   rowIndex: number;
   max: number;
   small?: boolean;
-  isLocked: boolean;
+  locked: boolean;
   updateRows?: (e: IEvent, rowIndex: number, index: number, id: string) => void;
 }
 
@@ -28,7 +28,7 @@ export default function Outputs({
   rowIndex,
   max,
   small = false,
-  isLocked,
+  locked,
   updateRows
 }: IOutput) {
   return (
@@ -52,7 +52,7 @@ export default function Outputs({
             } relative ${styles.checkbox}`}
           >
             <NumberInput
-              isDisabled={small || !isEnabled || isLocked}
+              isDisabled={small || !isEnabled || locked}
               max={max}
               value={value}
               updateRows={(e: IEvent) =>

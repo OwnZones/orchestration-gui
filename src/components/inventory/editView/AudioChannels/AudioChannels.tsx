@@ -11,10 +11,10 @@ import { channel, mapAudio } from '../../../../utils/audioMapping';
 
 interface IAudioChannels {
   source: Source;
-  isLocked: boolean;
+  locked: boolean;
 }
 
-export default function AudioChannels({ source, isLocked }: IAudioChannels) {
+export default function AudioChannels({ source, locked }: IAudioChannels) {
   type TOutputs = 'audio_mapping.outL' | 'audio_mapping.outR';
   const t = useTranslate();
   const outputs: TOutputs[] = ['audio_mapping.outL', 'audio_mapping.outR'];
@@ -227,8 +227,8 @@ export default function AudioChannels({ source, isLocked }: IAudioChannels) {
             outputRows={outputRows}
             rowIndex={rowIndex}
             max={max}
-            isLocked={isLocked}
             updateRows={updateRows}
+            locked={locked}
           />
         </div>
       ))}

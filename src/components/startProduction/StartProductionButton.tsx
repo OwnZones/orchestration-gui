@@ -17,18 +17,15 @@ import { usePutProduction } from '../../hooks/productions';
 import toast from 'react-hot-toast';
 import { useDeleteMonitoring } from '../../hooks/monitoring';
 import { useMultiviewPresets } from '../../hooks/multiviewPreset';
-import { SourceWithId } from '../../interfaces/Source';
 
 type StartProductionButtonProps = {
   production: Production | undefined;
-  sources: Map<string, SourceWithId>;
   disabled: boolean;
   refreshProduction: () => void;
 };
 
 export function StartProductionButton({
   production,
-  sources,
   disabled,
   refreshProduction
 }: StartProductionButtonProps) {
@@ -48,8 +45,6 @@ export function StartProductionButton({
 
   const onClick = () => {
     if (!production) return;
-    console.log('sources', sources);
-    console.log('production', production);
     const hasUndefinedPipeline = production.production_settings.pipelines.some(
       (p) => !p.pipeline_name
     );

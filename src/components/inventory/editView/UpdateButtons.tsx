@@ -9,16 +9,16 @@ import { IconTrash } from '@tabler/icons-react';
 
 type UpdateButtonsProps = {
   source: SourceWithId;
-  isLocked: boolean;
   removeInventorySource: (source: SourceWithId) => void;
   close: () => void;
+  locked: boolean;
 };
 
 export default function UpdateButtons({
   source,
-  isLocked,
   close,
-  removeInventorySource
+  removeInventorySource,
+  locked
 }: UpdateButtonsProps) {
   const t = useTranslate();
   const {
@@ -39,18 +39,16 @@ export default function UpdateButtons({
         <Button
           type="button"
           state="warning"
-          disabled={source.status !== 'gone' || isLocked}
+          disabled={source.status !== 'gone'}
           className={`${
-            isLocked || source.status !== 'gone'
+            source.status !== 'gone'
               ? 'bg-button-delete/50 pointer-events-none'
               : 'bg-button-delete'
           } mr-5 relative flex`}
           onClick={() => removeInventorySource(source)}
         >
           <IconTrash
-            className={`${
-              isLocked || source.status !== 'gone' ? 'text-p/50' : 'text-p'
-            }`}
+            className={`${source.status !== 'gone' ? 'text-p/50' : 'text-p'}`}
           />
         </Button>
         <Button state="warning" onClick={close}>
@@ -58,12 +56,12 @@ export default function UpdateButtons({
         </Button>
         <Button
           className={`${
-            isLocked || isSame
+            locked || isSame
               ? 'bg-button-bg/50 text-button-text/50 pointer-events-none'
               : 'text-button-text bg-button-bg'
           } ml-5 relative flex`}
           type="submit"
-          disabled={isSame || isLocked}
+          disabled={isSame || locked}
         >
           {loading ? (
             <Loader className="w-10 h-5" />

@@ -1,19 +1,17 @@
 import { IconLock, IconLockOpen } from '@tabler/icons-react';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type LockButtonProps = {
-  isLocked: boolean;
   classNames?: string;
-  onClick: () => void;
 };
 
-export const LockButton = ({
-  isLocked,
-  classNames,
-  onClick
-}: LockButtonProps) => {
+export const LockButton = ({ classNames }: LockButtonProps) => {
+  const { locked, toggleLocked } = useContext(GlobalContext);
+
   return (
-    <button onClick={onClick}>
-      {isLocked ? (
+    <button onClick={toggleLocked}>
+      {locked ? (
         <IconLock className={classNames} color="white" size={36} />
       ) : (
         <IconLockOpen className={classNames} color="white" size={36} />

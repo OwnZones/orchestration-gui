@@ -1,6 +1,7 @@
 import { Toaster } from 'react-hot-toast';
 import DefaultLayout from '../components/layout/DefaultLayout';
 import './globals.css';
+import GlobalContextProvider from '../contexts/GlobalContext';
 
 export default async function RootLayout({
   children
@@ -21,7 +22,9 @@ export default async function RootLayout({
             }
           }}
         />
-        <DefaultLayout>{children}</DefaultLayout>
+        <GlobalContextProvider>
+          <DefaultLayout>{children}</DefaultLayout>
+        </GlobalContextProvider>
       </body>
     </html>
   );

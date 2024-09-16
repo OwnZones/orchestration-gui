@@ -24,12 +24,12 @@ import { StartModal } from '../modal/StartModal';
 
 type ProductionListItemProps = {
   production: Production;
-  isLocked: boolean;
+  locked: boolean;
 };
 
 export function ProductionsListItem({
   production,
-  isLocked
+  locked
 }: ProductionListItemProps) {
   const [stopProduction, loading] = useStopProduction();
   const [startProduction, loadingStartProduction] = useStartProduction();
@@ -40,6 +40,7 @@ export function ProductionsListItem({
   const [stopModalOpen, setStopModalOpen] = useState(false);
   const [startErrorModalOpen, setStartErrorModalOpen] = useState(false);
   const putProduction = usePutProduction();
+
   const handleStopProduction = async () => {
     stopProduction(production)
       .then((status) => {
@@ -143,24 +144,21 @@ export function ProductionsListItem({
       </Link>
       <div className="flex space-x-4">
         {production.isActive && (
-          <MonitoringButton
-            id={production._id.toString()}
-            isLocked={isLocked}
-          />
+          <MonitoringButton id={production._id.toString()} />
         )}
         {isConfigured(production) && (
           <div
             onClick={() => handleStartStopButtonClick()}
             className={`${
-              isLocked
+              locked
                 ? 'pointer-events-none bg-brand/50 text-p/50'
                 : 'pointer-events-auto'
             } ${
-              production.isActive && !isLocked
-                ? 'bg-button-delete hover:bg-button-hover-red-bg'
+              production.isActive && !locked
+                ? 'bg-button-delete hover:bg-button-hover-red-bg pointer-events-none'
                 : 'bg-brand hover:bg-button-hover-bg'
             } 
-            ${isLocked && production.isActive && 'bg-button-delete/50'}
+            ${locked && production.isActive && 'bg-button-delete/50'}
             p-2 rounded cursor-pointer`}
           >
             {(loading || loadingStartProduction) && !startErrorModalOpen ? (
@@ -194,7 +192,7 @@ export function ProductionsListItem({
           isActive={production.isActive}
           id={production._id.toString()}
           name={production.name}
-          isLocked={isLocked}
+          locked={locked}
         />
       </div>
     </li>

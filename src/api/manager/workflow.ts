@@ -137,7 +137,7 @@ async function connectIngestSources(
         width: pipeline.width,
         ingest_id: ingestUuid,
         source_id: sourceId,
-        input_slot,
+        input_slot: input_slot,
         audio_mapping: JSON.stringify(audioMapping),
         interfaces: [
           {
@@ -492,7 +492,10 @@ export async function startProduction(
             source.type !== 'mediaplayer'
         )
         .map((source) => {
-          return source._id!.toString();
+          if (source._id !== undefined) {
+            return source._id.toString();
+          }
+          return '';
         })
     ).catch((error) => {
       if (error === "Can't connect to Database") {

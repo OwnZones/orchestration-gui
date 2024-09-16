@@ -24,16 +24,16 @@ export function useCreateStream(): CallbackHook<
     input_slot: number
   ): Promise<Result<AddSourceResult>> => {
     setLoading(true);
-    const stream = {
-      source: source,
-      input_slot: input_slot
-    };
 
     return fetch(`/api/manager/streams/`, {
       method: 'POST',
       // TODO: Implement api key
       headers: [['x-api-key', `Bearer apisecretkey`]],
-      body: JSON.stringify({ ...stream, production: production })
+      body: JSON.stringify({
+        source: source,
+        production: production,
+        input_slot: input_slot
+      })
     })
       .then(async (response) => {
         if (response.ok) {

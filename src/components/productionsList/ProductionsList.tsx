@@ -4,10 +4,10 @@ import { Production } from '../../interfaces/production';
 
 type ProductionsListProps = {
   productions: Production[];
-  isLocked: boolean;
+  locked: boolean;
 };
 
-function ProductionsList({ productions, isLocked }: ProductionsListProps) {
+function ProductionsList({ productions, locked }: ProductionsListProps) {
   productions
     .sort((a, b) => {
       return a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1;
@@ -19,7 +19,7 @@ function ProductionsList({ productions, isLocked }: ProductionsListProps) {
         <ProductionsListItem
           key={`${production._id}`}
           production={production}
-          isLocked={isLocked}
+          locked={locked}
         />
       ))}
     </ul>

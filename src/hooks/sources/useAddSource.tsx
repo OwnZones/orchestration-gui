@@ -21,7 +21,7 @@ export function useAddSource(): CallbackHook<
     const updatedSetup = addSetupItem(
       {
         _id: input._id ? input._id : undefined,
-        type: input.type,
+        type: input.type || 'ingest_source',
         label: input.label,
         input_slot: input.input_slot
       },

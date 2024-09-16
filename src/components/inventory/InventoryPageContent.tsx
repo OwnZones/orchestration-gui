@@ -1,13 +1,14 @@
 'use client';
-import { useState, Suspense } from 'react';
+import { Suspense, useContext } from 'react';
 import { LockButton } from '../lockButton/LockButton';
 import { useTranslate } from '../../i18n/useTranslate';
 import HeaderNavigation from '../headerNavigation/HeaderNavigation';
 import Inventory from './Inventory';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 export const InventoryPageContent = () => {
-  const [isLocked, setIsLocked] = useState<boolean>(true);
   const t = useTranslate();
+  const { locked } = useContext(GlobalContext);
 
   return (
     <>
@@ -17,15 +18,12 @@ export const InventoryPageContent = () => {
             <h1 className="m-2 text-4xl text-p text-center">
               {t('inventory')}
             </h1>
-            <LockButton
-              isLocked={isLocked}
-              onClick={() => setIsLocked(!isLocked)}
-            />
+            <LockButton />
           </div>
         </div>
       </HeaderNavigation>
       <Suspense>
-        <Inventory isLocked={isLocked} />
+        <Inventory locked={locked} />
       </Suspense>
     </>
   );

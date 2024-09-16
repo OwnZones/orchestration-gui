@@ -4,7 +4,7 @@ import SearchBar from './SearchBar';
 import FilterDropdown from './FilterDropdown';
 import { ClickAwayListener } from '@mui/base';
 import { SourceWithId } from '../../interfaces/Source';
-import { FilterContext } from '../inventory/FilterContext';
+import { FilterContext } from '../../contexts/FilterContext';
 
 type FilterOptionsProps = {
   onFilteredSources: (sources: Map<string, SourceWithId>) => void;
@@ -93,7 +93,6 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
       }
     }
   };
-
   const filterSources = (tempSet: Map<string, SourceWithId>) => {
     const isFilteringByType =
       showNdiType || showBmdType || showSrtType || showMediaSourceGeneratorType;
@@ -114,14 +113,6 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
         (showMediaSourceGeneratorType && ingestType === 'MEDIASOURCEGENERATOR')
       ) {
         shouldDelete = false;
-      }
-
-      if (onlyShowActiveSources && source.status === 'gone') {
-        shouldDelete = true;
-      }
-
-      if (shouldDelete) {
-        tempSet.delete(source._id.toString());
       }
 
       if (onlyShowActiveSources && source.status === 'gone') {

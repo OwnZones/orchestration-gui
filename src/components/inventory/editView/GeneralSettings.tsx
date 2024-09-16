@@ -1,16 +1,16 @@
 import { useContext } from 'react';
 import { EditViewContext, IInput } from '../EditViewContext';
-import { FilterContext } from '../FilterContext';
+import { FilterContext } from '../../../contexts/FilterContext';
 import { useTranslate } from '../../../i18n/useTranslate';
 import SelectOptions from './SelectOptions';
 import { getHertz } from '../../../utils/stream';
 import videoSettings from '../../../utils/videoSettings';
 
 type GeneralSettingsProps = {
-  isLocked: boolean;
+  locked: boolean;
 };
 
-export default function GeneralSettings({ isLocked }: GeneralSettingsProps) {
+export default function GeneralSettings({ locked }: GeneralSettingsProps) {
   const {
     input: [input, setInput],
     saved: [saved, setSaved],
@@ -46,11 +46,11 @@ export default function GeneralSettings({ isLocked }: GeneralSettingsProps) {
           value={input.name}
           onChange={(e) => onChange('name', e.target.value)}
           className={`${
-            isLocked
+            locked
               ? 'pointer-events-none bg-gray-700/50 border-gray-600/50 placeholder-gray-400/50 text-p/50'
               : 'pointer-events-auto bg-gray-700 border-gray-600 placeholder-gray-400 text-p'
           } 'cursor-pointer ml-5 border justify-center text-sm rounded-lg w-full pl-2 pt-1 pb-1 focus:ring-blue-500 focus:border-blue-500'`}
-          disabled={isLocked}
+          disabled={locked}
         />
       </div>
 
@@ -59,7 +59,7 @@ export default function GeneralSettings({ isLocked }: GeneralSettingsProps) {
           name="type"
           options={types}
           selected={input.type}
-          disabled={isLocked}
+          disabled={locked}
           onChange={(e) => onChange('type', e.target.value.toLowerCase())}
         />
       </div>
@@ -68,7 +68,7 @@ export default function GeneralSettings({ isLocked }: GeneralSettingsProps) {
           name="location"
           options={locations}
           selected={input.location}
-          disabled={isLocked}
+          disabled={locked}
           onChange={(e) => onChange('location', e.target.value.toLowerCase())}
         />
       </div>

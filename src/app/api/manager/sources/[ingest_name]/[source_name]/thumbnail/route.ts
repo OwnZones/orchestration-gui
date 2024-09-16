@@ -20,7 +20,6 @@ export async function GET(
       status: 403
     });
   }
-
   try {
     const ingestUuid = await getUuidFromIngestName(params.ingest_name);
     const sourceId = await getSourceIdFromSourceName(

@@ -6,18 +6,17 @@ import DragItem from '../dragElement/DragItem';
 import SourceCard from '../sourceCard/SourceCard';
 import { ISource, useDragableItems } from '../../hooks/useDragableItems';
 import { EmptySlotCard } from '../emptySlotCard/EmptySlotCard';
+
 export default function SourceCards({
   productionSetup,
   updateProduction,
   onSourceUpdate,
-  onSourceRemoval,
-  isLocked
+  onSourceRemoval
 }: {
   productionSetup: Production;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
-  isLocked: boolean;
 }) {
   const [items, moveItem] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);
@@ -57,31 +56,28 @@ export default function SourceCards({
               selectingText={selectingText}
             >
               <SourceCard
-                source={source}
+                source={isSource ? source : undefined}
+                sourceRef={isSource ? undefined : source}
+                src={isSource ? source.src : undefined}
+                type={isSource ? 'ingest_source' : source.type}
                 label={source.label}
-                src={source.src}
                 onSourceUpdate={onSourceUpdate}
                 onSourceRemoval={onSourceRemoval}
-                onSelectingText={(isSelecting: boolean) =>
-                  setSelectingText(isSelecting)
-                }
-                isLocked={isLocked}
+                onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
               />
             </DragItem>
           );
         } else {
           gridItems.push(
             <SourceCard
-              key={`${source.ingest_source_name}-${source.input_slot}-key`}
-              source={source}
+              source={isSource ? source : undefined}
+              sourceRef={isSource ? undefined : source}
+              src={isSource ? source.src : undefined}
+              type={isSource ? 'ingest_source' : source.type}
               label={source.label}
-              src={source.src}
               onSourceUpdate={onSourceUpdate}
               onSourceRemoval={onSourceRemoval}
-              onSelectingText={(isSelecting: boolean) =>
-                setSelectingText(isSelecting)
-              }
-              isLocked={isLocked}
+              onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
             />
           );
         }
