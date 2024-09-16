@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Source, SourceWithId } from '../../interfaces/Source';
-import { PreviewThumbnail } from './PreviewThumbnail';
-import { getSourceThumbnail } from '../../utils/source';
+import { SourceWithId } from '../../interfaces/Source';
 import videoSettings from '../../utils/videoSettings';
 import { getHertz } from '../../utils/stream';
 import { useTranslate } from '../../i18n/useTranslate';
@@ -11,53 +9,27 @@ import Outputs from '../inventory/editView/AudioChannels/Outputs';
 import { mapAudio } from '../../utils/audioMapping';
 import { oneBased } from '../inventory/editView/AudioChannels/utils';
 import capitalize from '../../utils/capitalize';
+import { SourceListItemThumbnail } from './SourceListItemThumbnail';
 
 type SourceListItemProps = {
   source: SourceWithId;
-  action: (source: SourceWithId) => void;
-  edit?: boolean;
+  action?: (source: SourceWithId) => void;
+  actionText?: string;
   disabled: unknown;
 };
 
-const getIcon = (source: Source) => {
-  const isGone = source.status === 'gone';
-  const className = isGone ? 'text-error' : 'text-brand';
-
-  const types = {
-    camera: (
-      <Icons
-        name={isGone ? 'IconVideoOff' : 'IconVideo'}
-        className={className}
-      />
-    ),
-    microphone: (
-      <Icons
-        name={isGone ? 'IconMicrophone2Off' : 'IconMicrophone2'}
-        className={className}
-      />
-    ),
-    graphics: (
-      <Icons
-        name={isGone ? 'IconVectorOff' : 'IconVector'}
-        className={className}
-      />
-    )
-  };
-
-  return types[source.type];
-};
-
-function InventoryListItem({
+function SourceListItem({
   source,
   action,
   disabled,
-  edit = false
+  actionText
 }: SourceListItemProps) {
   const t = useTranslate();
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [outputRows, setOutputRows] = useState<
     { id: string; value: string }[][]
   >([]);
+
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const { video_stream: videoStream, audio_stream: audioStream } = source;
@@ -102,15 +74,10 @@ function InventoryListItem({
       className={`relative w-full items-center border-b border-gray-600 ${
         disabled ? 'bg-unclickable-bg' : 'hover:bg-zinc-700'
       }`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
     >
-      {source.status !== 'gone' &&
-        source.type === 'camera' &&
-        previewVisible && <PreviewThumbnail src={getSourceThumbnail(source)} />}
       <div className="flex">
         <div className="flex flex-row flex-1 items-center space-x-4 p-3 sm:pb-4 ">
-          <div className="flex flex-row">{getIcon(source)}</div>
+          <SourceListItemThumbnail source={source} />
           <div
             style={style}
             className={`flex flex-col ${
@@ -185,14 +152,14 @@ function InventoryListItem({
                     ? 'text-unclickable-text'
                     : 'text-brand hover:bg-zinc-500'
                 } bg-zinc-600`}
-                onClick={() => (disabled ? '' : action(source))}
+                onClick={() => (disabled || !action ? '' : action(source))}
               >
                 <div
                   className={`flex items-center overflow-hidden mr-6 ${
                     disabled ? 'text-unclickable-text' : 'text-brand'
                   } text-xs`}
                 >
-                  {edit ? t('inventory_list.edit') : t('inventory_list.add')}
+                  {actionText}
                 </div>
                 <Icons
                   name="IconArrowRight"
@@ -209,4 +176,4 @@ function InventoryListItem({
   );
 }
 
-export default InventoryListItem;
+export default SourceListItem;

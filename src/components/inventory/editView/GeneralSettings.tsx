@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { EditViewContext, IInput } from '../EditViewContext';
-import { FilterContext } from '../FilterContext';
+import { FilterContext } from '../../../contexts/FilterContext';
 import { useTranslate } from '../../../i18n/useTranslate';
 import SelectOptions from './SelectOptions';
 import { getHertz } from '../../../utils/stream';
