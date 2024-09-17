@@ -39,18 +39,16 @@ export default function UpdateButtons({
         <Button
           type="button"
           state="warning"
-          disabled={source.status !== 'gone' || locked}
+          disabled={source.status !== 'gone'}
           className={`${
-            locked || source.status !== 'gone'
+            source.status !== 'gone'
               ? 'bg-button-delete/50 pointer-events-none'
               : 'bg-button-delete'
           } mr-5 relative flex`}
           onClick={() => removeInventorySource(source)}
         >
           <IconTrash
-            className={`${
-              locked || source.status !== 'gone' ? 'text-p/50' : 'text-p'
-            }`}
+            className={`${source.status !== 'gone' ? 'text-p/50' : 'text-p'}`}
           />
         </Button>
         <Button state="warning" onClick={close}>
