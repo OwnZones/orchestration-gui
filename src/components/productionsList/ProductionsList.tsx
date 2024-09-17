@@ -1,9 +1,14 @@
 import React from 'react';
-import { getProductions } from '../../api/manager/productions';
 import { ProductionsListItem } from './ProductionsListItem';
+import { Production } from '../../interfaces/production';
 
-async function ProductionsList() {
-  const productions = (await getProductions())
+type ProductionsListProps = {
+  productions: Production[];
+  locked: boolean;
+};
+
+function ProductionsList({ productions, locked }: ProductionsListProps) {
+  productions
     .sort((a, b) => {
       return a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1;
     })
@@ -14,6 +19,7 @@ async function ProductionsList() {
         <ProductionsListItem
           key={`${production._id}`}
           production={production}
+          locked={locked}
         />
       ))}
     </ul>

@@ -1,8 +1,6 @@
 'use client';
-import React, { useEffect, useState, KeyboardEvent } from 'react';
+import React, { useEffect, useState, KeyboardEvent, useContext } from 'react';
 import { PageProps } from '../../../../.next/types/app/production/[id]/page';
-import SourceListItem from '../../../components/sourceListItem/SourceListItem';
-import FilterOptions from '../../../components/filter/FilterOptions';
 import { AddSource } from '../../../components/addSource/AddSource';
 import { IconX } from '@tabler/icons-react';
 import { useSources } from '../../../hooks/sources/useSources';
@@ -43,6 +41,8 @@ import { useGetMultiviewPreset } from '../../../hooks/multiviewPreset';
 import { ISource } from '../../../hooks/useDragableItems';
 import { useMultiviews } from '../../../hooks/multiviews';
 import SourceList from '../../../components/sourceList/SourceList';
+import { LockButton } from '../../../components/lockButton/LockButton';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -88,6 +88,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [addSourceStatus, setAddSourceStatus] = useState<AddSourceStatus>();
   const [deleteSourceStatus, setDeleteSourceStatus] =
     useState<DeleteSourceStatus>();
+
+  const { locked } = useContext(GlobalContext);
 
   useEffect(() => {
     refreshPipelines();
@@ -608,14 +610,18 @@ export default function ProductionConfiguration({ params }: PageProps) {
             }
           }}
           onBlur={() => updateConfigName(configurationName)}
+          disabled={locked}
         />
         <div
           className="flex mr-2 w-fit rounded justify-end items-center gap-3"
           key={'StartProductionButtonKey'}
           id="presetDropdownDefaultCheckbox"
         >
+          <LockButton />
           <PresetDropdown
-            disabled={productionSetup ? productionSetup.isActive : false}
+            disabled={
+              (productionSetup ? productionSetup.isActive : false) || locked
+            }
             isHidden={isPresetDropdownHidden}
             setHidden={setIsPresetDropdownHidden}
             selectedPreset={selectedPreset}
@@ -629,14 +635,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
               })}
           </PresetDropdown>
           <ConfigureOutputButton
-            disabled={productionSetup?.isActive}
+            disabled={productionSetup?.isActive || locked}
             preset={selectedPreset}
             updatePreset={updatePreset}
           />
           <StartProductionButton
             refreshProduction={refreshProduction}
             production={productionSetup}
-            disabled={!selectedPreset ? true : false}
+            disabled={(!selectedPreset ? true : false) || locked}
           />
         </div>
       </HeaderNavigation>
@@ -652,6 +658,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             actionText={t('inventory_list.add')}
             onClose={() => setInventoryVisible(false)}
             isDisabledFunc={isDisabledFunction}
+            locked={locked}
           />
           {addSourceModal && selectedSource && (
             <AddSourceModal
@@ -661,6 +668,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               onConfirm={handleAddSource}
               status={addSourceStatus}
               loading={loadingCreateStream}
+              locked={locked}
             />
           )}
         </div>
@@ -723,7 +731,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
             <AddSource
               disabled={
                 productionSetup?.production_settings === undefined ||
-                productionSetup?.production_settings === null
+                productionSetup?.production_settings === null ||
+                locked
               }
               onClick={() => {
                 setInventoryVisible(true);
@@ -736,7 +745,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 (pipeline, i) => {
                   return (
                     <PipelineNameDropDown
-                      disabled={productionSetup.isActive}
+                      disabled={productionSetup.isActive || locked}
                       key={pipeline.pipeline_readable_name}
                       label={pipeline.pipeline_readable_name}
                       options={pipelines?.map((pipeline) => ({
@@ -752,7 +761,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               )}
             {productionSetup?.production_settings && (
               <ControlPanelDropDown
-                disabled={productionSetup.isActive}
+                disabled={productionSetup.isActive || locked}
                 options={controlPanels?.map((controlPanel) => ({
                   option: controlPanel.name,
                   available: controlPanel.outgoing_connections?.length === 0

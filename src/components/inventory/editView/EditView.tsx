@@ -10,12 +10,14 @@ export default function EditView({
   source,
   updateSource,
   close,
-  removeInventorySource
+  removeInventorySource,
+  locked
 }: {
   source: SourceWithId;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
   removeInventorySource: (source: SourceWithId) => void;
+  locked: boolean;
 }) {
   return (
     <EditViewContext source={source} updateSource={updateSource}>
@@ -23,16 +25,17 @@ export default function EditView({
         <div className="relative w-[38rem]">
           <ImageComponent src={getSourceThumbnail(source)} />
         </div>
-        <GeneralSettings />
+        <GeneralSettings locked={locked} />
       </div>
 
       <div className="flex-auto">
-        <AudioChannels source={source} />
+        <AudioChannels source={source} locked={locked} />
       </div>
       <UpdateButtons
+        source={source}
         close={close}
         removeInventorySource={removeInventorySource}
-        source={source}
+        locked={locked}
       />
     </EditViewContext>
   );

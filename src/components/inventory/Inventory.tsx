@@ -8,7 +8,7 @@ import EditView from './editView/EditView';
 import SourceList from '../sourceList/SourceList';
 import { useTranslate } from '../../i18n/useTranslate';
 
-export default function Inventory() {
+export default function Inventory({ locked }: { locked: boolean }) {
   const [removeInventorySource, reloadList] = useSetSourceToPurge();
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
@@ -38,10 +38,12 @@ export default function Inventory() {
         sources={sources}
         action={editSource}
         actionText={t('inventory_list.edit')}
+        locked={locked}
       />
       {currentSource ? (
         <div className={`p-3 ml-2 mt-2 bg-container rounded h-1/2 min-w-max`}>
           <EditView
+            locked={locked}
             source={currentSource}
             updateSource={(source) => setUpdatedSource(source)}
             close={() => setCurrentSource(null)}

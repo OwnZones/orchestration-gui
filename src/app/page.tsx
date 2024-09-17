@@ -1,15 +1,15 @@
-import React, { Suspense } from 'react';
-import ProductionsList from '../components/productionsList/ProductionsList';
-import { CreateProduction } from '../components/createProduction/CreateProduction';
-import { LoadingCover } from '../components/loader/LoadingCover';
+import React from 'react';
 import Link from 'next/link';
 import { Button } from '../components/button/Button';
 import { useTranslate } from '../i18n/useTranslate';
+import { getProductions } from '../api/manager/productions';
+import { HomePageContent } from '../components/homePageContent/HomePageContent';
 
 export const dynamic = 'force-dynamic';
 
-function Home() {
+async function Home() {
   const t = useTranslate();
+  const productions = await getProductions();
   return (
     <>
       <div>
@@ -22,13 +22,7 @@ function Home() {
             </Link>
           </div>
         </div>
-      </div>
-      <CreateProduction />
-      <div className="flex items-center w-full">
-        <Suspense fallback={<LoadingCover />}>
-          {/* @ts-expect-error Async Server Component: https://github.com/vercel/next.js/issues/42292 */}
-          <ProductionsList />
-        </Suspense>
+        <HomePageContent productions={productions} />
       </div>
     </>
   );

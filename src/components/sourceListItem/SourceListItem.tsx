@@ -16,15 +16,18 @@ type SourceListItemProps = {
   action?: (source: SourceWithId) => void;
   actionText?: string;
   disabled: unknown;
+  locked: boolean;
 };
 
 function SourceListItem({
   source,
   action,
   disabled,
+  locked,
   actionText
 }: SourceListItemProps) {
   const t = useTranslate();
+
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [outputRows, setOutputRows] = useState<
     { id: string; value: string }[][]
@@ -136,6 +139,7 @@ function SourceListItem({
                       outputRows={outputRows}
                       rowIndex={rowIndex}
                       max={channelsInArray[channelsInArray.length - 1]}
+                      locked={locked}
                     />
                   </div>
                 ))}
@@ -144,32 +148,34 @@ function SourceListItem({
           </div>
         </div>
         <div className="flex justify-center items-center	">
-          {!disabled ? (
-            <div className="relative w-full mr-4">
-              <button
-                className={`flex flex-row min-w-full items-center justify-center m-1 p-1 rounded-lg ${
-                  disabled
+          <div className="relative w-full mr-4">
+            <button
+              className={`flex flex-row min-w-full items-center justify-center m-1 p-1 rounded-lg ${
+                disabled || (locked && actionText === t('inventory_list.add'))
+                  ? 'text-unclickable-text pointer-events-none'
+                  : 'text-brand hover:bg-zinc-500 pointer-events-auto'
+              } bg-zinc-600`}
+              onClick={() => (disabled || !action ? '' : action(source))}
+            >
+              <div
+                className={`flex items-center overflow-hidden mr-6 ${
+                  disabled || (locked && actionText === t('inventory_list.add'))
                     ? 'text-unclickable-text'
-                    : 'text-brand hover:bg-zinc-500'
-                } bg-zinc-600`}
-                onClick={() => (disabled || !action ? '' : action(source))}
+                    : 'text-brand'
+                } text-xs`}
               >
-                <div
-                  className={`flex items-center overflow-hidden mr-6 ${
-                    disabled ? 'text-unclickable-text' : 'text-brand'
-                  } text-xs`}
-                >
-                  {actionText}
-                </div>
-                <Icons
-                  name="IconArrowRight"
-                  className={`absolute ${
-                    disabled ? 'text-unclickable-text' : 'text-brand'
-                  } right-2 w-4`}
-                />
-              </button>
-            </div>
-          ) : null}
+                {actionText}
+              </div>
+              <Icons
+                name="IconArrowRight"
+                className={`absolute ${
+                  disabled || (locked && actionText === t('inventory_list.add'))
+                    ? 'text-unclickable-text'
+                    : 'text-brand'
+                } right-2 w-4`}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </li>

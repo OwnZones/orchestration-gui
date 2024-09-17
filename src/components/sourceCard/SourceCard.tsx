@@ -3,11 +3,12 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { SourceReference } from '../../interfaces/Source';
-import { SourceThumbnail } from './SourceThumbnail';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
 import ImageComponent from '../image/ImageComponent';
 import { getSourceThumbnail } from '../../utils/source';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type SourceCardProps = {
   source: ISource;
@@ -33,6 +34,7 @@ export default function SourceCard({
   const [sourceLabel, setSourceLabel] = useState(label ? label : source.name);
 
   const t = useTranslate();
+  const { locked } = useContext(GlobalContext);
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
@@ -77,6 +79,7 @@ export default function SourceCard({
             onSelectingText(true);
           }}
           onBlur={saveText}
+          disabled={locked}
         />
       </div>
       <ImageComponent src={getSourceThumbnail(source)} />
@@ -86,7 +89,12 @@ export default function SourceCard({
         })}
       </h2>
       <button
-        className="z-20 absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg"
+        className={`${
+          locked
+            ? 'bg-red-700/50'
+            : 'hover:border-l hover:border-t bg-red-700 hover:bg-red-600'
+        } z-20 absolute bottom-0 right-0 text-p min-w-fit p-1 rounded-tl-lg`}
+        disabled={locked}
         onClick={() => {
           onSourceRemoval({
             _id: source._id.toString(),
