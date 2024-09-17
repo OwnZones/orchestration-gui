@@ -715,7 +715,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       });
                     }
                   }}
-                  isLocked={locked}
                 />
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal

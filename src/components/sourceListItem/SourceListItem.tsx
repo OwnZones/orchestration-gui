@@ -16,7 +16,6 @@ type SourceListItemProps = {
   action?: (source: SourceWithId) => void;
   actionText?: string;
   disabled: unknown;
-  action?: (source: SourceWithId) => void;
   locked: boolean;
 };
 
