@@ -5,7 +5,6 @@ import { useTranslate } from '../../../i18n/useTranslate';
 import SelectOptions from './SelectOptions';
 import { getHertz } from '../../../utils/stream';
 import videoSettings from '../../../utils/videoSettings';
-import { GlobalContext } from '../../../contexts/GlobalContext';
 
 type GeneralSettingsProps = {
   locked: boolean;
