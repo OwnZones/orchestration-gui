@@ -17,15 +17,12 @@ export const InventoryHeaderContent = () => {
             <h1 className="m-2 text-4xl text-p text-center">
               {t('inventory')}
             </h1>
-            <LockButton
-              isLocked={isLocked}
-              onClick={() => setIsLocked(!isLocked)}
-            />
+            <LockButton />
           </div>
         </div>
       </HeaderNavigation>
       <Suspense>
-        <Inventory isLocked={isLocked} />
+        <Inventory locked={isLocked} />
       </Suspense>
     </>
   );
