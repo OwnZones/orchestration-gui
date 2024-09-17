@@ -780,10 +780,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           </div>
           {productionSetup && productionSetup.isActive && (
             <div className="flex justify-end p-3">
-              <MonitoringButton
-                id={productionSetup?._id.toString()}
-                locked={locked}
-              />
+              <MonitoringButton id={productionSetup?._id.toString()} />
             </div>
           )}
         </div>
