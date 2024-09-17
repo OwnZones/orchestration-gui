@@ -38,8 +38,9 @@ export async function createControlPanelWebSocket() {
     closeMediaplayer: (input: number) => {
       ws.send(`media close ${input}`);
     },
-    close: () => {
-      ws.close();
-    }
+    close: () =>
+      setTimeout(() => {
+        ws.close();
+      }, 1000)
   };
 }
