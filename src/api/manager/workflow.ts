@@ -82,7 +82,7 @@ async function connectIngestSources(
   for (const source of sources) {
     input_slot =
       productionSources.find((s) => s._id === source._id.toString())
-        ?.input_slot || 5;
+        ?.input_slot || input_slot + 1;
     const ingestUuid = await getUuidFromIngestName(
       source.ingest_name,
       false
