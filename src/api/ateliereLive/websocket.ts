@@ -19,24 +19,18 @@ export async function createControlPanelWebSocket() {
   const ws = await createWebSocket();
   return {
     createHtml: (input: number) => {
-      ws.send('html reset');
       ws.send(`html create ${input} 1920 1080`);
-      setTimeout(() => {
-        ws.send(
-          `html load ${input} ${process.env.NEXTAUTH_URL}/html_input?input=${input}`
-        );
-      }, 1000);
     },
     createMediaplayer: (input: number) => {
-      ws.send('media reset');
       ws.send(`media create ${input} ${process.env.MEDIAPLAYER_PLACEHOLDER}`);
-      ws.send(`media play ${input}`);
     },
     closeHtml: (input: number) => {
       ws.send(`html close ${input}`);
+      ws.send('html reset');
     },
     closeMediaplayer: (input: number) => {
       ws.send(`media close ${input}`);
+      ws.send('media reset');
     },
     close: () =>
       setTimeout(() => {
