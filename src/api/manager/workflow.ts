@@ -95,6 +95,7 @@ async function connectIngestSources(
       source.ingest_source_name,
       false
     );
+
     const audioSettings = await getAudioMapping(new ObjectId(source._id));
     const newAudioMapping = audioSettings?.audio_stream?.audio_mapping;
     const audioMapping = newAudioMapping?.length ? newAudioMapping : [[0, 1]];
@@ -114,6 +115,7 @@ async function connectIngestSources(
       Log().info(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
+
       const stream: PipelineStreamSettings = {
         pipeline_id: pipeline.pipeline_id!,
         alignment_ms: pipeline.alignment_ms,
@@ -144,6 +146,7 @@ async function connectIngestSources(
           }
         ]
       };
+
       try {
         Log().info(
           `Connecting '${source.ingest_name}/${ingestUuid}:${source.ingest_source_name}' to '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`
@@ -156,6 +159,7 @@ async function connectIngestSources(
           );
           throw `Source '${source.ingest_name}/${ingestUuid}:${source.ingest_source_name}' failed to connect to '${pipeline.pipeline_name}/${pipeline.pipeline_id}': ${error.message}`;
         });
+
         usedPorts.add(availablePort);
         sourceToPipelineStreams.push({
           source_id: source._id.toString(),
@@ -322,14 +326,6 @@ export async function stopProduction(
     (source) => source.type === 'mediaplayer'
   );
 
-  for (const source of production.sources) {
-    for (const stream_uuid of source.stream_uuids || []) {
-      await deleteStreamByUuid(stream_uuid).catch((error) => {
-        Log().error('Failed to delete stream! \nError: ', error);
-      });
-    }
-  }
-
   for (const source of htmlSources) {
     controlPanelWS.closeHtml(source.input_slot);
   }
@@ -339,6 +335,14 @@ export async function stopProduction(
   }
 
   controlPanelWS.close();
+
+  for (const source of production.sources) {
+    for (const stream_uuid of source.stream_uuids || []) {
+      await deleteStreamByUuid(stream_uuid).catch((error) => {
+        Log().error('Failed to delete stream! \nError: ', error);
+      });
+    }
+  }
 
   for (const id of pipelineIds) {
     Log().info(`Stopping pipeline '${id}'`);
@@ -379,6 +383,7 @@ export async function stopProduction(
         };
       }
     }
+
     try {
       await removePipelineStreams(id).catch((error) => {
         Log().error(
@@ -433,7 +438,13 @@ export async function stopProduction(
       }
     }
     Log().info(`Pipeline '${id}' stopped`);
+
+    const pipelines = await getPipelines();
+    const pipelineFeedbackStreams = pipelines.find(
+      (p) => p.uuid === id
+    )?.feedback_streams;
   }
+
   if (
     !disconnectConnectionsStatus.ok ||
     !removePipelineStreamsStatus.ok ||
@@ -477,7 +488,8 @@ export async function startProduction(
       production.sources
         .filter(
           (source) =>
-            source._id !== undefined && source.type === 'ingest_source'
+            (source._id !== undefined && source.type !== 'html') ||
+            source.type !== 'mediaplayer'
         )
         .map((source) => {
           return source._id!.toString();
@@ -695,7 +707,6 @@ export async function startProduction(
       error: e
     };
   } // Try to setup pipeline outputs end
-
   // Try to setup multiviews start
   try {
     if (!production.production_settings.pipelines[0].multiviews) {
