@@ -638,6 +638,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             disabled={productionSetup?.isActive || locked}
             preset={selectedPreset}
             updatePreset={updatePreset}
+            production={productionSetup}
           />
           <StartProductionButton
             refreshProduction={refreshProduction}

@@ -1,4 +1,4 @@
-import { Preset } from '../../../interfaces/preset';
+import { MultiviewPreset, Preset } from '../../../interfaces/preset';
 import { ProgramOutput, PipelineSettings } from '../../../interfaces/pipeline';
 import { Modal } from '../Modal';
 import Decision from './Decision';
@@ -9,7 +9,10 @@ import toast from 'react-hot-toast';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import MultiviewSettingsConfig from './MultiviewSettings';
 import PipelineSettingsConfig from './PipelineSettings';
+import MultiviewLayoutSettings from './MultiviewLayoutSettings';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { Production } from '../../../interfaces/production';
+import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';
 
 export interface OutputStream {
   name: string;
@@ -29,13 +32,15 @@ type ConfigureOutputModalProps = {
   preset: Preset;
   onClose: () => void;
   updatePreset: (preset: Preset) => void;
+  production: Production | undefined;
 };
 
 export function ConfigureOutputModal({
   open,
   preset,
   onClose,
-  updatePreset
+  updatePreset,
+  production
 }: ConfigureOutputModalProps) {
   const defaultState = (pipelines: PipelineSettings[]) => {
     const streamsPerPipe = pipelines.map((pipe, i) => {
@@ -70,6 +75,10 @@ export function ConfigureOutputModal({
   const [portDuplicateIndexes, setPortDuplicateIndexes] = useState<number[]>(
     []
   );
+  const [layoutModalOpen, setLayoutModalOpen] = useState<string | null>(null);
+  const [newMultiviewPreset, setNewMultiviewPreset] =
+    useState<MultiviewPreset | null>(null);
+  const addNewPreset = usePutMultiviewPreset();
   const t = useTranslate();
 
   useEffect(() => {
@@ -87,6 +96,7 @@ export function ConfigureOutputModal({
   }, [preset]);
 
   const clearInputs = () => {
+    setLayoutModalOpen(null);
     setMultiviews(preset.pipelines[0].multiviews || []);
     setOutputStreams(defaultState(preset.pipelines));
     onClose();
@@ -128,6 +138,19 @@ export function ConfigureOutputModal({
 
     updatePreset(presetToUpdate);
     onClose();
+  };
+
+  const onUpdateLayoutPreset = () => {
+    if (!newMultiviewPreset) {
+      toast.error(t('preset.no_updated_layout'));
+      return;
+    }
+    addNewPreset(newMultiviewPreset);
+    setLayoutModalOpen(null);
+  };
+
+  const closeLayoutModal = () => {
+    setLayoutModalOpen(null);
   };
 
   const streamsToProgramOutputs = (
@@ -264,74 +287,94 @@ export function ConfigureOutputModal({
 
   return (
     <Modal open={open} outsideClick={() => clearInputs()}>
-      <div className="flex gap-3">
-        {preset.pipelines.map((pipeline, i) => {
-          return (
-            <PipelineSettingsConfig
-              key={pipeline.pipeline_readable_name}
-              title={`${
-                pipeline.pipeline_name
-                  ? pipeline.pipeline_name
-                  : pipeline.pipeline_readable_name
-              }`}
-              streams={outputstreams.filter((o) => o.pipelineIndex === i)}
-              addStream={addStream}
-              updateStream={updateStream}
-              updateStreams={updateStreams}
-              deleteStream={deleteStream}
-            />
-          );
-        })}
-        {multiviews &&
-          multiviews.length > 0 &&
-          multiviews.map((singleItem, index) => {
+      {!layoutModalOpen && (
+        <div className="flex gap-3">
+          {preset.pipelines.map((pipeline, i) => {
             return (
-              <div className="flex" key={index}>
-                <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
-                <div className="flex flex-col">
-                  <MultiviewSettingsConfig
-                    multiview={singleItem}
-                    handleUpdateMultiview={(input) =>
-                      handleUpdateMultiview(input, index)
-                    }
-                    portDuplicateError={
-                      portDuplicateIndexes.length > 0
-                        ? portDuplicateIndexes.includes(index)
-                        : false
-                    }
-                  />
-                  <div
-                    className={`w-full flex ${
-                      multiviews.length > 1 ? 'justify-between' : 'justify-end'
-                    }`}
-                  >
-                    {multiviews.length > 1 && (
-                      <button
-                        type="button"
-                        title="Add another multiview"
-                        onClick={() => removeNewMultiview(index)}
-                      >
-                        <IconTrash
-                          className={`ml-4 text-button-delete hover:text-red-400`}
-                        />
-                      </button>
-                    )}
-                    {multiviews.length === index + 1 && (
-                      <button
-                        type="button"
-                        title="Add another multiview"
-                        onClick={() => addNewMultiview(singleItem)}
-                      >
-                        <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <PipelineSettingsConfig
+                key={pipeline.pipeline_readable_name}
+                title={`${
+                  pipeline.pipeline_name
+                    ? pipeline.pipeline_name
+                    : pipeline.pipeline_readable_name
+                }`}
+                streams={outputstreams.filter((o) => o.pipelineIndex === i)}
+                addStream={addStream}
+                updateStream={updateStream}
+                updateStreams={updateStreams}
+                deleteStream={deleteStream}
+              />
             );
           })}
-      </div>
-      <Decision onClose={() => clearInputs()} onSave={onSave} />
+          {multiviews &&
+            multiviews.length > 0 &&
+            multiviews.map((singleItem, index) => {
+              return (
+                <div className="flex" key={index}>
+                  <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
+                  <div className="flex flex-col">
+                    <MultiviewSettingsConfig
+                      openConfigModal={(input: string) =>
+                        setLayoutModalOpen(input)
+                      }
+                      lastItem={multiviews.length === index + 1}
+                      multiview={singleItem}
+                      handleUpdateMultiview={(input) =>
+                        handleUpdateMultiview(input, index)
+                      }
+                      portDuplicateError={
+                        portDuplicateIndexes.length > 0
+                          ? portDuplicateIndexes.includes(index)
+                          : false
+                      }
+                    />
+                    <div
+                      className={`w-full flex ${
+                        multiviews.length > 1
+                          ? 'justify-between'
+                          : 'justify-end'
+                      }`}
+                    >
+                      {multiviews.length > 1 && (
+                        <button
+                          type="button"
+                          title="Add another multiview"
+                          onClick={() => removeNewMultiview(index)}
+                        >
+                          <IconTrash
+                            className={`ml-4 text-button-delete hover:text-red-400`}
+                          />
+                        </button>
+                      )}
+                      {multiviews.length === index + 1 && (
+                        <button
+                          type="button"
+                          title="Add another multiview"
+                          onClick={() => addNewMultiview(singleItem)}
+                        >
+                          <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      )}
+      {!!layoutModalOpen && (
+        <MultiviewLayoutSettings
+          configMode={layoutModalOpen}
+          production={production}
+          setNewMultiviewPreset={(newLayout) =>
+            setNewMultiviewPreset(newLayout)
+          }
+        />
+      )}
+      <Decision
+        onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
+        onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
+      />
     </Modal>
   );
 }

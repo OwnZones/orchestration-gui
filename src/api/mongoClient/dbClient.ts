@@ -50,7 +50,8 @@ async function bootstrapDbCollections(db: Db) {
     const multiviews = await db.collection('multiviews').countDocuments();
     if (multiviews === 0) {
       Log().info('Bootstrapping database with default multiview');
-      await db.collection('multiviews').insertOne(defaultMultiview);
+
+      await db.collection('multiviews').insertMany(defaultMultiview);
     } else {
       await migrateMultiviewPresets(db);
     }

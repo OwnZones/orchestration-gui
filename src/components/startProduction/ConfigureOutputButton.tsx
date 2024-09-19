@@ -6,17 +6,20 @@ import { Preset } from '../../interfaces/preset';
 import { useTranslate } from '../../i18n/useTranslate';
 import { Button } from '../button/Button';
 import { ConfigureOutputModal } from '../modal/configureOutputModal/ConfigureOutputModal';
+import { Production } from '../../interfaces/production';
 
 type ConfigureOutputButtonProps = {
   preset?: Preset;
   disabled?: boolean;
   updatePreset: (preset: Preset) => void;
+  production: Production | undefined;
 };
 
 export function ConfigureOutputButton({
   preset,
   updatePreset,
-  disabled
+  disabled,
+  production
 }: ConfigureOutputButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const toggleConfigModal = () => {
@@ -43,6 +46,7 @@ export function ConfigureOutputButton({
           preset={preset}
           onClose={toggleConfigModal}
           updatePreset={updatePreset}
+          production={production}
         />
       )}
     </>
