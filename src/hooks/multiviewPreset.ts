@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { MultiviewPreset } from '../interfaces/preset';
 import { DataHook } from './types';
 import { WithId } from 'mongodb';
+import { API_SECRET_KEY } from '../utils/constants';
+
 export function useGetMultiviewPresets() {
   return async (): Promise<MultiviewPreset[]> => {
     const response = await fetch(`/api/manager/multiviews`, {
@@ -52,4 +54,18 @@ export function useMultiviewPresets(): DataHook<MultiviewPreset[]> {
   }, []);
 
   return [multiviewPresets, loading, undefined];
+}
+
+export function usePutMultiviewPreset() {
+  return async (newMultiviewPreset: MultiviewPreset): Promise<void> => {
+    const response = await fetch('/api/manager/presets', {
+      method: 'PUT',
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
+      body: JSON.stringify(newMultiviewPreset)
+    });
+    if (response.ok) {
+      return;
+    }
+    throw await response.text();
+  };
 }
