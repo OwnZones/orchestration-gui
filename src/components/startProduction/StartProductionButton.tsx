@@ -199,8 +199,13 @@ export function StartProductionButton({
     return (
       <>
         <Button
-          className="bg-button-delete hover:bg-button-hover-red-bg"
+          className={`${
+            disabled
+              ? 'bg-button-delete/50'
+              : 'bg-button-delete hover:bg-button-hover-red-bg'
+          }`}
           onClick={() => setStopModalOpen(true)}
+          disabled={disabled}
         >
           {loading ? (
             <Loader className="w-14 h-6" />
@@ -226,7 +231,11 @@ export function StartProductionButton({
         onClick={onClick}
         disabled={disabled}
         hoverMessage={disabled ? 'Preset must be selected!' : ''}
-        className={'min-w-fit hover:bg-button-hover-bg'}
+        className={`${
+          disabled
+            ? 'bg-button-bg/50 pointer-events-none'
+            : 'hover:bg-button-hover-bg'
+        } min-w-fit`}
       >
         {loading ? <Loader className="w-10 h-5" /> : t('workflow.start')}
       </Button>

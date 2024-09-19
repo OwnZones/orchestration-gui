@@ -591,6 +591,7 @@ export const sv = {
   },
   online: 'ONLINE',
   offline: 'OFFLINE',
+  refresh_images: 'Uppdatera Tumnaglar',
   server_error: '{{string}}:n inte ansluten',
   system_controller: 'Systemkontroller',
   database: 'Databas',

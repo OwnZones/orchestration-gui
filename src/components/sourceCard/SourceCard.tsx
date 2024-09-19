@@ -2,9 +2,12 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { SourceReference, Type } from '../../interfaces/Source';
-import { SourceThumbnail } from './SourceThumbnail';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
+import ImageComponent from '../image/ImageComponent';
+import { getSourceThumbnail } from '../../utils/source';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type SourceCardProps = {
   source?: ISource;
@@ -35,6 +38,7 @@ export default function SourceCard({
     sourceRef?.label || source?.name
   );
   const t = useTranslate();
+  const { locked } = useContext(GlobalContext);
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
@@ -77,7 +81,7 @@ export default function SourceCard({
     >
       <div className="relative">
         <input
-          className={`absolute bg-zinc-900 text-center hover:border focus:hover:border-none w-full text-p bg-opacity-90 focus:bg-opacity-100`}
+          className={`absolute z-20 bg-zinc-900 text-center hover:border focus:hover:border-none w-full text-p bg-opacity-90 focus:bg-opacity-100`}
           value={sourceLabel}
           onChange={updateText}
           onKeyDown={handleKeyDown}
@@ -85,13 +89,12 @@ export default function SourceCard({
             onSelectingText(true);
           }}
           onBlur={saveText}
+          disabled={locked}
         />
       </div>
-      {source && source.src && (
-        <SourceThumbnail source={source} src={src} type={type} />
-      )}
-      {!source && sourceRef && <SourceThumbnail type={sourceRef.type} />}
-      {(sourceRef || source) && (
+      {source && <ImageComponent src={getSourceThumbnail(source)} />}
+      {!source && sourceRef && <ImageComponent src={src} />}
+      {(source || sourceRef) && (
         <h2
           className={`${
             source && 'absolute bottom-4'

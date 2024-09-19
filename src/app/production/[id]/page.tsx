@@ -1,6 +1,5 @@
 'use client';
-
-import React, { useEffect, useState, KeyboardEvent } from 'react';
+import React, { useEffect, useState, KeyboardEvent, useContext } from 'react';
 import { PageProps } from '../../../../.next/types/app/production/[id]/page';
 import SourceListItem from '../../../components/sourceListItem/SourceListItem';
 import FilterOptions from '../../../components/filter/FilterOptions';
@@ -21,7 +20,7 @@ import { removeSetupItem } from '../../../hooks/items/removeSetupItem';
 import { addSetupItem } from '../../../hooks/items/addSetupItem';
 import HeaderNavigation from '../../../components/headerNavigation/HeaderNavigation';
 import styles from './page.module.scss';
-import FilterProvider from '../../../components/inventory/FilterContext';
+import FilterProvider from '../../../contexts/FilterContext';
 import { useGetPresets } from '../../../hooks/presets';
 import { Preset } from '../../../interfaces/preset';
 import SourceCards from '../../../components/sourceCards/SourceCards';
@@ -43,8 +42,9 @@ import { useDeleteStream, useCreateStream } from '../../../hooks/streams';
 import { MonitoringButton } from '../../../components/button/MonitoringButton';
 import { useGetMultiviewPreset } from '../../../hooks/multiviewPreset';
 import { useMultiviews } from '../../../hooks/multiviews';
-import { useAddSource } from '../../../hooks/sources/useAddSource';
-import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
+import SourceList from '../../../components/sourceList/SourceList';
+import { LockButton } from '../../../components/lockButton/LockButton';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 import { Select } from '../../../components/select/Select';
 
 export default function ProductionConfiguration({ params }: PageProps) {
@@ -95,9 +95,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [deleteSourceStatus, setDeleteSourceStatus] =
     useState<DeleteSourceStatus>();
 
-  // Create source
-  const [firstEmptySlot] = useGetFirstEmptySlot();
-  const [addSource] = useAddSource();
+  const { locked } = useContext(GlobalContext);
 
   const isAddButtonDisabled =
     selectedValue !== 'HTML' && selectedValue !== 'Media Player';
@@ -400,8 +398,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
       </li>
     );
   }
-
-  // Adding source to a production, both in setup-mode and in live-mode
   function getSourcesToDisplay(
     filteredSources: Map<string, SourceWithId>
   ): React.ReactNode[] {
@@ -416,24 +412,52 @@ export default function ProductionConfiguration({ params }: PageProps) {
               setSelectedSource(source);
               setAddSourceModal(true);
             } else if (productionSetup) {
-              const input: SourceReference = {
-                _id: source._id.toString(),
-                type: 'ingest_source',
-                label: source.ingest_source_name,
-                input_slot: firstEmptySlot(productionSetup)
-              };
-              addSource(input, productionSetup).then((updatedSetup) => {
-                if (!updatedSetup) return;
-                setProductionSetup(updatedSetup);
-                setAddSourceModal(false);
-                setSelectedSource(undefined);
-              });
+              const updatedSetup = addSetupItem(
+                {
+                  _id: source._id.toString(),
+                  type: 'ingest_source',
+                  label: source.ingest_source_name,
+                  // Byt till hook
+                  input_slot: getFirstEmptySlot()
+                },
+                productionSetup
+              );
+              if (!updatedSetup) return;
+              setProductionSetup(updatedSetup);
+              putProduction(updatedSetup._id.toString(), updatedSetup).then(
+                () => {
+                  setAddSourceModal(false);
+                  setSelectedSource(undefined);
+                }
+              );
             }
           }}
         />
       );
     });
   }
+
+  const getFirstEmptySlot = () => {
+    if (!productionSetup) throw 'no_production';
+    let firstEmptySlot = productionSetup.sources.length + 1;
+    if (productionSetup.sources.length === 0) {
+      return firstEmptySlot;
+    }
+    for (
+      let i = 0;
+      i <
+      productionSetup.sources[productionSetup.sources.length - 1].input_slot;
+      i++
+    ) {
+      if (
+        !productionSetup.sources.some((source) => source.input_slot === i + 1)
+      ) {
+        firstEmptySlot = i + 1;
+        break;
+      }
+    }
+    return firstEmptySlot;
+  };
 
   const handleAddSource = async () => {
     setAddSourceStatus(undefined);
@@ -629,14 +653,18 @@ export default function ProductionConfiguration({ params }: PageProps) {
             }
           }}
           onBlur={() => updateConfigName(configurationName)}
+          disabled={locked}
         />
         <div
           className="flex mr-2 w-fit rounded justify-end items-center gap-3"
           key={'StartProductionButtonKey'}
           id="presetDropdownDefaultCheckbox"
         >
+          <LockButton />
           <PresetDropdown
-            disabled={productionSetup ? productionSetup.isActive : false}
+            disabled={
+              (productionSetup ? productionSetup.isActive : false) || locked
+            }
             isHidden={isPresetDropdownHidden}
             setHidden={setIsPresetDropdownHidden}
             selectedPreset={selectedPreset}
@@ -650,7 +678,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               })}
           </PresetDropdown>
           <ConfigureOutputButton
-            disabled={productionSetup?.isActive}
+            disabled={productionSetup?.isActive || locked}
             preset={selectedPreset}
             updatePreset={updatePreset}
           />
@@ -658,7 +686,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             refreshProduction={refreshProduction}
             production={productionSetup}
             sources={sources}
-            disabled={!selectedPreset ? true : false}
+            disabled={(!selectedPreset ? true : false) || locked}
           />
         </div>
       </HeaderNavigation>
@@ -668,42 +696,25 @@ export default function ProductionConfiguration({ params }: PageProps) {
             inventoryVisible ? 'min-w-[35%] ml-2 mt-2 max-h-[89vh]' : ''
           }`}
         >
-          <div className={`p-3 w-full bg-container rounded break-all h-[98%]`}>
-            <div className="flex justify-end mb-2">
-              <button className="flex justify-end mb-2">
-                <IconX
-                  className="w-5 h-5 text-brand"
-                  onClick={() => setInventoryVisible(false)}
-                />
-              </button>
-            </div>
-            <div className="mb-1">
-              <FilterProvider sources={sources}>
-                <FilterOptions
-                  onFilteredSources={(filtered: Map<string, SourceWithId>) => {
-                    setFilteredSources(new Map<string, SourceWithId>(filtered));
-                  }}
-                />
-              </FilterProvider>
-            </div>
-            <ul
-              className={`flex flex-col border-t border-gray-600 overflow-scroll h-[91%] ${
-                !inventoryVisible && 'hidden'
-              } ${styles.no_scrollbar}`}
-            >
-              {getSourcesToDisplay(filteredSources)}
-              {addSourceModal && selectedSource && (
-                <AddSourceModal
-                  name={selectedSource.name}
-                  open={addSourceModal}
-                  onAbort={handleAbortAddSource}
-                  onConfirm={handleAddSource}
-                  status={addSourceStatus}
-                  loading={loadingCreateStream}
-                />
-              )}
-            </ul>
-          </div>
+          <SourceList
+            sources={sources}
+            action={addSourceAction}
+            actionText={t('inventory_list.add')}
+            onClose={() => setInventoryVisible(false)}
+            isDisabledFunc={isDisabledFunction}
+            locked={locked}
+          />
+          {addSourceModal && selectedSource && (
+            <AddSourceModal
+              name={selectedSource.name}
+              open={addSourceModal}
+              onAbort={handleAbortAddSource}
+              onConfirm={handleAddSource}
+              status={addSourceStatus}
+              loading={loadingCreateStream}
+              locked={locked}
+            />
+          )}
         </div>
         <div className="flex flex-col h-fit w-full">
           <div
@@ -806,7 +817,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 (pipeline, i) => {
                   return (
                     <PipelineNameDropDown
-                      disabled={productionSetup.isActive}
+                      disabled={productionSetup.isActive || locked}
                       key={pipeline.pipeline_readable_name}
                       label={pipeline.pipeline_readable_name}
                       options={pipelines?.map((pipeline) => ({
@@ -822,7 +833,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               )}
             {productionSetup?.production_settings && (
               <ControlPanelDropDown
-                disabled={productionSetup.isActive}
+                disabled={productionSetup.isActive || locked}
                 options={controlPanels?.map((controlPanel) => ({
                   option: controlPanel.name,
                   available: controlPanel.outgoing_connections?.length === 0

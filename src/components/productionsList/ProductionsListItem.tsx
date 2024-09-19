@@ -20,24 +20,27 @@ import toast from 'react-hot-toast';
 import { refresh } from '../../utils/refresh';
 import { StopModal } from '../modal/StopModal';
 import { useState } from 'react';
-import { useDeleteMonitoring } from '../../hooks/monitoring';
 import { StartModal } from '../modal/StartModal';
 
 type ProductionListItemProps = {
   production: Production;
+  locked: boolean;
 };
 
-export function ProductionsListItem({ production }: ProductionListItemProps) {
+export function ProductionsListItem({
+  production,
+  locked
+}: ProductionListItemProps) {
   const [stopProduction, loading] = useStopProduction();
   const [startProduction, loadingStartProduction] = useStartProduction();
   const [startProductionStatus, setStartProductionStatus] =
     useState<StartProductionStatus>();
   const [stopProductionStatus, setStopProductionStatus] =
     useState<StopProductionStatus>();
-  const [deleteMonitoring] = useDeleteMonitoring();
   const [stopModalOpen, setStopModalOpen] = useState(false);
   const [startErrorModalOpen, setStartErrorModalOpen] = useState(false);
   const putProduction = usePutProduction();
+
   const handleStopProduction = async () => {
     stopProduction(production)
       .then((status) => {
@@ -147,10 +150,16 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
           <div
             onClick={() => handleStartStopButtonClick()}
             className={`${
-              production.isActive
-                ? 'bg-button-delete hover:bg-button-hover-red-bg'
+              locked
+                ? 'pointer-events-none bg-brand/50 text-p/50'
+                : 'pointer-events-auto'
+            } ${
+              production.isActive && !locked
+                ? 'bg-button-delete hover:bg-button-hover-red-bg pointer-events-none'
                 : 'bg-brand hover:bg-button-hover-bg'
-            } p-2 rounded cursor-pointer`}
+            } 
+            ${locked && production.isActive && 'bg-button-delete/50'}
+            p-2 rounded cursor-pointer`}
           >
             {(loading || loadingStartProduction) && !startErrorModalOpen ? (
               <Loader className="w-6 h-6" />
@@ -183,6 +192,7 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
           isActive={production.isActive}
           id={production._id.toString()}
           name={production.name}
+          locked={locked}
         />
       </div>
     </li>

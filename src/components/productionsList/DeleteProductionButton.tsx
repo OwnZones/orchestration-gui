@@ -11,19 +11,20 @@ type DeleteProductionButtonProps = {
   id: string;
   name: string;
   isActive: boolean;
+  locked: boolean;
 };
 
 export function DeleteProductionButton({
   id,
   name,
-  isActive
+  isActive,
+  locked
 }: DeleteProductionButtonProps) {
   const router = useRouter();
   const deleteProduction = useDeleteProduction();
 
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
   const onClick = useCallback(() => setModalOpen(true), []);
   const onAbort = useCallback(() => setModalOpen(false), []);
   const onConfirm = useCallback(async () => {
@@ -38,12 +39,12 @@ export function DeleteProductionButton({
     <>
       <button
         className={`${
-          isActive
-            ? 'bg-gray-400'
-            : 'bg-button-delete hover:bg-button-hover-red-bg'
+          isActive || locked
+            ? 'bg-button-delete/50 text-p/50'
+            : 'bg-button-delete hover:bg-button-hover-red-bg text-p'
         } p-2 rounded`}
         onClick={onClick}
-        disabled={loading || isActive}
+        disabled={loading || isActive || locked}
       >
         {loading ? (
           <Loader className="w-6 h-6" />
