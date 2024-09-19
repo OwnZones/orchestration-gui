@@ -768,6 +768,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
               />
               <div className="flex flex-row">
                 <Select
+                  disabled={
+                    productionSetup?.production_settings === undefined ||
+                    productionSetup.production_settings === null
+                  }
                   options={[
                     t('production.add_other_source_type'),
                     'HTML',
