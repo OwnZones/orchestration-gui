@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
 const wsUrl = `ws://${process.env.CONTROL_PANEL_WS}`;
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const { action, inputSlot } = await request.json();
 
   if (!wsUrl) {

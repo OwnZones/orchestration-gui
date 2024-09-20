@@ -1,4 +1,4 @@
-import { API_SECRET_KEY } from "../utils/constants";
+import { API_SECRET_KEY } from '../utils/constants';
 
 export function useWebsocket() {
   const closeWebsocket = async (
