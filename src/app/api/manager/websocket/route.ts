@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 
 const wsUrl = `ws://${process.env.CONTROL_PANEL_WS}`;
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const { action, inputSlot } = await request.json();
 
   if (!wsUrl) {
