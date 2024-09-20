@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Source, SourceReference, SourceWithId } from '../../interfaces/Source';
-import { PreviewThumbnail } from './PreviewThumbnail';
-import { getSourceThumbnail } from '../../utils/source';
+import { SourceWithId } from '../../interfaces/Source';
 import videoSettings from '../../utils/videoSettings';
 import { getHertz } from '../../utils/stream';
 import { useTranslate } from '../../i18n/useTranslate';

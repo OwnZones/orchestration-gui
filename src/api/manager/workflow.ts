@@ -137,7 +137,7 @@ async function connectIngestSources(
         width: pipeline.width,
         ingest_id: ingestUuid,
         source_id: sourceId,
-        input_slot,
+        input_slot: input_slot,
         audio_mapping: JSON.stringify(audioMapping),
         interfaces: [
           {

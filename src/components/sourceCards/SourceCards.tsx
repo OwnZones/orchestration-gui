@@ -54,59 +54,31 @@ export default function SourceCards({
               updateProduction={updateProduction}
               selectingText={selectingText}
             >
-              {isSource ? (
-                <SourceCard
-                  source={source}
-                  label={source.label}
-                  src={source.src}
-                  onSourceUpdate={onSourceUpdate}
-                  onSourceRemoval={onSourceRemoval}
-                  onSelectingText={(isSelecting) =>
-                    setSelectingText(isSelecting)
-                  }
-                  type={'ingest_source'}
-                />
-              ) : (
-                <SourceCard
-                  sourceRef={source}
-                  label={source.label}
-                  onSourceUpdate={onSourceUpdate}
-                  onSourceRemoval={onSourceRemoval}
-                  onSelectingText={(isSelecting) =>
-                    setSelectingText(isSelecting)
-                  }
-                  type={source.type}
-                />
-              )}
+              <SourceCard
+                source={isSource ? source : undefined}
+                sourceRef={isSource ? undefined : source}
+                src={isSource ? source.src : undefined}
+                type={isSource ? 'ingest_source' : source.type}
+                label={source.label}
+                onSourceUpdate={onSourceUpdate}
+                onSourceRemoval={onSourceRemoval}
+                onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
+              />
             </DragItem>
           );
         } else {
-          isSource
-            ? gridItems.push(
-                <SourceCard
-                  source={source}
-                  label={source.label}
-                  src={source.src}
-                  onSourceUpdate={onSourceUpdate}
-                  onSourceRemoval={onSourceRemoval}
-                  onSelectingText={(isSelecting) =>
-                    setSelectingText(isSelecting)
-                  }
-                  type={'ingest_source'}
-                />
-              )
-            : gridItems.push(
-                <SourceCard
-                  sourceRef={source}
-                  label={source.label}
-                  onSourceUpdate={onSourceUpdate}
-                  onSourceRemoval={onSourceRemoval}
-                  onSelectingText={(isSelecting) =>
-                    setSelectingText(isSelecting)
-                  }
-                  type={source.type}
-                />
-              );
+          gridItems.push(
+            <SourceCard
+              source={isSource ? source : undefined}
+              sourceRef={isSource ? undefined : source}
+              src={isSource ? source.src : undefined}
+              type={isSource ? 'ingest_source' : source.type}
+              label={source.label}
+              onSourceUpdate={onSourceUpdate}
+              onSourceRemoval={onSourceRemoval}
+              onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
+            />
+          );
         }
         return false;
       } else {

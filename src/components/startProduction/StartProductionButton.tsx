@@ -48,8 +48,6 @@ export function StartProductionButton({
 
   const onClick = () => {
     if (!production) return;
-    console.log('sources', sources);
-    console.log('production', production);
     const hasUndefinedPipeline = production.production_settings.pipelines.some(
       (p) => !p.pipeline_name
     );

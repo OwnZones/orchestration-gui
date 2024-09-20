@@ -1,5 +1,5 @@
 'use client';
-import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { SourceReference, Type } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
@@ -92,8 +92,10 @@ export default function SourceCard({
           disabled={locked}
         />
       </div>
-      {source && <ImageComponent src={getSourceThumbnail(source)} />}
-      {!source && sourceRef && <ImageComponent src={src} />}
+      {source && !sourceRef && (
+        <ImageComponent src={getSourceThumbnail(source)} />
+      )}
+      {!source && sourceRef && <ImageComponent type={sourceRef.type} />}
       {(source || sourceRef) && (
         <h2
           className={`${
@@ -119,7 +121,7 @@ export default function SourceCard({
       )}
       {(source || sourceRef) && (
         <button
-          className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg"
+          className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg z-20"
           onClick={() => {
             if (source) {
               onSourceRemoval({

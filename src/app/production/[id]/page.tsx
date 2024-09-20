@@ -1,10 +1,8 @@
 'use client';
+
 import React, { useEffect, useState, KeyboardEvent, useContext } from 'react';
 import { PageProps } from '../../../../.next/types/app/production/[id]/page';
-import SourceListItem from '../../../components/sourceListItem/SourceListItem';
-import FilterOptions from '../../../components/filter/FilterOptions';
 import { AddInput } from '../../../components/addInput/AddInput';
-import { IconX } from '@tabler/icons-react';
 import { useSources } from '../../../hooks/sources/useSources';
 import {
   AddSourceStatus,
@@ -19,8 +17,6 @@ import { updateSetupItem } from '../../../hooks/items/updateSetupItem';
 import { removeSetupItem } from '../../../hooks/items/removeSetupItem';
 import { addSetupItem } from '../../../hooks/items/addSetupItem';
 import HeaderNavigation from '../../../components/headerNavigation/HeaderNavigation';
-import styles from './page.module.scss';
-import FilterProvider from '../../../contexts/FilterContext';
 import { useGetPresets } from '../../../hooks/presets';
 import { Preset } from '../../../interfaces/preset';
 import SourceCards from '../../../components/sourceCards/SourceCards';
@@ -46,6 +42,9 @@ import SourceList from '../../../components/sourceList/SourceList';
 import { LockButton } from '../../../components/lockButton/LockButton';
 import { GlobalContext } from '../../../contexts/GlobalContext';
 import { Select } from '../../../components/select/Select';
+import { useAddSource } from '../../../hooks/sources/useAddSource';
+import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
+import { useWebsocket } from '../../../hooks/useWebsocket';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -94,6 +93,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [addSourceStatus, setAddSourceStatus] = useState<AddSourceStatus>();
   const [deleteSourceStatus, setDeleteSourceStatus] =
     useState<DeleteSourceStatus>();
+
+  // Create source
+  const [firstEmptySlot] = useGetFirstEmptySlot();
+  const [addSource] = useAddSource();
+
+  // Websocket
+  const [closeWebsocket] = useWebsocket();
 
   const { locked } = useContext(GlobalContext);
 
@@ -398,65 +404,29 @@ export default function ProductionConfiguration({ params }: PageProps) {
       </li>
     );
   }
-  function getSourcesToDisplay(
-    filteredSources: Map<string, SourceWithId>
-  ): React.ReactNode[] {
-    return Array.from(filteredSources.values()).map((source, index) => {
-      return (
-        <SourceListItem
-          key={`${source.ingest_source_name}-${index}`}
-          source={source}
-          disabled={selectedProductionItems?.includes(source._id.toString())}
-          action={(source: SourceWithId) => {
-            if (productionSetup && productionSetup.isActive) {
-              setSelectedSource(source);
-              setAddSourceModal(true);
-            } else if (productionSetup) {
-              const updatedSetup = addSetupItem(
-                {
-                  _id: source._id.toString(),
-                  type: 'ingest_source',
-                  label: source.ingest_source_name,
-                  // Byt till hook
-                  input_slot: getFirstEmptySlot()
-                },
-                productionSetup
-              );
-              if (!updatedSetup) return;
-              setProductionSetup(updatedSetup);
-              putProduction(updatedSetup._id.toString(), updatedSetup).then(
-                () => {
-                  setAddSourceModal(false);
-                  setSelectedSource(undefined);
-                }
-              );
-            }
-          }}
-        />
-      );
-    });
-  }
 
-  const getFirstEmptySlot = () => {
-    if (!productionSetup) throw 'no_production';
-    let firstEmptySlot = productionSetup.sources.length + 1;
-    if (productionSetup.sources.length === 0) {
-      return firstEmptySlot;
+  const addSourceAction = (source: SourceWithId) => {
+    if (productionSetup && productionSetup.isActive) {
+      setSelectedSource(source);
+      setAddSourceModal(true);
+    } else if (productionSetup) {
+      const input: SourceReference = {
+        _id: source._id.toString(),
+        type: 'ingest_source',
+        label: source.ingest_source_name,
+        input_slot: firstEmptySlot(productionSetup)
+      };
+      addSource(input, productionSetup).then((updatedSetup) => {
+        if (!updatedSetup) return;
+        setProductionSetup(updatedSetup);
+        setAddSourceModal(false);
+        setSelectedSource(undefined);
+      });
     }
-    for (
-      let i = 0;
-      i <
-      productionSetup.sources[productionSetup.sources.length - 1].input_slot;
-      i++
-    ) {
-      if (
-        !productionSetup.sources.some((source) => source.input_slot === i + 1)
-      ) {
-        firstEmptySlot = i + 1;
-        break;
-      }
-    }
-    return firstEmptySlot;
+  };
+
+  const isDisabledFunction = (source: SourceWithId): boolean => {
+    return selectedProductionItems?.includes(source._id.toString());
   };
 
   const handleAddSource = async () => {
@@ -615,7 +585,25 @@ export default function ProductionConfiguration({ params }: PageProps) {
           return;
         }
       }
+
+      if (
+        selectedSourceRef.type === 'html' ||
+        selectedSourceRef.type === 'mediaplayer'
+      ) {
+        // Action specifies what websocket method to call
+        const action =
+          selectedSourceRef.type === 'html' ? 'closeHtml' : 'closeMediaplayer';
+        const inputSlot = productionSetup.sources.find(
+          (source) => source._id === selectedSourceRef._id
+        )?.input_slot;
+
+        if (!inputSlot) return;
+
+        closeWebsocket(action, inputSlot);
+      }
+
       const updatedSetup = removeSetupItem(selectedSourceRef, productionSetup);
+
       if (!updatedSetup) return;
       setProductionSetup(updatedSetup);
       putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {

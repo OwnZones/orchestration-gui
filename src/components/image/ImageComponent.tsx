@@ -10,14 +10,17 @@ import Image from 'next/image';
 import { IconExclamationCircle } from '@tabler/icons-react';
 import { Loader } from '../loader/Loader';
 import { GlobalContext } from '../../contexts/GlobalContext';
+import { Source, Type } from '../../interfaces/Source';
 
 interface ImageComponentProps extends PropsWithChildren {
-  src: string;
+  src?: string;
   alt?: string;
+  source?: Source;
+  type?: Type;
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = (props) => {
-  const { src, alt = 'Image', children } = props;
+  const { src, alt = 'Image', children, type } = props;
   const { imageRefetchIndex } = useContext(GlobalContext);
   const [imgSrc, setImgSrc] = useState<string>();
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -49,45 +52,60 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   }, []);
 
   return (
-    <div className="relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
-      {((!imgSrc || error) && (
-        <IconExclamationCircle className="text-error fill-white w-full h-full" />
-      )) || (
-        <>
-          <Image
-            alt={alt}
-            className={`transition-opacity opacity-0 ${
-              loaded && !loading ? 'opacity-100' : ''
-            }`}
-            src={imgSrc!}
-            onLoad={() => {
-              setError(undefined);
-              setLoaded(false);
-            }}
-            onLoadingComplete={() => {
-              setLoaded(true);
-            }}
-            onError={(err) => {
-              setError(err);
-            }}
-            placeholder="empty"
-            width={0}
-            height={0}
-            sizes="20vh"
-            style={{
-              width: 'auto',
-              height: '100%'
-            }}
-          />
-          <Loader
-            className={`absolute top-1/2 left-1/2 w-1/3 h-1/3 -translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 ${
-              loading || !loaded ? 'opacity-100' : ''
-            }`}
-          />
-        </>
+    <>
+      {(!type || type === 'ingest_source') && src && (
+        <div className="relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
+          {((!imgSrc || error) && (
+            <IconExclamationCircle className="text-error fill-white w-full h-full" />
+          )) || (
+            <>
+              <Image
+                alt={alt}
+                className={`transition-opacity opacity-0 ${
+                  loaded && !loading ? 'opacity-100' : ''
+                }`}
+                src={imgSrc!}
+                onLoad={() => {
+                  setError(undefined);
+                  setLoaded(false);
+                }}
+                onLoadingComplete={() => {
+                  setLoaded(true);
+                }}
+                onError={(err) => {
+                  setError(err);
+                }}
+                placeholder="empty"
+                width={0}
+                height={0}
+                sizes="20vh"
+                style={{
+                  width: 'auto',
+                  height: '100%'
+                }}
+              />
+              <Loader
+                className={`absolute top-1/2 left-1/2 w-1/3 h-1/3 -translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 ${
+                  loading || !loaded ? 'opacity-100' : ''
+                }`}
+              />
+            </>
+          )}
+          {children}
+        </div>
       )}
-      {children}
-    </div>
+      {(type === 'html' || type === 'mediaplayer') && (
+        <span
+          className={`${
+            type === 'html' ? 'bg-sky-600' : 'bg-green-600'
+          } flex justify-center items-center w-full h-full`}
+        >
+          <p className="text-black text-xl">
+            {type === 'html' ? 'HTML' : 'Media Player'}
+          </p>
+        </span>
+      )}
+    </>
   );
 };
 
