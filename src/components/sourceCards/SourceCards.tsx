@@ -10,11 +10,13 @@ import { ISource, useDragableItems } from '../../hooks/useDragableItems';
 
 export default function SourceCards({
   productionSetup,
+  locked,
   updateProduction,
   onSourceUpdate,
   onSourceRemoval
 }: {
   productionSetup: Production;
+  locked: boolean;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference, sourceItem: ISource) => void;
   onSourceRemoval: (source: SourceReference) => void;
@@ -51,7 +53,7 @@ export default function SourceCards({
         // console.log(`Removing source "${source.name}" from sources list`);
         tempItems = tempItems.filter((i) => i._id !== source._id);
         // console.log(`Adding source "${source.name}" to grid`);
-        if (!productionSetup.isActive) {
+        if (!productionSetup.isActive && !locked) {
           gridItems.push(
             <DragItem
               key={`${source.ingest_source_name}-${source.input_slot}-key`}
