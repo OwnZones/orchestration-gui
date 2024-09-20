@@ -9,11 +9,13 @@ import { EmptySlotCard } from '../emptySlotCard/EmptySlotCard';
 
 export default function SourceCards({
   productionSetup,
+  locked,
   updateProduction,
   onSourceUpdate,
   onSourceRemoval
 }: {
   productionSetup: Production;
+  locked: boolean;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
@@ -43,7 +45,8 @@ export default function SourceCards({
       const isSource = isISource(source);
       if (source.input_slot === i + 1) {
         tempItems = tempItems.filter((i) => i._id !== source._id);
-        if (!productionSetup.isActive) {
+        // console.log(`Adding source "${source.name}" to grid`);
+        if (!productionSetup.isActive && !locked) {
           gridItems.push(
             <DragItem
               key={id === typeof String ? id : id.toString()}
