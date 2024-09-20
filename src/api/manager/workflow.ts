@@ -492,7 +492,10 @@ export async function startProduction(
             source.type !== 'mediaplayer'
         )
         .map((source) => {
-          return source._id!.toString();
+          if (source._id !== undefined) {
+            return source._id.toString();
+          }
+          return '';
         })
     ).catch((error) => {
       if (error === "Can't connect to Database") {
