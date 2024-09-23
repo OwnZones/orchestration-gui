@@ -1,3 +1,4 @@
+LICENSE.md
 **/.next
 *.tfstate*
 scripts/mongosh-admin.js
