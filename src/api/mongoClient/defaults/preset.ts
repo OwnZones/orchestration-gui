@@ -181,125 +181,273 @@ export const ldOnlyPreset = {
   ]
 };
 
-export const defaultMultiview = {
-  _id: new ObjectId('6582ff61987fa290e66ba95c'),
-  name: '10 inputs HD',
-  layout: {
-    output_height: 1080,
-    output_width: 1920,
-    views: [
-      {
-        input_slot: 1002,
-        x: 0,
-        y: 0,
-        height: 540,
-        width: 960,
-        label: 'Preview'
-      },
-      {
-        input_slot: 1001,
-        x: 960,
-        y: 0,
-        height: 540,
-        width: 960,
-        label: 'Program'
-      },
-      {
-        input_slot: 1,
-        x: 0,
-        y: 540,
-        height: 270,
-        width: 384,
-        label: 'Input 1'
-      },
-      {
-        input_slot: 2,
-        x: 384,
-        y: 540,
-        height: 270,
-        width: 384,
-        label: 'Input 2'
-      },
-      {
-        input_slot: 3,
-        x: 768,
-        y: 540,
-        height: 270,
-        width: 384,
-        label: 'Input 3'
-      },
-      {
-        input_slot: 4,
-        x: 1152,
-        y: 540,
-        height: 270,
-        width: 384,
-        label: 'Input 4'
-      },
-      {
-        input_slot: 5,
-        x: 1536,
-        y: 540,
-        height: 270,
-        width: 384,
-        label: 'Input 5'
-      },
-      {
-        input_slot: 6,
-        x: 0,
-        y: 810,
-        height: 270,
-        width: 384,
-        label: 'Input 6'
-      },
-      {
-        input_slot: 7,
-        x: 384,
-        y: 810,
-        height: 270,
-        width: 384,
-        label: 'Input 7'
-      },
-      {
-        input_slot: 8,
-        x: 768,
-        y: 810,
-        height: 270,
-        width: 384,
-        label: 'Input 8'
-      },
-      {
-        input_slot: 9,
-        x: 1152,
-        y: 810,
-        height: 270,
-        width: 384,
-        label: 'Input 9'
-      },
-      {
-        input_slot: 10,
-        x: 1536,
-        y: 810,
-        height: 270,
-        width: 384,
-        label: 'Input 10'
-      }
-    ]
+export const defaultMultiview = [
+  {
+    _id: new ObjectId('6582ff61987fa290e66ba95c'),
+    name: '10 inputs HD',
+    layout: {
+      output_height: 1080,
+      output_width: 1920,
+      views: [
+        {
+          input_slot: 1002,
+          x: 0,
+          y: 0,
+          height: 540,
+          width: 960,
+          label: 'Preview'
+        },
+        {
+          input_slot: 1001,
+          x: 960,
+          y: 0,
+          height: 540,
+          width: 960,
+          label: 'Program'
+        },
+        {
+          input_slot: 1,
+          x: 0,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 1'
+        },
+        {
+          input_slot: 2,
+          x: 384,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 2'
+        },
+        {
+          input_slot: 3,
+          x: 768,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 3'
+        },
+        {
+          input_slot: 4,
+          x: 1152,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 4'
+        },
+        {
+          input_slot: 5,
+          x: 1536,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 5'
+        },
+        {
+          input_slot: 6,
+          x: 0,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 6'
+        },
+        {
+          input_slot: 7,
+          x: 384,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 7'
+        },
+        {
+          input_slot: 8,
+          x: 768,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 8'
+        },
+        {
+          input_slot: 9,
+          x: 1152,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 9'
+        },
+        {
+          input_slot: 10,
+          x: 1536,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 10'
+        }
+      ]
+    },
+    output: {
+      format: 'MPEG-TS-SRT',
+      frame_rate_d: 1,
+      frame_rate_n: 50,
+      local_ip: '0.0.0.0',
+      local_port: 1234,
+      remote_ip: '0.0.0.0',
+      remote_port: 1234,
+      srt_mode: 'listener',
+      srt_latency_ms: 120,
+      srt_passphrase: '',
+      video_format: 'AVC',
+      video_kilobit_rate: 5000,
+      speed_quality_balance: 'balanced',
+      pic_mode: 'pic_mode_ip'
+    }
   },
-  output: {
-    format: 'MPEG-TS-SRT',
-    frame_rate_d: 1,
-    frame_rate_n: 50,
-    local_ip: '0.0.0.0',
-    local_port: 1234,
-    remote_ip: '0.0.0.0',
-    remote_port: 1234,
-    srt_mode: 'listener',
-    srt_latency_ms: 120,
-    srt_passphrase: '',
-    video_format: 'AVC',
-    video_kilobit_rate: 5000,
-    speed_quality_balance: 'balanced',
-    pic_mode: 'pic_mode_ip'
+  {
+    _id: new ObjectId('65cb266c00fecda4a1faf977'),
+    name: '12 inputs HD',
+    layout: {
+      output_height: 1080,
+      output_width: 1920,
+      views: [
+        {
+          input_slot: 1002,
+          x: 0,
+          y: 0,
+          height: 540,
+          width: 960,
+          label: 'Preview'
+        },
+        {
+          input_slot: 1001,
+          x: 960,
+          y: 0,
+          height: 540,
+          width: 960,
+          label: 'Program'
+        },
+        {
+          input_slot: 1,
+          x: 0,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 1'
+        },
+        {
+          input_slot: 2,
+          x: 384,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 2'
+        },
+        {
+          input_slot: 3,
+          x: 768,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 3'
+        },
+        {
+          input_slot: 4,
+          x: 1152,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 4'
+        },
+        {
+          input_slot: 5,
+          x: 1536,
+          y: 540,
+          height: 270,
+          width: 384,
+          label: 'Input 5'
+        },
+        {
+          input_slot: 6,
+          x: 0,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 6'
+        },
+        {
+          input_slot: 7,
+          x: 384,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 7'
+        },
+        {
+          input_slot: 8,
+          x: 768,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 8'
+        },
+        {
+          input_slot: 9,
+          x: 1152,
+          y: 810,
+          height: 270,
+          width: 384,
+          label: 'Input 9'
+        },
+        {
+          input_slot: 10,
+          x: 1536,
+          y: 810,
+          height: 135,
+          width: 192,
+          label: 'VS'
+        },
+        {
+          input_slot: 11,
+          x: 1728,
+          y: 810,
+          height: 135,
+          width: 192,
+          label: 'UR'
+        },
+        {
+          input_slot: 12,
+          x: 1536,
+          y: 945,
+          height: 135,
+          width: 192,
+          label: 'OV'
+        },
+        {
+          input_slot: 13,
+          x: 1728,
+          y: 945,
+          height: 135,
+          width: 192,
+          label: 'CG'
+        }
+      ]
+    },
+    output: {
+      format: 'MPEG-TS-SRT',
+      frame_rate_d: 1,
+      frame_rate_n: 50,
+      local_ip: '0.0.0.0',
+      local_port: 4567,
+      remote_ip: '0.0.0.0',
+      remote_port: 1234,
+      srt_mode: 'listener',
+      srt_latency_ms: 60,
+      srt_passphrase: '',
+      video_format: 'AVC',
+      video_kilobit_rate: 5000,
+      speed_quality_balance: 'balanced',
+      pic_mode: 'pic_mode_ip'
+    }
   }
-};
+];

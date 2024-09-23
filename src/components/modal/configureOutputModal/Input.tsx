@@ -8,6 +8,7 @@ interface IInput {
   onKeyDown?: (e: KeyboardEvent) => void;
   size?: 'small' | 'large';
   inputError?: boolean;
+  placeholder?: string;
 }
 
 export default function Input({
@@ -17,7 +18,8 @@ export default function Input({
   type = 'text',
   onKeyDown,
   size = 'small',
-  inputError
+  inputError,
+  placeholder
 }: IInput) {
   const errorCss = 'border-red-500 focus:border-red-500 focus:outline';
 
@@ -34,6 +36,7 @@ export default function Input({
         } pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none ${
           inputError ? errorCss : ''
         }`}
+        placeholder={placeholder ? placeholder : ''}
       />
     </div>
   );
