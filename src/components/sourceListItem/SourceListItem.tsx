@@ -70,7 +70,7 @@ function SourceListItem({
           : []
       );
     }
-  }, [source.audio_stream.audio_mapping]);
+  }, [source?.audio_stream.audio_mapping]);
 
   return (
     <li

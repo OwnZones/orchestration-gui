@@ -10,7 +10,7 @@
     "pretty:format": "prettier --write .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "next lint",
-    "dev": "./update_gui_version.sh && next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "version:rc": "npm version prerelease --preid=rc",
@@ -32,6 +32,7 @@
     "@sinclair/typebox": "^0.25.24",
     "@tabler/icons": "^2.22.0",
     "@tabler/icons-react": "^2.20.0",
+    "@types/ws": "^8.5.12",
     "bcrypt": "^5.1.0",
     "cron": "^2.3.1",
     "date-fns": "^2.30.0",
@@ -48,7 +49,8 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "tailwind-merge": "^1.13.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",

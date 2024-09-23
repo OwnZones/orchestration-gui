@@ -1,6 +1,7 @@
 import { ObjectId, WithId } from 'mongodb';
 export type SourceType = 'camera' | 'graphics' | 'microphone';
 export type SourceStatus = 'ready' | 'new' | 'gone' | 'purge';
+export type Type = 'ingest_source' | 'html' | 'mediaplayer';
 export type VideoStream = {
   height?: number;
   width?: number;
@@ -16,7 +17,7 @@ export type AudioStream = {
 export type Numbers = number | number[];
 
 export interface Source {
-  _id?: ObjectId;
+  _id?: ObjectId | string;
   status: SourceStatus;
   name: string;
   type: SourceType;
@@ -33,7 +34,8 @@ export interface Source {
 }
 
 export interface SourceReference {
-  _id: string;
+  _id?: string;
+  type: Type;
   label: string;
   stream_uuids?: string[];
   input_slot: number;

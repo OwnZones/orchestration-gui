@@ -29,7 +29,6 @@ export function AddSourceModal({
     <Modal open={open} outsideClick={onAbort}>
       <div className="text-center flex flex-col items-center">
         <h1 className="text-xl">{t('workflow.add_source_modal', { name })}</h1>
-
         <div>{status && <AddSourceFeed status={status} />}</div>
         <div className="flex gap-8 mt-4">
           <Button

@@ -46,7 +46,8 @@ export const en = {
     orig: 'Original Name: {{name}}',
     metadata: 'Source Metadata',
     location_unknown: 'Unknown',
-    last_connected: 'Last connection'
+    last_connected: 'Last connection',
+    input_slot: 'Input slot: {{input_slot}}'
   },
   delete_source_status: {
     delete_stream: 'Delete stream',
@@ -63,14 +64,17 @@ export const en = {
   },
   production_configuration: 'Production Configuration',
   production: {
-    add_source: 'Add Source',
+    add_source: 'Add ingest',
     select_preset: 'Select Preset',
     clear_selection: 'Clear Selection',
     started: 'Production started: {{name}}',
     failed: 'Production start failed: {{name}}',
     stopped: 'Production stopped: {{name}}',
     stop_failed: 'Production stop failed: {{name}}',
-    missing_multiview: 'Missing multiview reference in selected preset'
+    missing_multiview: 'Missing multiview reference in selected preset',
+    source: 'Source',
+    add: 'Add',
+    add_other_source_type: 'Add other source type'
   },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',
