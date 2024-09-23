@@ -673,7 +673,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
           <StartProductionButton
             refreshProduction={refreshProduction}
             production={productionSetup}
-            sources={sources}
             disabled={(!selectedPreset ? true : false) || locked}
           />
         </div>

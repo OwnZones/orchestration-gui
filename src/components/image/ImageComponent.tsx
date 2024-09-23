@@ -10,12 +10,11 @@ import Image from 'next/image';
 import { IconExclamationCircle } from '@tabler/icons-react';
 import { Loader } from '../loader/Loader';
 import { GlobalContext } from '../../contexts/GlobalContext';
-import { Source, Type } from '../../interfaces/Source';
+import { Type } from '../../interfaces/Source';
 
 interface ImageComponentProps extends PropsWithChildren {
   src?: string;
   alt?: string;
-  source?: Source;
   type?: Type;
 }
 

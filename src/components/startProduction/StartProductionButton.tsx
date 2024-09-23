@@ -17,18 +17,15 @@ import { usePutProduction } from '../../hooks/productions';
 import toast from 'react-hot-toast';
 import { useDeleteMonitoring } from '../../hooks/monitoring';
 import { useMultiviewPresets } from '../../hooks/multiviewPreset';
-import { SourceWithId } from '../../interfaces/Source';
 
 type StartProductionButtonProps = {
   production: Production | undefined;
-  sources: Map<string, SourceWithId>;
   disabled: boolean;
   refreshProduction: () => void;
 };
 
 export function StartProductionButton({
   production,
-  sources,
   disabled,
   refreshProduction
 }: StartProductionButtonProps) {

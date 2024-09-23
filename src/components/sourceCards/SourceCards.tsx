@@ -6,6 +6,7 @@ import DragItem from '../dragElement/DragItem';
 import SourceCard from '../sourceCard/SourceCard';
 import { ISource, useDragableItems } from '../../hooks/useDragableItems';
 import { EmptySlotCard } from '../emptySlotCard/EmptySlotCard';
+
 export default function SourceCards({
   productionSetup,
   updateProduction,

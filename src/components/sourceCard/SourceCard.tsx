@@ -1,5 +1,5 @@
 'use client';
-import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { SourceReference, Type } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
