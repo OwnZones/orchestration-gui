@@ -42,6 +42,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
       {currentSource ? (
         <div className={`p-3 ml-2 mt-2 bg-container rounded h-1/2 min-w-max`}>
           <EditView
+            locked={locked}
             source={currentSource}
             updateSource={(source) => setUpdatedSource(source)}
             close={() => setCurrentSource(null)}

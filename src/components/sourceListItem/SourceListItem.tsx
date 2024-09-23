@@ -23,6 +23,7 @@ function SourceListItem({
   source,
   action,
   disabled,
+  locked,
   actionText
 }: SourceListItemProps) {
   const t = useTranslate();
@@ -158,28 +159,19 @@ function SourceListItem({
             >
               <div
                 className={`flex items-center overflow-hidden mr-6 ${
-                  disabled || (locked && actionText === t('inventory_list.add'))
-                    ? 'text-unclickable-text'
-                    : 'text-brand hover:bg-zinc-500'
-                } bg-zinc-600`}
-                onClick={() => (disabled || !action ? '' : action(source))}
+                  disabled ? 'text-unclickable-text' : 'text-brand'
+                } text-xs`}
               >
-                <div
-                  className={`flex items-center overflow-hidden mr-6 ${
-                    disabled ? 'text-unclickable-text' : 'text-brand'
-                  } text-xs`}
-                >
-                  {actionText}
-                </div>
-                <Icons
-                  name="IconArrowRight"
-                  className={`absolute ${
-                    disabled ? 'text-unclickable-text' : 'text-brand'
-                  } right-2 w-4`}
-                />
-              </button>
-            </div>
-          ) : null}
+                {actionText}
+              </div>
+              <Icons
+                name="IconArrowRight"
+                className={`absolute ${
+                  disabled ? 'text-unclickable-text' : 'text-brand'
+                } right-2 w-4`}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </li>

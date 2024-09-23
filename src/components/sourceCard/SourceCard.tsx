@@ -1,11 +1,12 @@
 'use client';
-import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
-import { SourceReference } from '../../interfaces/Source';
+import { SourceReference, Type } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
 import ImageComponent from '../image/ImageComponent';
 import { getSourceThumbnail } from '../../utils/source';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type SourceCardProps = {
   source?: ISource;
@@ -15,7 +16,9 @@ type SourceCardProps = {
   onSelectingText: (bool: boolean) => void;
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
-  src: string;
+  src?: string;
+  sourceRef?: SourceReference;
+  type: Type;
 };
 
 export default function SourceCard({
@@ -26,7 +29,9 @@ export default function SourceCard({
   onSelectingText,
   forwardedRef,
   src,
-  style
+  style,
+  sourceRef,
+  type
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(
     sourceRef?.label || source?.name

@@ -103,6 +103,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   const { locked } = useContext(GlobalContext);
 
+  const isAddButtonDisabled =
+    selectedValue !== 'HTML' && selectedValue !== 'Media Player';
+
   useEffect(() => {
     refreshPipelines();
     refreshControlPanels();
@@ -696,6 +699,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               onConfirm={handleAddSource}
               status={addSourceStatus}
               loading={loadingCreateStream}
+              locked={locked}
             />
           )}
         </div>
@@ -753,16 +757,47 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 )}
               </DndProvider>
             )}
-            <AddSource
+          </div>
+          <div className="bg-zinc-700 aspect-video m-2 p-2 text-p border-2 border-zinc-300 rounded flex flex-col gap-2 justify-center items-center">
+            <AddInput
+              onClickSource={() => setInventoryVisible(true)}
               disabled={
                 productionSetup?.production_settings === undefined ||
-                productionSetup?.production_settings === null ||
-                locked
+                productionSetup.production_settings === null
               }
-              onClick={() => {
-                setInventoryVisible(true);
-              }}
             />
+            <div className="flex flex-row">
+              <Select
+                disabled={
+                  productionSetup?.production_settings === undefined ||
+                  productionSetup.production_settings === null
+                }
+                options={[
+                  t('production.add_other_source_type'),
+                  'HTML',
+                  'Media Player'
+                ]}
+                value={selectedValue}
+                onChange={(e) => {
+                  setSelectedValue(e.target.value);
+                }}
+              />
+              <button
+                className={`p-1.5 rounded ml-2 ${
+                  isAddButtonDisabled
+                    ? 'bg-zinc-500/50 text-white/50'
+                    : 'bg-zinc-500 text-white'
+                }`}
+                onClick={() =>
+                  addSourceToProduction(
+                    selectedValue === 'HTML' ? 'html' : 'mediaplayer'
+                  )
+                }
+                disabled={isAddButtonDisabled}
+              >
+                {t('production.add')}
+              </button>
+            </div>
           </div>
           <div className="w-full flex gap-2 p-3">
             {productionSetup?.production_settings &&

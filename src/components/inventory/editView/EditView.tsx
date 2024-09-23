@@ -25,7 +25,7 @@ export default function EditView({
         <div className="relative w-[38rem]">
           <ImageComponent src={getSourceThumbnail(source)} />
         </div>
-        <GeneralSettings />
+        <GeneralSettings locked={locked} />
       </div>
 
       <div className="flex-auto">
