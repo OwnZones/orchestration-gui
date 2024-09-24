@@ -123,12 +123,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
   const setSelectedPipelineName = (
     pipelineIndex: number,
-    pipelineName?: string
+    pipelineName?: string,
+    id?: string
   ) => {
     setProductionSetup((prevState) => {
       const updatedPipelines = prevState?.production_settings.pipelines;
       if (!updatedPipelines) return;
       updatedPipelines[pipelineIndex].pipeline_name = pipelineName;
+      updatedPipelines[pipelineIndex].pipeline_id = id;
       putProduction(prevState._id, {
         ...prevState,
         production_settings: {
@@ -750,6 +752,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       label={pipeline.pipeline_readable_name}
                       options={pipelines?.map((pipeline) => ({
                         option: pipeline.name,
+                        id: pipeline.uuid,
                         available: pipeline.streams.length === 0
                       }))}
                       pipelineIndex={i}

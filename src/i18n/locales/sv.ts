@@ -72,7 +72,8 @@ export const sv = {
     failed: 'Start av produktion misslyckades: {{name}}',
     stopped: 'Produktion stoppad: {{name}}',
     stop_failed: 'Stopp av produktion misslyckades: {{name}}',
-    missing_multiview: 'Saknar referens till en multiview i valt preset'
+    missing_multiview: 'Saknar referens till en multiview i valt preset',
+    configure_outputs: 'Konfigurera Outputs'
   },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',

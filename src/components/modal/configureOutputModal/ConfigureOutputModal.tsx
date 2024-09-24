@@ -89,7 +89,7 @@ export function ConfigureOutputModal({
   const clearInputs = () => {
     setMultiviews(preset.pipelines[0].multiviews || []);
     setOutputStreams(defaultState(preset.pipelines));
-    onClose();
+    // onClose();
   };
 
   useEffect(() => {
@@ -263,7 +263,12 @@ export function ConfigureOutputModal({
   };
 
   return (
-    <Modal open={open} outsideClick={() => clearInputs()}>
+    <Modal
+      open={open}
+      outsideClick={() => {
+        clearInputs();
+      }}
+    >
       <div className="flex gap-3">
         {preset.pipelines.map((pipeline, i) => {
           return (
@@ -279,6 +284,8 @@ export function ConfigureOutputModal({
               updateStream={updateStream}
               updateStreams={updateStreams}
               deleteStream={deleteStream}
+              updatePreset={updatePreset}
+              preset={preset}
             />
           );
         })}

@@ -70,7 +70,8 @@ export const en = {
     failed: 'Production start failed: {{name}}',
     stopped: 'Production stopped: {{name}}',
     stop_failed: 'Production stop failed: {{name}}',
-    missing_multiview: 'Missing multiview reference in selected preset'
+    missing_multiview: 'Missing multiview reference in selected preset',
+    configure_outputs: 'Configure Outputs'
   },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',

@@ -62,6 +62,10 @@ export interface PipelineSettings {
   audio_mapping: string;
   program_output_port: number; // deprecated but kept for backward compatibility
   program_output: ProgramOutput[];
+  outputs?: {
+    uuid: string;
+    streams: PipelineOutputSettings[];
+  }[];
   multiviews?: MultiviewSettings[];
   interfaces: [
     {

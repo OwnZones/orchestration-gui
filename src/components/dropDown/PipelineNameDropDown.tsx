@@ -3,11 +3,12 @@ import DropDown from './DropDown';
 
 type PipelineNamesDropDownProps = {
   label: string;
-  options?: { option: string; available: boolean }[];
+  options?: { option: string; available: boolean; id: string }[];
   initial?: string;
   setSelectedPipelineName: (
     pipelineIndex: number,
-    pipelineName?: string
+    pipelineName?: string,
+    id?: string
   ) => void;
   pipelineIndex: number;
   disabled: boolean;
@@ -22,7 +23,8 @@ export default function PipelineNamesDropDown({
 }: PipelineNamesDropDownProps) {
   const [selected, setSelected] = useState<string | undefined>(initial);
   useEffect(() => {
-    setSelectedPipelineName(pipelineIndex, selected);
+    const id = options?.find((o) => o.option === selected)?.id;
+    setSelectedPipelineName(pipelineIndex, selected, id);
   }, [selected]);
 
   const handleSetSelected = (option: string) => {

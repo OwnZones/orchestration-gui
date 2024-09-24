@@ -1,10 +1,16 @@
+'use client';
+
 import { useTranslate } from '../../../i18n/useTranslate';
 import Input from './Input';
 import Options from './Options';
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent, useState } from 'react';
 import StreamAccordion from './StreamAccordion';
 import { OutputStream } from './ConfigureOutputModal';
 import { v4 as uuidv4 } from 'uuid';
+import { IconSettings } from '@tabler/icons-react';
+import PipelineOutputsModal from './PipelineOutputsModal';
+import { PipelineSettings as IPipeline } from '../../../interfaces/pipeline';
+import { Preset } from '../../../interfaces/preset';
 
 interface PipelineSettingsProps {
   title: string;
@@ -13,6 +19,8 @@ interface PipelineSettingsProps {
   updateStream: (stream: OutputStream) => void;
   updateStreams: (streams: OutputStream[]) => void;
   deleteStream: (id: string, index: number) => void;
+  updatePreset: (preset: Preset) => void;
+  preset: Preset;
 }
 export default function PipelineSettings({
   title,
@@ -20,9 +28,13 @@ export default function PipelineSettings({
   addStream,
   updateStream,
   updateStreams,
-  deleteStream
+  deleteStream,
+  updatePreset,
+  preset
 }: PipelineSettingsProps) {
   const t = useTranslate();
+  const [showOutputConfigModal, setShowOutputConfigModal] =
+    useState<boolean>(false);
 
   const preventCharachters = (evt: KeyboardEvent) =>
     ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault();
@@ -115,7 +127,7 @@ export default function PipelineSettings({
           }
         />
       </div>
-      <div className="flex flex-col gap-3 min-h-[22rem]">
+      <div className="flex flex-col gap-3">
         {streams.map((stream) => {
           return (
             <StreamAccordion
@@ -142,6 +154,21 @@ export default function PipelineSettings({
       >
         {t('preset.add_stream')}
       </button>
+      <button
+        onClick={() => setShowOutputConfigModal(true)}
+        className="flex flex-row justify-center rounded-xl p-1 border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500"
+      >
+        <IconSettings className="text-p mr-2" />
+        {t('production.configure_outputs')}
+      </button>
+      {showOutputConfigModal && (
+        <PipelineOutputsModal
+          closeModal={() => setShowOutputConfigModal(false)}
+          name={title}
+          updatePreset={updatePreset}
+          preset={preset}
+        />
+      )}
     </div>
   );
 }
