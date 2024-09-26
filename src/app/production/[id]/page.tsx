@@ -43,6 +43,7 @@ import { useMultiviews } from '../../../hooks/multiviews';
 import SourceList from '../../../components/sourceList/SourceList';
 import { LockButton } from '../../../components/lockButton/LockButton';
 import { GlobalContext } from '../../../contexts/GlobalContext';
+import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -596,6 +597,15 @@ export default function ProductionConfiguration({ params }: PageProps) {
     setSelectedSource(undefined);
     setDeleteSourceStatus(undefined);
   };
+
+  const hasSelectedPipelines = () => {
+    if (!productionSetup?.production_settings?.pipelines?.length) return false;
+    let allPipesHaveName = true;
+    productionSetup.production_settings.pipelines.forEach((p) => {
+      if (!p.pipeline_name) allPipesHaveName = false;
+    });
+    return allPipesHaveName;
+  };
   return (
     <>
       <HeaderNavigation>
@@ -637,6 +647,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
               })}
           </PresetDropdown>
           <ConfigureOutputButton
+            disabled={
+              productionSetup?.isActive || locked || !hasSelectedPipelines()
+            }
+            preset={selectedPreset}
+            updatePreset={updatePreset}
+          />
+          <ConfigureMultiviewButton
             disabled={productionSetup?.isActive || locked}
             preset={selectedPreset}
             updatePreset={updatePreset}

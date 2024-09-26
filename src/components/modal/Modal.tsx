@@ -29,7 +29,7 @@ export function Modal({ open, children, outsideClick }: ModalProps) {
 
   return (
     <BaseModal
-      className="fixed top-0 left-0 w-full h-full bg-background/30 flex justify-center items-center z-50"
+      className="fixed top-0 left-0 w-full h-full bg-background/30 flex justify-center items-center z-50 overflow-auto"
       open={open}
     >
       <div

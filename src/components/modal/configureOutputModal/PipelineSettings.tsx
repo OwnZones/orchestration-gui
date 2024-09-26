@@ -9,7 +9,6 @@ import { OutputStream } from './ConfigureOutputModal';
 import { v4 as uuidv4 } from 'uuid';
 import { IconSettings } from '@tabler/icons-react';
 import PipelineOutputsModal from './PipelineOutputsModal';
-import { PipelineSettings as IPipeline } from '../../../interfaces/pipeline';
 import { Preset } from '../../../interfaces/preset';
 
 interface PipelineSettingsProps {
@@ -99,8 +98,8 @@ export default function PipelineSettings({
   return (
     <div className="flex flex-col gap-2 rounded p-4">
       <h1 className="font-bold">{title}</h1>
-      <div className="flex flex-col gap-3">
-        <Options
+      {/* <div className="flex flex-col gap-3"> */}
+      {/* <Options
           label={t('preset.video_format')}
           options={['AVC', 'HEVC']}
           value={streams[0].videoFormat}
@@ -153,7 +152,7 @@ export default function PipelineSettings({
         className="rounded-xl p-1 border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500"
       >
         {t('preset.add_stream')}
-      </button>
+      </button> */}
       <button
         onClick={() => setShowOutputConfigModal(true)}
         className="flex flex-row justify-center rounded-xl p-1 border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500"

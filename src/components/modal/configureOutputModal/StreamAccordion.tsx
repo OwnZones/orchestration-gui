@@ -7,8 +7,8 @@ import { OutputStream } from './ConfigureOutputModal';
 type StreamAccordionProps = {
   stream: OutputStream;
   isOnlyStream: boolean;
-  update: (key: string, value: string, id: string) => void;
-  onDelete: (id: string, index: number) => void;
+  update: (key: string, value: string) => void;
+  onDelete: () => void;
 };
 
 export default function StreamAccordion({
@@ -24,7 +24,7 @@ export default function StreamAccordion({
   }
 
   const handleDelete = () => {
-    onDelete(stream.id, stream.pipelineIndex);
+    onDelete();
   };
 
   return (
@@ -60,22 +60,22 @@ export default function StreamAccordion({
             label={t('preset.mode')}
             options={['listener', 'caller']}
             value={stream.srtMode}
-            update={(value) => update('srtMode', value, stream.id)}
+            update={(value) => update('srtMode', value)}
           />
           <Input
             label={t('preset.port')}
             value={stream.port}
-            update={(value) => update('port', value, stream.id)}
+            update={(value) => update('port', value)}
           />
           <Input
             label={t('preset.ip')}
             value={stream.ip}
-            update={(value) => update('ip', value, stream.id)}
+            update={(value) => update('ip', value)}
           />
           <Input
             label={t('preset.srt_passphrase')}
             value={stream.srtPassphrase}
-            update={(value) => update('srtPassphrase', value, stream.id)}
+            update={(value) => update('srtPassphrase', value)}
           />
         </div>
       </div>

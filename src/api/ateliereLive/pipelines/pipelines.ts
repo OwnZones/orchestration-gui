@@ -3,6 +3,7 @@ import {
   ResourcesPipelineResponse
 } from '../../../../types/ateliere-live';
 import {
+  PipelineOutput,
   PipelineOutputSettings,
   PipelineSettings
 } from '../../../interfaces/pipeline';
@@ -161,44 +162,28 @@ export async function removePipelineStreams(pipeId: string) {
 }
 
 export async function createPipelineOutputs(pipeline: PipelineSettings) {
-  const outputs = await getPipelineOutputs(pipeline.pipeline_id!).catch(
+  const outputs = pipeline.outputs;
+  if (!outputs) return;
+  const startOutputStreamsPromises = outputs.map((o) => {
+    return startPipelineStream(
+      pipeline.pipeline_id!,
+      o.uuid,
+      buildOutputStreamSettings(o)
+    );
+  });
+  const startedOutputs = await Promise.all(startOutputStreamsPromises).catch(
     (error) => {
       Log().error(
-        `Failed to get outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`,
+        `Failed to create outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`,
         error
       );
-      throw `Failed to get outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}': ${error}`;
+      throw `Failed to create outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}': ${error.message}`;
     }
   );
-
-  Log().info(
-    `Creating outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`
-  );
-
-  let outputUuid = outputs[0].uuid!;
-  if (outputs.length > 0) {
-    const outputToUse = outputs.find(
-      (output) => output.name.toLowerCase().indexOf('program') !== -1
-    );
-    if (outputToUse) {
-      outputUuid = outputToUse.uuid!;
-    }
-  }
-
-  await startPipelineStream(
-    pipeline.pipeline_id!,
-    outputUuid,
-    buildPipelineSettingsBody(pipeline)
-  ).catch((error) => {
-    Log().error(
-      `Failed to create outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}' at output '${outputUuid}'`,
-      error
-    );
-    throw `Failed to create outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}' at output '${outputUuid}': ${error.message}`;
-  });
   Log().info(
     `Outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}' created`
   );
+  return startedOutputs;
 }
 
 export async function connectControlPanelToPipeline(
@@ -284,30 +269,27 @@ export async function connectControlPanelToPipeline(
   await Promise.all(connectSendersToReceivers);
 }
 
-function buildPipelineSettingsBody(
-  pipeline: PipelineSettings
+function buildOutputStreamSettings(
+  output: PipelineOutput
 ): PipelineOutputSettings[] {
-  const outputSettings = pipeline.program_output.map((output) => {
+  const outputSettings = output.streams.map((s) => {
     return {
-      audio_format: output.audio_format,
-      audio_kilobit_rate: output.audio_kilobit_rate,
-      format: output.format,
-      local_ip: output.local_ip,
-      local_port: output.srt_mode === 'caller' ? 0 : output.port,
-      remote_ip: output.remote_ip, // only used in caller mode
-      remote_port: output.port,
-      srt_mode: output.srt_mode, // 'listener' or 'caller'
-      srt_latency_ms: output.srt_latency_ms, // 120
-      srt_passphrase: output.srt_passphrase, // ''
-      video_bit_depth: output.video_bit_depth,
-      video_format: output.video_format,
-      video_gop_length: output.video_gop_length,
-      video_kilobit_rate: output.video_kilobit_rate
+      video_format: output.settings.video_format,
+      video_bit_depth: output.settings.video_bit_depth,
+      video_kilobit_rate: output.settings.video_kilobit_rate,
+      audio_format: s.audio_format,
+      audio_kilobit_rate: s.audio_kilobit_rate,
+      format: s.format,
+      local_ip: s.local_ip,
+      local_port: s.srt_mode === 'caller' ? 0 : s.local_port,
+      remote_ip: s.remote_ip, // only used in caller mode
+      remote_port: s.remote_port,
+      srt_mode: s.srt_mode, // 'listener' or 'caller'
+      srt_latency_ms: s.srt_latency_ms, // 120
+      srt_passphrase: s.srt_passphrase, // ''
+      video_gop_length: s.video_gop_length
     };
   });
-  Log().info(
-    `Output settings for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`,
-    outputSettings
-  );
+  Log().info(`Creating streams for output ${output.uuid}.'`, outputSettings);
   return outputSettings;
 }

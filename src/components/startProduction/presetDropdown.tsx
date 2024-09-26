@@ -50,7 +50,7 @@ export const PresetDropdown = ({
         <div
           className={`relative ${
             isHidden ? 'overflow-hidden max-h-0' : 'min-h-fit max-h-[100rem]'
-          } transition-all duration-150 items-center mt-1 z-10 divide-y  rounded-lg shadow bg-zinc-700 divide-gray-600 dropend`}
+          } transition-all duration-150 items-center mt-1 z-30 divide-y  rounded-lg shadow bg-zinc-700 divide-gray-600 dropend`}
         >
           <ul
             className={`absolute -right-7 top-6 rounded border flex-col min-h-fit px-3 text-sm bg-container text-p`}
