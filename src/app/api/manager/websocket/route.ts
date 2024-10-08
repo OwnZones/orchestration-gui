@@ -18,10 +18,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     ws.onopen = () => {
       if (action === 'closeHtml') {
         ws.send(`html close ${inputSlot}`);
-        ws.send('html reset');
       } else if (action === 'closeMediaplayer') {
         ws.send(`media close ${inputSlot}`);
-        ws.send('media reset');
       }
       ws.close();
     };

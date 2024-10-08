@@ -21,11 +21,9 @@ export async function createControlPanelWebSocket() {
     },
     closeHtml: (input: number) => {
       ws.send(`html close ${input}`);
-      ws.send('html reset');
     },
     closeMediaplayer: (input: number) => {
       ws.send(`media close ${input}`);
-      ws.send('media reset');
     },
     close: () =>
       setTimeout(() => {
