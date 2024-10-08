@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslate } from '../../i18n/useTranslate';
-import { SortSelect } from './SortSelect';
+import { Select } from '../select/Select';
 import { IconArrowsSort } from '@tabler/icons-react';
 
 function FilterDropdown({
@@ -283,7 +283,8 @@ function FilterDropdown({
             <span className="flex min-w-[20%] mr-5">
               {t('inventory_list.sort_by')}
             </span>
-            <SortSelect
+            <Select
+              classNames="w-1/2"
               value={selectedValue}
               onChange={(e) => {
                 setSelectedValue(e.target.value);

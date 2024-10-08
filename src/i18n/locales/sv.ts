@@ -48,7 +48,8 @@ export const sv = {
     orig: 'Enhetsnamn: {{name}}',
     metadata: 'Käll-metadata',
     location_unknown: 'Okänd',
-    last_connected: 'Senast uppkoppling'
+    last_connected: 'Senast uppkoppling',
+    input_slot: 'Ingång: {{input_slot}}'
   },
   delete_source_status: {
     delete_stream: 'Radera ström',
@@ -65,14 +66,17 @@ export const sv = {
   },
   production_configuration: 'Produktionskonfiguration',
   production: {
-    add_source: 'Lägg till källa',
+    add_source: 'Lägg till ingång',
     select_preset: 'Välj produktionsmall',
     clear_selection: 'Rensa val',
     started: 'Produktion startad: {{name}}',
     failed: 'Start av produktion misslyckades: {{name}}',
     stopped: 'Produktion stoppad: {{name}}',
     stop_failed: 'Stopp av produktion misslyckades: {{name}}',
-    missing_multiview: 'Saknar referens till en multiview i valt preset'
+    missing_multiview: 'Saknar referens till en multiview i valt preset',
+    source: 'Källa',
+    add: 'Lägg till',
+    add_other_source_type: 'Lägg till annan källtyp'
   },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',
@@ -587,6 +591,7 @@ export const sv = {
   },
   online: 'ONLINE',
   offline: 'OFFLINE',
+  refresh_images: 'Uppdatera Tumnaglar',
   server_error: '{{string}}:n inte ansluten',
   system_controller: 'Systemkontroller',
   database: 'Databas',
@@ -610,6 +615,14 @@ export const sv = {
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
     no_multiview_found: 'Hittade ingen multiview',
+    select_multiview_layout: 'Komposition',
+    configure_layout: 'Justera komposition',
+    create_layout: 'Skapa komposition',
+    update_layout: 'Uppdatera komposition',
+    no_updated_layout: 'Ingen uppdaterad komposition',
+    new_preset_name: 'Min komposition',
+    muliview_view: 'Ingång',
+    select_option: 'Välj',
     select_multiview_preset: 'Förinställningar',
     no_port_selected: 'Unik port krävs'
   },

@@ -38,6 +38,7 @@ Then copy the `.env.sample` file and name it `.env`, it will contain env variabl
 
 - `LIVE_URL` - The URL to the Ateliere Live system controller REST API
 - `LIVE_CREDENTIALS` - Credentials for the Ateliere Live system controller REST API
+- `CONTROL_PANEL_WS` - Specifies the IP address or hostname and port for the control panel WebSocket server.
 
 - `NEXTAUTH_SECRET` - The secret used to encrypt the JWT Token
 - `NEXTAUTH_URL` - The base url for the service, eg. `http://localhost:3000`, used internally by NextAuth.

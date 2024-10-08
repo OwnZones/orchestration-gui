@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { SourceWithId } from '../../interfaces/Source';
+import { SourceWithId } from '../interfaces/Source';
 
 interface IContext {
   locations: string[];

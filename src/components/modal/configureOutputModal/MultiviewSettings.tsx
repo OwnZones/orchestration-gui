@@ -6,17 +6,22 @@ import { MultiviewPreset } from '../../../interfaces/preset';
 import Input from './Input';
 import Options from './Options';
 import toast from 'react-hot-toast';
+import { IconSettings } from '@tabler/icons-react';
 
 type MultiviewSettingsProps = {
+  lastItem: boolean;
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
   portDuplicateError: boolean;
+  openConfigModal: (input: string) => void;
 };
 
 export default function MultiviewSettingsConfig({
+  lastItem,
   multiview,
   handleUpdateMultiview,
-  portDuplicateError
+  portDuplicateError,
+  openConfigModal
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewPresets, loading] = useMultiviewPresets();
@@ -142,16 +147,28 @@ export default function MultiviewSettingsConfig({
   const multiviewOrPreset = multiview ? multiview : selectedMultiviewPreset;
 
   return (
-    <div className="flex flex-col gap-2 rounded p-4">
+    <div className="flex flex-col gap-2 rounded p-4 pr-7">
       <div className="flex justify-between">
         <h1 className="font-bold">{t('preset.multiview_output_settings')}</h1>
       </div>
-      <Options
-        label={t('preset.select_multiview_preset')}
-        options={multiviewPresetNames}
-        value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
-        update={(value) => handleSetSelectedMultiviewPreset(value)}
-      />
+      <div className="relative">
+        <Options
+          label={t('preset.select_multiview_layout')}
+          options={multiviewPresetNames}
+          value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
+          update={(value) => handleSetSelectedMultiviewPreset(value)}
+        />
+        {lastItem && (
+          // TODO: When possible to edit layout, uncomment the following code and remove the button below
+          <button
+            onClick={() => openConfigModal('create')}
+            title={t('preset.configure_layout')}
+            className={`absolute top-0 right-[-10%] min-w-fit`}
+          >
+            <IconSettings className="text-p" />
+          </button>
+        )}
+      </div>
       <div className="flex flex-col gap-3">
         <Options
           label={t('preset.video_format')}

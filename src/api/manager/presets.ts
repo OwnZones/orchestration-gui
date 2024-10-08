@@ -18,6 +18,7 @@ export async function getMultiviewPresets(): Promise<MultiviewPreset[]> {
   const db = await getDatabase();
   return await db.collection<MultiviewPreset>('multiviews').find({}).toArray();
 }
+
 export async function getMultiviewPreset(
   id: string
 ): Promise<WithId<MultiviewPreset>> {
@@ -26,6 +27,16 @@ export async function getMultiviewPreset(
     .collection<MultiviewPreset>('multiviews')
     .findOne({ _id: new ObjectId(id) })) as WithId<MultiviewPreset>;
 }
+
+export async function putMultiviewPreset(
+  newMultiviewPreset: MultiviewPreset
+): Promise<void> {
+  const db = await getDatabase();
+  await db
+    .collection('multiviews')
+    .insertOne({ ...newMultiviewPreset, _id: new ObjectId() });
+}
+
 export async function putPreset(
   id: string,
   preset: PresetWithId

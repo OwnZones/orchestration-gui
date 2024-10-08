@@ -14,19 +14,20 @@ export function addSetupItem(
       ...productionSetup.sources,
       {
         _id: source._id,
+        type: source.type,
         label: source.label,
         stream_uuids: source.stream_uuids,
         input_slot: source.input_slot
       }
     ].sort((a, b) => a.input_slot - b.input_slot)
   };
-
   return {
     ...updatedSetup,
     sources: [
       ...productionSetup.sources,
       {
         _id: source._id,
+        type: source.type,
         label: source.label,
         stream_uuids: source.stream_uuids,
         input_slot: source.input_slot

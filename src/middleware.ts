@@ -41,4 +41,4 @@ export default withAuth(function middleware(req) {
   }
 });
 
-export const config = { matcher: ['/', '/((?!api|images).*)/'] };
+export const config = { matcher: ['/', '/((?!api|images|html_input).*)/'] };

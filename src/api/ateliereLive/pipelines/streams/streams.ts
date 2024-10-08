@@ -66,6 +66,7 @@ export async function createStream(
         return pipeline.uuid;
       })
     );
+
     const ingestUuid = await getUuidFromIngestName(
       source.ingest_name,
       false
@@ -79,6 +80,7 @@ export async function createStream(
       source.ingest_source_name,
       false
     );
+
     const audioMapping =
       source.audio_stream.audio_mapping &&
       source.audio_stream.audio_mapping.length > 0
@@ -86,6 +88,7 @@ export async function createStream(
         : [[0, 1]];
 
     await initDedicatedPorts();
+
     for (const pipeline of production_settings.pipelines) {
       const availablePorts = getAvailablePortsForIngest(
         source.ingest_name,
@@ -101,6 +104,7 @@ export async function createStream(
       Log().info(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
+
       const stream: PipelineStreamSettings = {
         pipeline_id: pipeline.pipeline_id!,
         alignment_ms: pipeline.alignment_ms,
@@ -131,6 +135,7 @@ export async function createStream(
           }
         ]
       };
+
       try {
         Log().info(
           `Connecting '${source.ingest_name}/${ingestUuid}}:${source.ingest_source_name}' to '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`
@@ -147,6 +152,7 @@ export async function createStream(
         Log().info(
           `Stream '${result.stream_uuid}' from '${source.ingest_name}/${ingestUuid}' to '${pipeline.pipeline_name}/${pipeline.pipeline_id}' connected`
         );
+
         sourceToPipelineStreams.push({
           source_id: source._id.toString(),
           stream_uuid: result.stream_uuid,

@@ -1,3 +1,4 @@
+import { SourceReference, SourceWithId } from './../../interfaces/Source';
 import {
   Production,
   ProductionSettings,
@@ -35,7 +36,7 @@ import {
   ResourcesSenderNetworkEndpoint
 } from '../../../types/ateliere-live';
 import { getSourcesByIds } from './sources';
-import { SourceWithId, SourceToPipelineStream } from '../../interfaces/Source';
+import { SourceToPipelineStream } from '../../interfaces/Source';
 import {
   getAvailablePortsForIngest,
   getCurrentlyUsedPorts,
@@ -49,6 +50,8 @@ import { Result } from '../../interfaces/result';
 import { Monitoring } from '../../interfaces/monitoring';
 import { getDatabase } from '../mongoClient/dbClient';
 import { updatedMonitoringForProduction } from './job/syncMonitoring';
+import { createControlPanelWebSocket } from '../ateliereLive/websocket';
+import { ObjectId } from 'mongodb';
 
 const isUsed = (pipeline: ResourcesPipelineResponse) => {
   const hasStreams = pipeline.streams.length > 0;
@@ -68,15 +71,18 @@ const isUsed = (pipeline: ResourcesPipelineResponse) => {
 };
 
 async function connectIngestSources(
+  productionSources: SourceReference[],
   productionSettings: ProductionSettings,
   sources: SourceWithId[],
   usedPorts: Set<number>
 ) {
-  let input_slot = 0;
   const sourceToPipelineStreams: SourceToPipelineStream[] = [];
+  let input_slot = 0;
 
   for (const source of sources) {
-    input_slot = input_slot + 1;
+    input_slot =
+      productionSources.find((s) => s._id === source._id.toString())
+        ?.input_slot || input_slot + 1;
     const ingestUuid = await getUuidFromIngestName(
       source.ingest_name,
       false
@@ -89,7 +95,8 @@ async function connectIngestSources(
       source.ingest_source_name,
       false
     );
-    const audioSettings = await getAudioMapping(source._id);
+
+    const audioSettings = await getAudioMapping(new ObjectId(source._id));
     const newAudioMapping = audioSettings?.audio_stream?.audio_mapping;
     const audioMapping = newAudioMapping?.length ? newAudioMapping : [[0, 1]];
 
@@ -108,6 +115,7 @@ async function connectIngestSources(
       Log().info(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
+
       const stream: PipelineStreamSettings = {
         pipeline_id: pipeline.pipeline_id!,
         alignment_ms: pipeline.alignment_ms,
@@ -129,7 +137,7 @@ async function connectIngestSources(
         width: pipeline.width,
         ingest_id: ingestUuid,
         source_id: sourceId,
-        input_slot,
+        input_slot: input_slot,
         audio_mapping: JSON.stringify(audioMapping),
         interfaces: [
           {
@@ -138,9 +146,10 @@ async function connectIngestSources(
           }
         ]
       };
+
       try {
         Log().info(
-          `Connecting '${source.ingest_name}/${ingestUuid}}:${source.ingest_source_name}' to '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`
+          `Connecting '${source.ingest_name}/${ingestUuid}:${source.ingest_source_name}' to '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`
         );
         Log().debug(stream);
         const result = await connectIngestToPipeline(stream).catch((error) => {
@@ -150,6 +159,7 @@ async function connectIngestSources(
           );
           throw `Source '${source.ingest_name}/${ingestUuid}:${source.ingest_source_name}' failed to connect to '${pipeline.pipeline_name}/${pipeline.pipeline_id}': ${error.message}`;
         });
+
         usedPorts.add(availablePort);
         sourceToPipelineStreams.push({
           source_id: source._id.toString(),
@@ -308,6 +318,24 @@ export async function stopProduction(
     (p) => p.pipeline_id
   );
 
+  const controlPanelWS = await createControlPanelWebSocket();
+  const htmlSources = production.sources.filter(
+    (source) => source.type === 'html'
+  );
+  const mediaPlayerSources = production.sources.filter(
+    (source) => source.type === 'mediaplayer'
+  );
+
+  for (const source of htmlSources) {
+    controlPanelWS.closeHtml(source.input_slot);
+  }
+
+  for (const source of mediaPlayerSources) {
+    controlPanelWS.closeMediaplayer(source.input_slot);
+  }
+
+  controlPanelWS.close();
+
   for (const source of production.sources) {
     for (const stream_uuid of source.stream_uuids || []) {
       await deleteStreamByUuid(stream_uuid).catch((error) => {
@@ -355,6 +383,7 @@ export async function stopProduction(
         };
       }
     }
+
     try {
       await removePipelineStreams(id).catch((error) => {
         Log().error(
@@ -409,7 +438,13 @@ export async function stopProduction(
       }
     }
     Log().info(`Pipeline '${id}' stopped`);
+
+    const pipelines = await getPipelines();
+    const pipelineFeedbackStreams = pipelines.find(
+      (p) => p.uuid === id
+    )?.feedback_streams;
   }
+
   if (
     !disconnectConnectionsStatus.ok ||
     !removePipelineStreamsStatus.ok ||
@@ -450,9 +485,18 @@ export async function startProduction(
   try {
     // Get sources from the DB
     const sources = await getSourcesByIds(
-      production.sources.map((source) => {
-        return source._id.toString();
-      })
+      production.sources
+        .filter(
+          (source) =>
+            (source._id !== undefined && source.type !== 'html') ||
+            source.type !== 'mediaplayer'
+        )
+        .map((source) => {
+          if (source._id !== undefined) {
+            return source._id.toString();
+          }
+          return '';
+        })
     ).catch((error) => {
       if (error === "Can't connect to Database") {
         throw "Can't connect to Database";
@@ -537,8 +581,8 @@ export async function startProduction(
         return pipeline.uuid;
       })
     );
-
     streams = await connectIngestSources(
+      production.sources,
       production_settings,
       sources,
       usedPorts
@@ -611,6 +655,24 @@ export async function startProduction(
     };
   } // Try to connect control panels and pipeline-to-pipeline connections end
 
+  const controlPanelWS = await createControlPanelWebSocket();
+  const htmlSources = production.sources.filter(
+    (source) => source.type === 'html'
+  );
+  const mediaPlayerSources = production.sources.filter(
+    (source) => source.type === 'mediaplayer'
+  );
+
+  for (const source of htmlSources) {
+    controlPanelWS.createHtml(source.input_slot);
+  }
+
+  for (const source of mediaPlayerSources) {
+    controlPanelWS.createMediaplayer(source.input_slot);
+  }
+
+  controlPanelWS.close();
+
   // Try to setup pipeline outputs start
   try {
     for (const pipeline of production_settings.pipelines) {
@@ -648,7 +710,6 @@ export async function startProduction(
       error: e
     };
   } // Try to setup pipeline outputs end
-
   // Try to setup multiviews start
   try {
     if (!production.production_settings.pipelines[0].multiviews) {
@@ -720,12 +781,13 @@ export async function startProduction(
       ...production,
       sources: production.sources.map((source) => {
         const streamsForSource = streams?.filter(
-          (stream) => stream.source_id === source._id.toString()
+          (stream) => stream.source_id === source._id?.toString()
         );
         return {
           ...source,
-          stream_uuids: streamsForSource?.map((s) => s.stream_uuid),
-          input_slot: streamsForSource[0].input_slot
+          stream_uuids:
+            streamsForSource?.map((s) => s.stream_uuid) || undefined,
+          input_slot: source.input_slot
         };
       }),
       isActive: true

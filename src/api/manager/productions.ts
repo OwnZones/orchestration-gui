@@ -28,14 +28,29 @@ export async function setProductionsIsActiveFalse(): Promise<
 export async function putProduction(
   id: string,
   production: Production
-): Promise<void> {
+): Promise<Production> {
   const db = await getDatabase();
+  const newSourceId = new ObjectId().toString();
+
+  const sources = production.sources
+    ? production.sources.flatMap((singleSource) => {
+        return singleSource._id
+          ? singleSource
+          : {
+              _id: newSourceId,
+              type: singleSource.type,
+              label: singleSource.label,
+              input_slot: singleSource.input_slot
+            };
+      })
+    : [];
+
   await db.collection('productions').findOneAndReplace(
     { _id: new ObjectId(id) },
     {
       name: production.name,
       isActive: production.isActive,
-      sources: production.sources,
+      sources: sources,
       production_settings: production.production_settings
     }
   );
@@ -43,6 +58,14 @@ export async function putProduction(
   if (!production.isActive) {
     deleteMonitoring(db, id);
   }
+
+  return {
+    _id: new ObjectId(id).toString(),
+    name: production.name,
+    isActive: production.isActive,
+    sources: sources,
+    production_settings: production.production_settings
+  };
 }
 
 export async function postProduction(data: Production): Promise<ObjectId> {

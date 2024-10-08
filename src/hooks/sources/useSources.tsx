@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
 
 export function useSources(
-  deleteComplete?: boolean,
+  reloadList?: boolean,
   updatedSource?: SourceWithId
 ): [Map<string, SourceWithId>, boolean] {
   const [sources, setSources] = useState<Map<string, SourceWithId>>(
@@ -11,7 +11,7 @@ export function useSources(
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!updatedSource || deleteComplete) {
+    if (!updatedSource || reloadList) {
       fetch('/api/manager/sources?mocked=false', {
         method: 'GET',
         // TODO: Implement api key
@@ -34,6 +34,6 @@ export function useSources(
     }
     sources.set(updatedSource._id.toString(), updatedSource);
     setSources(new Map<string, SourceWithId>(sources));
-  }, [updatedSource, deleteComplete]);
+  }, [updatedSource, reloadList]);
   return [sources, loading];
 }

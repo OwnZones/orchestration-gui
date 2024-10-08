@@ -64,13 +64,12 @@ export async function createMultiviewForPipeline(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     productionSettings.pipelines[multiviewIndex].pipeline_id!;
   const sources = await getSourcesByIds(
-    sourceRefs.map((ref) => ref._id.toString())
+    sourceRefs.map((ref) => (ref._id ? ref._id.toString() : ''))
   );
   const sourceRefsWithLabels = sourceRefs.map((ref) => {
+    const refId = ref._id ? ref._id.toString() : '';
     if (!ref.label) {
-      const source = sources.find(
-        (source) => source._id.toString() === ref._id.toString()
-      );
+      const source = sources.find((source) => source._id.toString() === refId);
       ref.label = source?.name || '';
     }
     return ref;

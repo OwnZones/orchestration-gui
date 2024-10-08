@@ -12,6 +12,7 @@ type AddSourceModalProps = {
   onConfirm: () => void;
   status?: AddSourceStatus;
   loading: boolean;
+  locked: boolean;
 };
 
 export function AddSourceModal({
@@ -20,14 +21,14 @@ export function AddSourceModal({
   onAbort,
   onConfirm,
   status,
-  loading
+  loading,
+  locked
 }: AddSourceModalProps) {
   const t = useTranslate();
   return (
     <Modal open={open} outsideClick={onAbort}>
       <div className="text-center flex flex-col items-center">
         <h1 className="text-xl">{t('workflow.add_source_modal', { name })}</h1>
-
         <div>{status && <AddSourceFeed status={status} />}</div>
         <div className="flex gap-8 mt-4">
           <Button
@@ -37,7 +38,7 @@ export function AddSourceModal({
             {t('abort')}
           </Button>
 
-          <Button onClick={onConfirm} className={'min-w-fit'}>
+          <Button onClick={onConfirm} className={'min-w-fit'} disabled={locked}>
             {loading ? (
               <Loader className="w-10 h-5" />
             ) : (
