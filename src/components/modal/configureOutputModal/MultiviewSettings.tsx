@@ -29,12 +29,6 @@ export default function MultiviewSettingsConfig({
     MultiviewPreset | undefined
   >(multiview);
 
-  // TODO: When possible to edit layout, uncomment the following code
-  // const [modalOpen, setModalOpen] = useState(false);
-  // const toggleConfigModal = () => {
-  //   setModalOpen((state) => !state);
-  // };
-
   useEffect(() => {
     if (multiview) {
       setSelectedMultiviewPreset(multiview);
@@ -173,33 +167,6 @@ export default function MultiviewSettingsConfig({
           >
             <IconSettings className="text-p" />
           </button>
-          // <>
-          //   <button
-          //     onClick={toggleConfigModal}
-          //     title={t('preset.configure_layout')}
-          //     className={`absolute top-0 right-[-10%] min-w-fit`}
-          //   >
-          //     <IconSettings className="text-p" />
-          //   </button>
-          //   {modalOpen && (
-          //     <div className="absolute top-5 right-[-65%] flex flex-col">
-          //       <button
-          //         type="button"
-          //         className={`min-w-fit bg-zinc-700 rounded-t-sm p-1 border-b-[1px] border-b-zinc-600 hover:bg-zinc-600`}
-          //         onClick={() => openConfigModal('create')}
-          //       >
-          //         {t('preset.create_layout')}
-          //       </button>
-          //       <button
-          //         type="button"
-          //         className={`min-w-fit bg-zinc-700 rounded-b-sm  p-1 hover:bg-zinc-600`}
-          //         onClick={() => openConfigModal('edit')}
-          //       >
-          //         {t('preset.update_layout')}
-          //       </button>
-          //     </div>
-          //   )}
-          // </>
         )}
       </div>
       <div className="flex flex-col gap-3">

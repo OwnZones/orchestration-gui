@@ -5,11 +5,6 @@ function createWebSocket(): Promise<WebSocket> {
     const ws = new WebSocket(`ws://${process.env.CONTROL_PANEL_WS}`);
     ws.on('error', reject);
     ws.on('open', () => {
-      // const send = ws.send.bind(ws);
-      // ws.send = (message) => {
-      //   console.debug(`[websocket] sending message: ${message}`);
-      //   send(message);
-      // };
       resolve(ws);
     });
   });

@@ -306,7 +306,7 @@ export const defaultMultiview = [
   },
   {
     _id: new ObjectId('65cb266c00fecda4a1faf977'),
-    name: '12 inputs HD',
+    name: '13 inputs HD',
     layout: {
       output_height: 1080,
       output_width: 1920,
