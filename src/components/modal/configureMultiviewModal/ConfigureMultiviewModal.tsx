@@ -137,6 +137,7 @@ export function ConfigureMultiviewModal({
       return;
     }
 
+    console.log('production ID - to save', newMultiviewLayout?._id);
     await addNewLayout(newMultiviewLayout);
     setNewMultiviewLayout(null);
     setLayoutModalOpen(false);

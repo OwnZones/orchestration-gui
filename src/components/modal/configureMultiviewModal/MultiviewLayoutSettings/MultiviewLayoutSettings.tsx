@@ -60,6 +60,10 @@ export default function MultiviewLayoutSettings({
     newPresetName
   );
 
+  useEffect(() => {
+    console.log('production ID - main layout', production?._id);
+  }, [production?._id]);
+
   const deleteLayout = useDeleteMultiviewLayout();
   const t = useTranslate();
 

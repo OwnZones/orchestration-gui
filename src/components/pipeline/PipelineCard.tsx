@@ -18,6 +18,11 @@ export function PipelineCard({ pipelineId, isActive }: PipelineCardProps) {
   }, [isActive]);
 
   const SrtInfo = data?.status;
+
+  useEffect(() => {
+    console.log('SrtInfo', SrtInfo);
+  }, [SrtInfo]);
+
   if (SrtInfo === undefined) {
     return null;
   }

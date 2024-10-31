@@ -27,7 +27,9 @@ export function useGetProduction() {
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     });
     if (response.ok) {
-      return response.json();
+      const res = response.json();
+      console.log('GET RESPONSE:', res);
+      return res;
     }
     throw await response.text();
   };
@@ -35,6 +37,7 @@ export function useGetProduction() {
 
 export function usePutProduction() {
   return async (id: string, production: Production): Promise<Production> => {
+    console.log('PUT REQUEST:', production.production_settings.pipelines[0].pipeline_id);
     const response = await fetch(`/api/manager/productions/${id}`, {
       method: 'PUT',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
