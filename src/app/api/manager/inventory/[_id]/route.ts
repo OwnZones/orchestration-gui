@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { purgeInventorySourceItem } from '../../../../../api/manager/inventory';
+
+type Params = Promise<{ _id: string }>;
 
 export async function PUT(
   request: NextRequest,
@@ -13,8 +14,10 @@ export async function PUT(
     });
   }
 
+  const { _id } = await params;
+
   try {
-    const response = await purgeInventorySourceItem(params._id);
+    const response = await purgeInventorySourceItem(_id);
     if (response.acknowledged && response.modifiedCount === 0) {
       return new NextResponse(`Did not match requirements`, {
         status: 204

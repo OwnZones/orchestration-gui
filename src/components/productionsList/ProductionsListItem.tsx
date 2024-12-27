@@ -34,7 +34,6 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
     useState<StartProductionStatus>();
   const [stopProductionStatus, setStopProductionStatus] =
     useState<StopProductionStatus>();
-  const [deleteMonitoring] = useDeleteMonitoring();
   const [stopModalOpen, setStopModalOpen] = useState(false);
   const [startErrorModalOpen, setStartErrorModalOpen] = useState(false);
   const putProduction = usePutProduction();
@@ -91,7 +90,7 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
             }
           }
         })
-        .catch((error) => {
+        .catch(() => {
           setStartProductionStatus({
             success: false,
             steps: [{ step: 'start', success: false }]

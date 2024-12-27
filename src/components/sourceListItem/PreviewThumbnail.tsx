@@ -16,7 +16,7 @@ export const PreviewThumbnail = ({ src }: PreviewProps) => {
       <Image
         alt="Preview Thumbnail"
         src={src}
-        onLoadingComplete={() => setLoaded(true)}
+        onLoad={() => setLoaded(true)}
         placeholder="empty"
         width={0}
         height={0}

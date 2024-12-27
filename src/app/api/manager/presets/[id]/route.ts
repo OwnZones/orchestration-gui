@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPresetByid } from '../../../../../api/manager/presets';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { putPreset } from '../../../../../api/manager/presets';
 import { PresetWithId } from '../../../../../interfaces/preset';
 import { Log } from '../../../../../api/logger';
+
+type Params = Promise<{ id: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -15,9 +16,10 @@ export async function GET(
       status: 403
     });
   }
+  const { id } = await params;
 
   try {
-    return NextResponse.json(await getPresetByid(params.id));
+    return NextResponse.json(await getPresetByid(id));
   } catch (e) {
     return new NextResponse(JSON.stringify(e), {
       status: 500
@@ -34,9 +36,11 @@ export async function PUT(
       status: 403
     });
   }
+  const { id } = await params;
+
   try {
     const body = (await request.json()) as PresetWithId;
-    const prod = await putPreset(params.id, body);
+    const prod = await putPreset(id, body);
     return new NextResponse(JSON.stringify(prod), { status: 200 });
   } catch (error) {
     Log().warn('Could not update preset', error);

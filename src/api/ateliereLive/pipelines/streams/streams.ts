@@ -97,7 +97,7 @@ export async function createStream(
         throw `No available ports for ingest '${source.ingest_name}'`;
       }
 
-      const availablePort = availablePorts.values().next().value;
+      const availablePort = availablePorts.values().next().value as number;
       Log().info(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );

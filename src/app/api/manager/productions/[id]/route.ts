@@ -7,10 +7,7 @@ import {
 import { Production } from '../../../../../interfaces/production';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 
-type Params = {
-  id: string;
-  data?: any;
-};
+type Params = Promise<{ id: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -21,8 +18,9 @@ export async function GET(
       status: 403
     });
   }
+  const { id } = await params;
   try {
-    const production = await getProduction(params.id);
+    const production = await getProduction(id);
     const prod = {
       ...production,
       sources: production.sources.sort((a, b) => a.input_slot - b.input_slot),
@@ -46,9 +44,10 @@ export async function PUT(
       status: 403
     });
   }
+  const { id } = await params;
   try {
     const body = (await request.json()) as Production;
-    const prod = await putProduction(params.id, body);
+    const prod = await putProduction(id, body);
     return new NextResponse(JSON.stringify(prod), { status: 200 });
   } catch (error) {
     console.log(error);
@@ -67,8 +66,9 @@ export async function DELETE(
       status: 403
     });
   }
+  const { id } = await params;
   try {
-    await deleteProduction(params.id);
+    await deleteProduction(id);
     return new NextResponse(null, {
       status: 200
     });

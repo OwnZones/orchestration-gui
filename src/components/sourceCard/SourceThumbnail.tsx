@@ -26,7 +26,7 @@ export function SourceThumbnail({ source, src }: SourceThumbnailProps) {
       className={`transition-opacity opacity-0 ${loaded ? 'opacity-100' : ''}`}
       alt="Preview Thumbnail"
       src={src}
-      onLoadingComplete={() => setLoaded(true)}
+      onLoad={() => setLoaded(true)}
       onError={() => setLoaded(true)}
       placeholder="empty"
       width={0}

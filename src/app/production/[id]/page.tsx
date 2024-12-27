@@ -42,9 +42,15 @@ import { MonitoringButton } from '../../../components/button/MonitoringButton';
 import { useGetMultiviewPreset } from '../../../hooks/multiviewPreset';
 import { ISource } from '../../../hooks/useDragableItems';
 import { useMultiviews } from '../../../hooks/multiviews';
+import { use } from 'react';
 
-export default function ProductionConfiguration({ params }: PageProps) {
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default function ProductionConfiguration({ params }: Props) {
   const t = useTranslate();
+  const productionId = use(params).id;
 
   //SOURCES
   const [sources] = useSources();
@@ -173,7 +179,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
 
   const refreshProduction = () => {
-    getProduction(params.id).then((config) => {
+    getProduction(productionId).then((config) => {
       // check if production has pipelines in use or control panels in use, if so update production
       const production = config.isActive
         ? config

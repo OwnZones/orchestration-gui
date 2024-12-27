@@ -6,10 +6,7 @@ import {
 } from '../../../../../../../api/ateliereLive/ingest';
 import { isAuthenticated } from '../../../../../../../api/manager/auth';
 
-type Params = {
-  ingest_name: string;
-  source_name: string;
-};
+type Params = Promise<{ ingest_name: string; source_name: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -21,12 +18,11 @@ export async function GET(
     });
   }
 
+  const { ingest_name } = await params;
+  const { source_name } = await params;
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name);
-    const sourceId = await getSourceIdFromSourceName(
-      ingestUuid,
-      params.source_name
-    );
+    const ingestUuid = await getUuidFromIngestName(ingest_name);
+    const sourceId = await getSourceIdFromSourceName(ingestUuid, source_name);
     const base64Image = await getSourceThumbnail(ingestUuid, sourceId);
     if (!base64Image) {
       return new NextResponse('image not found', { status: 404 });

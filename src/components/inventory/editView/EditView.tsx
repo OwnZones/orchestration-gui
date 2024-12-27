@@ -36,7 +36,7 @@ export default function EditView({
             }`}
             alt="Preview Thumbnail"
             src={src}
-            onLoadingComplete={() => setLoaded(true)}
+            onLoad={() => setLoaded(true)}
             placeholder="empty"
             width={300}
             height={0}

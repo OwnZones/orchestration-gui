@@ -1,4 +1,3 @@
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 import { deleteStream } from '../../../../../api/ateliereLive/pipelines/streams/streams';
@@ -7,6 +6,8 @@ import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipe
 import { DeleteSourceStep } from '../../../../../interfaces/Source';
 import { Result } from '../../../../../interfaces/result';
 import { Log } from '../../../../../api/logger';
+
+type Params = Promise<{ id: string }>;
 
 export async function DELETE(
   request: NextRequest,
@@ -19,10 +20,11 @@ export async function DELETE(
   }
   const body = await request.json();
   const multiview = body.multiview as MultiviewSettings[];
+  const { id } = await params;
   try {
-    await deleteStream(params.id).catch((e) => {
-      Log().error(`Failed to delete stream: ${params.id}: ${e.message}`);
-      throw `Failed to delete stream: ${params.id}: ${e.message}`;
+    await deleteStream(id).catch((e) => {
+      Log().error(`Failed to delete stream: ${id}: ${e.message}`);
+      throw `Failed to delete stream: ${id}: ${e.message}`;
     });
     if (!multiview || multiview.length === 0) {
       return new NextResponse(
@@ -60,7 +62,7 @@ export async function DELETE(
           {
             step: 'delete_stream',
             success: false,
-            message: `Failed to delete stream: ${params.id}: ${e}`
+            message: `Failed to delete stream: ${id}: ${e}`
           }
         ],
         error: 'Failed to remove stream properly'
