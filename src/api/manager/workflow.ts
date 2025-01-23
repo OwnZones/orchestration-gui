@@ -200,11 +200,9 @@ async function connectIngestSources(
 
 async function insertPipelineUuid(productionSettings: ProductionSettings) {
   const availablePipelines = await getPipelines().catch((error) => {
-    Log().error(
-      `Failed to get pipeline IDs for '${productionSettings.name}'`,
-      error
-    );
-    throw `Failed to get pipeline IDs for '${productionSettings.name}: ${error.message}'`;
+    const errorMessage = `Failed to get pipeline IDs for '${productionSettings.name}: ${error.message}'`;
+    Log().error(errorMessage);
+    throw errorMessage;
   });
 
   for (const pipelinePreset of productionSettings.pipelines) {
@@ -212,13 +210,32 @@ async function insertPipelineUuid(productionSettings: ProductionSettings) {
       (p: ResourcesCompactPipelineResponse) =>
         p.name === pipelinePreset.pipeline_name
     );
-    if (pipeline) {
-      pipelinePreset.pipeline_id = pipeline.uuid;
-    } else {
-      Log().error(
-        `No pipeline with name ${pipelinePreset.pipeline_name} was found`
-      );
-      throw `No pipeline with name ${pipelinePreset.pipeline_name} was found`;
+    if (!pipeline) {
+      const errorMessage = `No pipeline with name ${pipelinePreset.pipeline_name} was found`;
+      Log().error(errorMessage);
+      throw errorMessage;
+    }
+
+    pipelinePreset.pipeline_id = pipeline.uuid;
+
+    // Check if any outputs are configured, then update the UUID of them. This does currently not support that
+    // the pipeline has been reconfigured with fewer number of outputs than it had while the outputs was configured
+    // in the first place.
+    if (pipelinePreset.outputs) {
+      if (pipelinePreset.outputs!.length <= pipeline.outputs.length) {
+        for (let i = 0; i < pipelinePreset.outputs!.length; i++) {
+          Log().debug(
+            `Updating output from uuid: ${pipelinePreset.outputs![i].uuid} to ${
+              pipeline.outputs[i].uuid
+            }`
+          );
+          pipelinePreset.outputs![i].uuid = pipeline.outputs[i].uuid;
+        }
+      } else if (pipelinePreset.outputs!.length > pipeline.outputs.length) {
+        const errorMessage = `The pipeline ${pipelinePreset.pipeline_name} has less outputs than number of configured outputs for the production, failing to start production`;
+        Log().error(errorMessage);
+        throw errorMessage;
+      }
     }
   }
 }
