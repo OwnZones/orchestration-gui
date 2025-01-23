@@ -1,4 +1,3 @@
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 import {
@@ -15,6 +14,8 @@ export type UpdateStreamRequestBody = {
   alignment_ms: number;
 };
 
+type Params = Promise<{ id: string }>;
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Params }
@@ -26,10 +27,11 @@ export async function DELETE(
   }
   const body = await request.json();
   const multiview = body.multiview as MultiviewSettings[];
+  const { id } = await params;
   try {
-    await deleteStream(params.id).catch((e) => {
-      Log().error(`Failed to delete stream: ${params.id}: ${e.message}`);
-      throw `Failed to delete stream: ${params.id}: ${e.message}`;
+    await deleteStream(id).catch((e) => {
+      Log().error(`Failed to delete stream: ${id}: ${e.message}`);
+      throw `Failed to delete stream: ${id}: ${e.message}`;
     });
     if (!multiview || multiview.length === 0) {
       return new NextResponse(
@@ -67,7 +69,7 @@ export async function DELETE(
           {
             step: 'delete_stream',
             success: false,
-            message: `Failed to delete stream: ${params.id}: ${e}`
+            message: `Failed to delete stream: ${id}: ${e}`
           }
         ],
         error: 'Failed to remove stream properly'
@@ -153,12 +155,10 @@ export async function PATCH(
 
   const data = await request.json();
   const updateStreamRequest = data as UpdateStreamRequestBody;
+  const { id } = await params;
 
   try {
-    const result = await updateStream(
-      params.id,
-      updateStreamRequest.alignment_ms
-    );
+    const result = await updateStream(id, updateStreamRequest.alignment_ms);
     return new NextResponse(JSON.stringify(result), {
       status: 200
     });

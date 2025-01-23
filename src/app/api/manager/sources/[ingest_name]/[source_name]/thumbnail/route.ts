@@ -7,10 +7,10 @@ import {
 import { isAuthenticated } from '../../../../../../../api/manager/auth';
 import { Log } from '../../../../../../../api/logger';
 
-type Params = {
+type Params = Promise<{
   ingest_name: string;
   source_name: string;
-};
+}>;
 
 export async function GET(
   request: NextRequest,
@@ -22,10 +22,12 @@ export async function GET(
     });
   }
 
+  const { ingest_name, source_name } = await params;
+
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name);
+    const ingestUuid = await getUuidFromIngestName(ingest_name);
     const sourceId = ingestUuid
-      ? await getSourceIdFromSourceName(ingestUuid, params.source_name)
+      ? await getSourceIdFromSourceName(ingestUuid, source_name)
       : 0;
     const base64Image = await getSourceThumbnail(
       ingestUuid || '',
@@ -37,7 +39,7 @@ export async function GET(
     return new NextResponse(Buffer.from(base64Image, 'base64'));
   } catch (e) {
     Log().error(
-      `Error fetching thumbnail for '${params.source_name}' from ingest '${params.ingest_name}':`,
+      `Error fetching thumbnail for '${source_name}' from ingest '${ingest_name}':`,
       e
     );
     return new NextResponse(e?.toString(), { status: 404 });

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { getMultiviewPreset } from '../../../../../api/manager/multiview-presets';
 import { isAuthenticated } from '../../../../../api/manager/auth';
+
+type Params = Promise<{ id: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -12,8 +13,10 @@ export async function GET(
       status: 403
     });
   }
+  const { id } = await params;
+
   try {
-    return NextResponse.json(await getMultiviewPreset(params.id));
+    return NextResponse.json(await getMultiviewPreset(id));
   } catch (e) {
     return new NextResponse(JSON.stringify(e), {
       status: 500

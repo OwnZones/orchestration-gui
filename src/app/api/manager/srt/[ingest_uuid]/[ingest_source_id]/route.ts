@@ -3,10 +3,10 @@ import { isAuthenticated } from '../../../../../../api/manager/auth';
 import { deleteSrtSource } from '../../../../../../api/ateliereLive/ingest';
 import { Log } from '../../../../../../api/logger';
 
-type Params = {
+type Params = Promise<{
   ingest_uuid: string;
   ingest_source_id: number;
-};
+}>;
 
 export async function DELETE(
   request: NextRequest,
@@ -18,7 +18,9 @@ export async function DELETE(
     });
   }
 
-  return await deleteSrtSource(params.ingest_uuid, params.ingest_source_id)
+  const { ingest_uuid, ingest_source_id } = await params;
+
+  return await deleteSrtSource(ingest_uuid, ingest_source_id)
     .then((response) => {
       return new NextResponse(JSON.stringify(response));
     })

@@ -5,9 +5,9 @@ import {
   getUuidFromIngestName
 } from '../../../../../../api/ateliereLive/ingest';
 
-type Params = {
+type Params = Promise<{
   ingest_name: string;
-};
+}>;
 
 export async function GET(
   request: NextRequest,
@@ -19,8 +19,10 @@ export async function GET(
     });
   }
 
+  const { ingest_name } = await params;
+
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name);
+    const ingestUuid = await getUuidFromIngestName(ingest_name);
     const ingestSources = ingestUuid ? await getIngestSources(ingestUuid) : [];
     return new NextResponse(JSON.stringify(ingestSources), { status: 200 });
   } catch (error) {

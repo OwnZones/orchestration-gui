@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../../../../api/manager/auth';
 import { getPipelineHtmlSources } from '../../../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
 
-type Params = {
-  id: string;
-};
+type Params = Promise<{ id: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -16,8 +14,10 @@ export async function GET(
     });
   }
 
+  const { id } = await params;
+
   try {
-    const htmlSources = await getPipelineHtmlSources(params.id);
+    const htmlSources = await getPipelineHtmlSources(id);
     return new NextResponse(
       JSON.stringify({
         htmlSources

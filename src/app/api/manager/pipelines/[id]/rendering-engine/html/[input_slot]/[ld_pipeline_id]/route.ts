@@ -5,11 +5,11 @@ import { DeleteRenderingEngineSourceStep } from '../../../../../../../../../inte
 import { Result } from '../../../../../../../../../interfaces/result';
 import { Log } from '../../../../../../../../../api/logger';
 
-type Params = {
+type Params = Promise<{
   id: string;
   input_slot: number;
   ld_pipeline_id: string;
-};
+}>;
 
 export async function DELETE(
   request: NextRequest,
@@ -21,10 +21,12 @@ export async function DELETE(
     });
   }
 
+  const { id, input_slot } = await params;
+
   try {
-    await deleteHtmlFromPipeline(params.id, params.input_slot).catch((e) => {
-      Log().error(`Failed to delete html: ${params.id}: ${e.message}`);
-      throw `Failed to delete html: ${params.id}: ${e.message}`;
+    await deleteHtmlFromPipeline(id, input_slot).catch((e) => {
+      Log().error(`Failed to delete html: ${id}: ${e.message}`);
+      throw `Failed to delete html: ${id}: ${e.message}`;
     });
     return new NextResponse(
       JSON.stringify({
@@ -60,7 +62,7 @@ export async function DELETE(
           {
             step: 'delete_html',
             success: false,
-            message: `Failed to delete html: ${params.id}: ${e}`
+            message: `Failed to delete html: ${id}: ${e}`
           }
         ],
         error: e

@@ -6,10 +6,10 @@ import {
   getSourceIdFromSourceName
 } from '../../../../../../../api/ateliereLive/ingest';
 
-type Params = {
+type Params = Promise<{
   ingest_name: string;
   ingest_source_name: string;
-};
+}>;
 
 export async function GET(
   request: NextRequest,
@@ -21,10 +21,12 @@ export async function GET(
     });
   }
 
+  const { ingest_name, ingest_source_name } = await params;
+
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name);
+    const ingestUuid = await getUuidFromIngestName(ingest_name);
     const sourceId = ingestUuid
-      ? await getSourceIdFromSourceName(ingestUuid, params.ingest_source_name)
+      ? await getSourceIdFromSourceName(ingestUuid, ingest_source_name)
       : 0;
     const ingestStreams = ingestUuid ? await getIngestStreams(ingestUuid) : [];
     const sourceStreams = ingestStreams.filter(
