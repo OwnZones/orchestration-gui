@@ -3,9 +3,7 @@ import { isAuthenticated } from '../../../../../../api/manager/auth';
 import { getPipelineRenderingEngine } from '../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
 import { Log } from '../../../../../../api/logger';
 
-type Params = {
-  id: string;
-};
+type Params = Promise<{ id: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -17,8 +15,10 @@ export async function GET(
     });
   }
 
+  const { id } = await params;
+
   try {
-    const renderingEngine = await getPipelineRenderingEngine(params.id);
+    const renderingEngine = await getPipelineRenderingEngine(id);
     return new NextResponse(
       JSON.stringify({
         renderingEngine

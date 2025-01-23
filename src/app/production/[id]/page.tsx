@@ -6,7 +6,6 @@ import React, {
   useContext,
   useMemo
 } from 'react';
-import { PageProps } from '../../../../.next/types/app/production/[id]/page';
 import { AddInput } from '../../../components/addInput/AddInput';
 import { useSources } from '../../../hooks/sources/useSources';
 import {
@@ -70,9 +69,15 @@ import { useDeleteHtmlSource } from '../../../hooks/renderingEngine/useDeleteHtm
 import { useDeleteMediaSource } from '../../../hooks/renderingEngine/useDeleteMediaSource';
 import { useCreateHtmlSource } from '../../../hooks/renderingEngine/useCreateHtmlSource';
 import { useCreateMediaSource } from '../../../hooks/renderingEngine/useCreateMediaSource';
+import { use } from 'react';
+
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
+  const productionId = use(params).id;
 
   //SOURCES
   const [sources] = useSources();
@@ -231,7 +236,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
 
   const refreshProduction = () => {
-    getProduction(params.id).then((config) => {
+    getProduction(productionId).then((config) => {
       // check if production has pipelines in use or control panels in use, if so update production
       const production = config.isActive
         ? config

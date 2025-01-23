@@ -5,10 +5,10 @@ import {
   getUuidFromIngestName
 } from '../../../../../../../api/ateliereLive/ingest';
 
-type Params = {
+type Params = Promise<{
   ingest_name: string;
   ingest_source_name: string;
-};
+}>;
 
 export async function GET(
   request: NextRequest,
@@ -20,14 +20,12 @@ export async function GET(
     });
   }
 
+  const { ingest_name, ingest_source_name } = await params;
+
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name, false);
+    const ingestUuid = await getUuidFromIngestName(ingest_name, false);
     const sourceId = ingestUuid
-      ? await getSourceIdFromSourceName(
-          ingestUuid,
-          params.ingest_source_name,
-          false
-        )
+      ? await getSourceIdFromSourceName(ingestUuid, ingest_source_name, false)
       : 0;
     return new NextResponse(JSON.stringify(sourceId), { status: 200 });
   } catch (error) {

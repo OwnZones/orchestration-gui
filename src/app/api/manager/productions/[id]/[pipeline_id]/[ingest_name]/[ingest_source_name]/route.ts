@@ -11,12 +11,12 @@ import {
   getUuidFromIngestName
 } from '../../../../../../../../api/ateliereLive/ingest';
 
-type Params = {
+type Params = Promise<{
   id: string;
   pipeline_id: string;
   ingest_name: string;
   ingest_source_name: string;
-};
+}>;
 
 export async function GET(
   request: NextRequest,
@@ -28,30 +28,32 @@ export async function GET(
     });
   }
 
+  const { id, pipeline_id, ingest_name, ingest_source_name } = await params;
+
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name);
+    const ingestUuid = await getUuidFromIngestName(ingest_name);
 
     const sourceId = ingestUuid
-      ? await getSourceIdFromSourceName(ingestUuid, params.ingest_source_name)
+      ? await getSourceIdFromSourceName(ingestUuid, ingest_source_name)
       : null;
 
     const alignment =
       sourceId !== null && sourceId !== undefined
         ? await getProductionPipelineSourceAlignment(
-            params.id,
-            params.pipeline_id,
-            params.ingest_source_name,
-            params.ingest_name
+            id,
+            pipeline_id,
+            ingest_source_name,
+            ingest_name
           )
         : 0;
 
     const latency =
       sourceId !== null && sourceId !== undefined
         ? await getProductionSourceLatency(
-            params.id,
-            params.pipeline_id,
-            params.ingest_source_name,
-            params.ingest_name
+            id,
+            pipeline_id,
+            ingest_source_name,
+            ingest_name
           )
         : 0;
 
@@ -83,26 +85,27 @@ export async function PUT(
 
   const alignment = body.alignment_ms;
   const latency = body.max_network_latency_ms;
+  const { id, pipeline_id, ingest_name, ingest_source_name } = await params;
 
   try {
-    const ingestUuid = await getUuidFromIngestName(params.ingest_name);
+    const ingestUuid = await getUuidFromIngestName(ingest_name);
     const sourceId = ingestUuid
-      ? await getSourceIdFromSourceName(ingestUuid, params.ingest_source_name)
+      ? await getSourceIdFromSourceName(ingestUuid, ingest_source_name)
       : null;
 
     if (sourceId !== null && sourceId !== undefined) {
       const alignmentResult = await setProductionPipelineSourceAlignment(
-        params.id,
-        params.pipeline_id,
-        params.ingest_name,
-        params.ingest_source_name,
+        id,
+        pipeline_id,
+        ingest_name,
+        ingest_source_name,
         alignment
       );
       const latencyResult = await setProductionPipelineSourceLatency(
-        params.id,
-        params.pipeline_id,
-        params.ingest_name,
-        params.ingest_source_name,
+        id,
+        pipeline_id,
+        ingest_name,
+        ingest_source_name,
         latency
       );
 

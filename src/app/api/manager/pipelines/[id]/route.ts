@@ -8,9 +8,7 @@ import {
 } from '../../../../../utils/pipeline';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 
-type Params = {
-  id: string;
-};
+type Params = Promise<{ id: string }>;
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +19,8 @@ export async function GET(
       status: 403
     });
   }
-  const pipeline = await getPipeline(params.id);
+  const { id } = await params;
+  const pipeline = await getPipeline(id);
   if (!pipeline) {
     console.log('Pipeline not found');
   }

@@ -1,7 +1,8 @@
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../../api/manager/auth';
 import { removeInventorySource } from '../../../../../../api/manager/inventory';
+
+type Params = Promise<{ _id: string }>;
 
 export async function DELETE(
   request: NextRequest,
@@ -12,8 +13,10 @@ export async function DELETE(
       status: 403
     });
   }
+  const { _id } = await params;
+
   try {
-    await removeInventorySource(params._id);
+    await removeInventorySource(_id);
     return new NextResponse(null, {
       status: 200
     });

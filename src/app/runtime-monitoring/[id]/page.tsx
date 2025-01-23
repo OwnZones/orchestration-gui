@@ -14,9 +14,16 @@ import IngestList from '../../../components/monitoringList/IngestList';
 import PipelineList from '../../../components/monitoringList/PipelineList';
 import { CompactControlPanelList } from '../../../components/monitoringList/CompactControlPanelList';
 
-export default function Page({ params }: { params: { id: string } }) {
+import { use } from 'react';
+
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default function Page({ params }: Props) {
   const t = useTranslate();
-  const [monitoring] = useMonitoring(params.id);
+  const productionId = use(params).id;
+  const [monitoring] = useMonitoring(productionId);
   if (!monitoring) {
     return null;
   }

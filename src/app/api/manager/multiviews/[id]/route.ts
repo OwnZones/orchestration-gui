@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
 import { MultiviewViews } from '../../../../../interfaces/multiview';
 import {
@@ -13,6 +12,8 @@ type PutMultiviewRequest = {
   multiviews: MultiviewViews[];
 };
 
+type Params = Promise<{ id: string }>;
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Params }
@@ -22,8 +23,11 @@ export async function GET(
       status: 403
     });
   }
+
+  const { id } = await params;
+
   try {
-    return NextResponse.json(await getMultiviewLayout(params.id));
+    return NextResponse.json(await getMultiviewLayout(id));
   } catch (e) {
     return new NextResponse(JSON.stringify(e), {
       status: 500
@@ -40,12 +44,17 @@ export async function PUT(
       status: 403
     });
   }
+
+  const { id } = await params;
+
+  const idNumber = Number(id);
+
   try {
     const data = (await request.json()) as PutMultiviewRequest;
     return NextResponse.json(
       await updateMultiviewForPipeline(
         data.pipelineId,
-        params.id,
+        idNumber,
         data.multiviews
       )
     );
@@ -65,8 +74,11 @@ export async function DELETE(
       status: 403
     });
   }
+
+  const { id } = await params;
+
   try {
-    await deleteLayout(params.id);
+    await deleteLayout(id);
     return new NextResponse(null, {
       status: 200
     });

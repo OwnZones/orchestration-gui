@@ -3,9 +3,9 @@ import { isAuthenticated } from '../../../../../../api/manager/auth';
 import { Log } from '../../../../../../api/logger';
 import { createSrtSource } from '../../../../../../api/ateliereLive/ingest';
 
-type Params = {
+type Params = Promise<{
   uuid: string;
-};
+}>;
 
 export async function POST(
   request: NextRequest,
@@ -17,9 +17,11 @@ export async function POST(
     });
   }
 
+  const { uuid } = await params;
+
   const data = await request.json();
 
-  return await createSrtSource(params.uuid, data.srtPayload)
+  return await createSrtSource(uuid, data.srtPayload)
     .then((response) => {
       return new NextResponse(JSON.stringify(response));
     })
