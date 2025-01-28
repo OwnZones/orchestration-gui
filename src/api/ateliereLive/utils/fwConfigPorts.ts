@@ -1,27 +1,20 @@
-import { FwConfigTypeEnum } from '../../../interfaces/firewallConfig';
-import { getFwConfigs } from '../../manager/firewallConfig';
+import {
+  FwConfigTypeEnum,
+  FwConfigWithId
+} from '../../../interfaces/firewallConfig';
+import {
+  getFwConfigs,
+  putFwConfigLastUsedPortIndex
+} from '../../manager/firewallConfig';
 import { getPipeline } from '../pipelines/pipelines';
 
-const dedicatedPorts = new Map<string, Set<number>>();
+const dedicatedPorts = new Map<string, FwConfigWithId>();
 
 export async function initDedicatedPorts() {
   dedicatedPorts.clear();
   (await getFwConfigs()).map((conf) => {
-    const temp = dedicatedPorts.get(`${conf.type}-${conf.name}`);
-    if (temp) {
-      conf.port_range_allow.forEach((port) => {
-        temp.add(port);
-      });
-      dedicatedPorts.set(`${conf.type}-${conf.name}`, temp);
-    } else {
-      dedicatedPorts.set(
-        `${conf.type}-${conf.name}`,
-        new Set<number>(conf.port_range_allow)
-      );
-    }
+    dedicatedPorts.set(`${conf.type}-${conf.name}`, conf);
   });
-  const temp = dedicatedPorts;
-  return temp;
 }
 
 export async function getCurrentlyUsedPorts(
@@ -65,7 +58,7 @@ export async function getCurrentlyUsedPorts(
   return usedPorts;
 }
 
-export function getAvailablePortsForIngest(
+export async function getNextAvailablePortForIngest(
   name: string,
   usedPorts: Set<number>
 ) {
@@ -77,26 +70,23 @@ export function getAvailablePortsForIngest(
       `${FwConfigTypeEnum.Ingest}-${'default'}`
     )!;
   }
-  const availablePorts = new Set<number>();
-  dedicatedPortsForName.forEach((dedPort) => {
-    if (usedPorts && !usedPorts.has(dedPort)) {
-      availablePorts.add(dedPort);
-    }
-  });
-  return availablePorts;
-}
 
-export function getAvailablePortsForNameAndType(
-  name: string,
-  type: string,
-  usedPorts: Set<number>
-) {
-  const dedicatedTypePorts = dedicatedPorts.get(`${type}-${name}`)!;
-  const availablePorts = new Set<number>();
-  dedicatedTypePorts.forEach((dedPort) => {
-    if (usedPorts && !usedPorts.has(dedPort)) {
-      availablePorts.add(dedPort);
+  const port_range = dedicatedPortsForName.port_range_allow;
+  const numberOfPorts = port_range.length;
+  let availablePort = -1;
+  for (let i = 0; i < numberOfPorts; i++) {
+    const currentPort =
+      port_range[dedicatedPortsForName.last_used_port_index++ % numberOfPorts];
+    if (usedPorts && !usedPorts.has(currentPort)) {
+      availablePort = currentPort;
+      break;
     }
-  });
-  return availablePorts;
+  }
+
+  if (availablePort != -1) {
+    dedicatedPortsForName.last_used_port_index %= numberOfPorts;
+    await putFwConfigLastUsedPortIndex(dedicatedPortsForName);
+  }
+
+  return availablePort;
 }

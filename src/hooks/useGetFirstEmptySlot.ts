@@ -5,7 +5,7 @@ import { CallbackHook } from './types';
 export function useGetFirstEmptySlot(): CallbackHook<
   (productionSetup?: Production | undefined) => number
 > {
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(true);
 
   const findFirstEmptySlot = (productionSetup: Production | undefined) => {
     if (!productionSetup) throw 'no_production';

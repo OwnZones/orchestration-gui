@@ -48,7 +48,24 @@ export async function putFwConfig(
     {
       name: fwConfig.name,
       type: fwConfig.type,
-      port_range_allow: fwConfig.port_range_allow
+      port_range_allow: fwConfig.port_range_allow,
+      last_used_port_index: fwConfig.last_used_port_index
     }
   );
+}
+
+export async function putFwConfigLastUsedPortIndex(
+  fwConfig: FwConfigWithId
+): Promise<void> {
+  const db = await getDatabase();
+
+  const result = await db
+    .collection('fw_config')
+    .findOneAndUpdate(
+      { _id: fwConfig._id },
+      { $set: { last_used_port_index: fwConfig.last_used_port_index } }
+    );
+  if (!result.value) {
+    console.log('Failed to update firewall rules with last used port:', result);
+  }
 }

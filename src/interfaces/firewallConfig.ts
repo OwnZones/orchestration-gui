@@ -10,6 +10,7 @@ export interface FwConfig {
   name: string;
   type: FwConfigType;
   port_range_allow: number[];
+  last_used_port_index: number;
 }
 
 export type FwConfigWithId = WithId<FwConfig>;

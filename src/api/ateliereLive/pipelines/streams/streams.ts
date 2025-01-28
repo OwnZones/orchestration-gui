@@ -14,8 +14,8 @@ import { getSourceIdFromSourceName, getUuidFromIngestName } from '../../ingest';
 import { connectIngestToPipeline } from '../../streams';
 import { getAuthorizationHeader } from '../../utils/authheader';
 import {
-  getAvailablePortsForIngest,
   getCurrentlyUsedPorts,
+  getNextAvailablePortForIngest,
   initDedicatedPorts
 } from '../../utils/fwConfigPorts';
 import {
@@ -90,22 +90,15 @@ export async function createStream(
     await initDedicatedPorts();
 
     for (const pipeline of production_settings.pipelines) {
-      const availablePorts = getAvailablePortsForIngest(
+      const availablePort = await getNextAvailablePortForIngest(
         source.ingest_name,
         usedPorts
       );
 
-      if (availablePorts.size === 0) {
+      if (availablePort == -1) {
         Log().error(`No available ports for ingest '${source.ingest_name}'`);
         throw `No available ports for ingest '${source.ingest_name}'`;
       }
-
-      const availablePort = availablePorts.values().next().value;
-      if (!availablePort)
-        throw `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name} cannot be undefined`;
-      Log().info(
-        `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
-      );
 
       const pipelineSource = pipeline.sources?.find(
         (s) =>
