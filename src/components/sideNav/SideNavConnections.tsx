@@ -28,17 +28,17 @@ const SideNavConnections = () => {
   const [appHealth, setAppHealth] = useState<IApp>({});
   const [allConnected, setAllConnected] = useState<boolean>(false);
   const t = useTranslate();
+  const [isAppHovered, setIsAppHovered] = useState(false);
 
   // TODO Maybe there is a better way to compare the objects.
   const checkConnections = useCallback(() => {
     checkApiConnections()
       .then((data) => {
-        if (JSON.stringify(data) !== JSON.stringify(connection))
-          setConnection(data);
-        if (loading) setLoading(() => false);
+        setConnection(data);
+        setLoading(false);
       })
       .catch(() => {
-        if (loading) setLoading(false);
+        setLoading(false);
         setConnection({});
       });
   }, []);
@@ -46,8 +46,7 @@ const SideNavConnections = () => {
   const checkApp = useCallback(() => {
     checkAppHealth()
       .then((data) => {
-        if (JSON.stringify(data) !== JSON.stringify(appHealth))
-          setAppHealth(data);
+        setAppHealth(data);
       })
       .catch(() => {
         setAppHealth({});
@@ -89,14 +88,24 @@ const SideNavConnections = () => {
           ) : (
             <>
               <div
-                className={`${
+                className={`relative ${
                   appHealth?.version ? 'text-confirm' : 'text-button-delete'
                 }`}
+                onMouseEnter={() => setIsAppHovered(true)}
+                onMouseLeave={() => setIsAppHovered(false)}
               >
                 {t('application')}
+                {isAppHovered && (
+                  <div
+                    className="absolute top-[-40px] bg-black text-white px-3 py-1 rounded-md text-sm shadow-lg"
+                    style={{ whiteSpace: 'nowrap', width: 'auto' }}
+                  >
+                    Application version: {appHealth?.version}
+                  </div>
+                )}
               </div>
               <div
-                className={`${
+                className={`relative ${
                   connection?.liveApi?.connected
                     ? 'text-confirm'
                     : 'text-button-delete'
@@ -105,7 +114,7 @@ const SideNavConnections = () => {
                 {t('system_controller')}
               </div>
               <div
-                className={`${
+                className={`relative ${
                   connection?.database?.connected
                     ? 'text-confirm'
                     : 'text-button-delete'
