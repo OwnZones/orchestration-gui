@@ -396,6 +396,14 @@ export async function stopProduction(
       success: true
     } as StopProductionStep
   };
+  let resetPipelineStatus = {
+    ok: true,
+    value: {
+      step: 'reset_pipeline',
+      success: true
+    } as StopProductionStep
+  };
+
   const pipelineIds = production.production_settings.pipelines.map(
     (p) => p.pipeline_id
   );
@@ -565,17 +573,34 @@ export async function stopProduction(
     Log().info(`Pipeline '${id}' stopped`);
   }
 
+  const resetPipelinePromises = pipelineIds.map((pipeline) => {
+    Log().info(`Resetting pipeline: ${pipeline!}`);
+    return resetPipeline(pipeline!);
+  });
+  await Promise.all(resetPipelinePromises).catch((error) => {
+    resetPipelineStatus = {
+      ok: false,
+      value: {
+        step: 'reset_pipeline',
+        success: false,
+        message: `Failed to reset pipelines: ${error}`
+      }
+    };
+  });
+
   if (
     !disconnectConnectionsStatus.ok ||
     !removePipelineStreamsStatus.ok ||
-    !deleteMultiviewsStatus.ok
+    !deleteMultiviewsStatus.ok ||
+    !resetPipelineStatus.ok
   ) {
     return {
       ok: false,
       value: [
         disconnectConnectionsStatus.value,
         removePipelineStreamsStatus.value,
-        deleteMultiviewsStatus.value
+        deleteMultiviewsStatus.value,
+        resetPipelineStatus.value
       ],
       error: 'Failed to stop production properly'
     };
@@ -585,7 +610,8 @@ export async function stopProduction(
     value: [
       disconnectConnectionsStatus.value,
       removePipelineStreamsStatus.value,
-      deleteMultiviewsStatus.value
+      deleteMultiviewsStatus.value,
+      resetPipelineStatus.value
     ]
   };
 }
