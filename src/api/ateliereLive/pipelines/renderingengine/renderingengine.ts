@@ -1,6 +1,7 @@
 import {
   ResourcesHTMLBrowser,
   ResourcesMediaPlayer,
+  ResourcesRenderingEngineFormat,
   ResourcesRenderingEngineResponse
 } from '../../../../../types/ateliere-live';
 import { LIVE_BASE_API_PATH } from '../../../../constants';
@@ -685,4 +686,42 @@ export async function getPipelineRenderingEngineMedia(
   } else {
     throw new Error(`Unexpected non-JSON response: ${responseText}`);
   }
+}
+
+export async function putPipelineRenderingEngineFormat(
+  pipelineUuid: string,
+  format: ResourcesRenderingEngineFormat
+): Promise<void> {
+  const response = await fetch(
+    new URL(
+      LIVE_BASE_API_PATH + `/pipelines/${pipelineUuid}/renderingengine/format`,
+      process.env.LIVE_URL
+    ),
+    {
+      method: 'PUT',
+      headers: {
+        authorization: getAuthorizationHeader()
+      },
+      body: JSON.stringify(format)
+    }
+  );
+
+  if (response.ok) {
+    return;
+  }
+
+  if (response.status == 404) {
+    Log().info(`Failed to set new format for pipeline: ${pipelineUuid}`);
+    return;
+  }
+
+  const errorMessage = await response.text().then((text) => {
+    try {
+      return JSON.parse(text).message;
+    } catch {
+      return text; // Return raw text if JSON parsing fails
+    }
+  });
+
+  throw new Error(errorMessage);
 }
