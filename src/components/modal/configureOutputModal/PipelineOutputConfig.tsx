@@ -67,15 +67,16 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
     updatePipelineOutputs(updatedOutputs);
   }, [updatedOutputs]);
 
-  const handleAddStream = (outputId: string) => {
+  const handleAddStream = (output: ResourcesNameAndUUIDResponse) => {
     const newOutputs: PipelineOutput[] = cloneDeep(updatedOutputs);
-    const foundOutput = newOutputs.find((o) => o.uuid === outputId);
+    const foundOutput = newOutputs.find((o) => o.uuid === output.uuid);
     const newStream = createNewStream(getPortNumber(), pipeline);
     if (foundOutput) {
       foundOutput?.streams.push(newStream);
     } else {
       newOutputs.push({
-        uuid: outputId,
+        uuid: output.uuid,
+        name: output.name,
         settings: getStreamEncoderSettings(pipeline),
         streams: [newStream]
       });
@@ -180,17 +181,18 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
   const handleUpdateOutputSetting = (
     key: keyof PipelineOutputEncoderSettings,
     value: string | number,
-    outputId: string
+    output: ResourcesNameAndUUIDResponse
   ) => {
     const newOutputs: PipelineOutput[] = cloneDeep(updatedOutputs);
-    let foundOutputIndex = newOutputs.findIndex((o) => o.uuid === outputId);
+    let foundOutputIndex = newOutputs.findIndex((o) => o.uuid === output.uuid);
     if (foundOutputIndex < 0) {
       newOutputs.push({
-        uuid: outputId,
+        uuid: output.uuid,
+        name: output.name,
         settings: getStreamEncoderSettings(pipeline),
         streams: []
       });
-      foundOutputIndex = newOutputs.findIndex((o) => o.uuid === outputId);
+      foundOutputIndex = newOutputs.findIndex((o) => o.uuid === output.uuid);
     }
 
     if (!newOutputs[foundOutputIndex].settings) {
@@ -207,11 +209,11 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
     setUpdatedOutputs(newOutputs);
   };
 
-  const getOutputFields = (outputId: string) => {
-    const foundOutput = updatedOutputs.find((p) => p.uuid === outputId);
+  const getOutputFields = (output: ResourcesNameAndUUIDResponse) => {
+    const foundOutput = updatedOutputs.find((p) => p.uuid === output.uuid);
 
     return (
-      <div className="flex flex-col gap-3" key={`${outputId}-options`}>
+      <div className="flex flex-col gap-3" key={`${output.uuid}-options`}>
         <Options
           label={t('preset.video_format')}
           options={[
@@ -223,7 +225,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
             getStreamEncoderSettings(pipeline).video_format
           }
           update={(value) =>
-            handleUpdateOutputSetting('video_format', value, outputId)
+            handleUpdateOutputSetting('video_format', value, output)
           }
         />
         <Options
@@ -243,7 +245,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
             getStreamEncoderSettings(pipeline).video_bit_depth.toString()
           }
           update={(value) =>
-            handleUpdateOutputSetting('video_bit_depth', value, outputId)
+            handleUpdateOutputSetting('video_bit_depth', value, output)
           }
         />
 
@@ -256,7 +258,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
             getStreamEncoderSettings(pipeline).video_kilobit_rate
           }
           update={(value) =>
-            handleUpdateOutputSetting('video_kilobit_rate', value, outputId)
+            handleUpdateOutputSetting('video_kilobit_rate', value, output)
           }
         />
       </div>
@@ -273,12 +275,12 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
             key={'output-settings-' + index}
           >
             <h1 className="font-bold text-center">{output.name}</h1>
-            {getOutputFields(output.uuid)}
+            {getOutputFields(output)}
             <div className="flex flex-col gap-3">
               {getOutputStreams(output.uuid)}
             </div>
             <button
-              onClick={() => handleAddStream(output.uuid)}
+              onClick={() => handleAddStream(output)}
               className="rounded-xl p-1 border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500 p-3"
             >
               {t('preset.add_stream')}

@@ -218,23 +218,35 @@ async function insertPipelineUuid(productionSettings: ProductionSettings) {
 
     pipelinePreset.pipeline_id = pipeline.uuid;
 
-    // Check if any outputs are configured, then update the UUID of them. This does currently not support that
-    // the pipeline has been reconfigured with fewer number of outputs than it had while the outputs was configured
-    // in the first place.
-    if (pipelinePreset.outputs) {
-      if (pipelinePreset.outputs!.length <= pipeline.outputs.length) {
-        for (let i = 0; i < pipelinePreset.outputs!.length; i++) {
-          Log().debug(
-            `Updating output from uuid: ${pipelinePreset.outputs![i].uuid} to ${
-              pipeline.outputs[i].uuid
-            }`
+    // Check if any outputs are configured, then update the UUID of them. If no output is found in the pipeline,
+    // the output is removed from the preset. If the output in the preset has no streams configured, remove it
+    // as well to clean up the object as much as possible.
+    if (pipelinePreset.outputs && pipelinePreset.outputs!.length > 0) {
+      for (const output of pipelinePreset.outputs!) {
+        if (output.streams.length == 0) {
+          Log().info(
+            `Output ${output.name} has no streams configured, removing output from preset`
           );
-          pipelinePreset.outputs![i].uuid = pipeline.outputs[i].uuid;
+          pipelinePreset.outputs = pipelinePreset.outputs.filter(
+            (o) => o != output
+          );
+          continue;
         }
-      } else if (pipelinePreset.outputs!.length > pipeline.outputs.length) {
-        const errorMessage = `The pipeline ${pipelinePreset.pipeline_name} has less outputs than number of configured outputs for the production, failing to start production`;
-        Log().error(errorMessage);
-        throw errorMessage;
+
+        Log().debug(`Trying to find uuid for output with name: ${output.name}`);
+        const pipelineOutput = pipeline.outputs.find(
+          (o) => o.name == output.name
+        );
+        if (pipelineOutput) {
+          output.uuid = pipelineOutput.uuid;
+        } else {
+          Log().info(
+            `No output found in the pipeline with name: ${output.name}, removing output from preset`
+          );
+          pipelinePreset.outputs = pipelinePreset.outputs?.filter(
+            (o) => o != output
+          );
+        }
       }
     }
   }

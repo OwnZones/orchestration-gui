@@ -85,6 +85,7 @@ export interface PipelineSettings {
 
 export interface PipelineOutput {
   uuid: string;
+  name: string;
   settings: PipelineOutputEncoderSettings;
   streams: PipelineOutputSettings[];
 }
