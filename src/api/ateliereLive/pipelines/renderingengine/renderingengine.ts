@@ -332,7 +332,7 @@ export async function createPipelineMediaSource(
   source: SourceReference
 ) {
   const payload = {
-    filename: data.filename,
+    path: data.filename,
     input_slot: Number(inputSlot)
   };
 
