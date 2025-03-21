@@ -49,24 +49,6 @@ export function ConfigureOutputModal({
   }, [preset]);
 
   const onSave = () => {
-    const locations = pipelines
-      .map((p) =>
-        p.outputs?.map((o) =>
-          o.streams.map((s) => `${s.local_ip}:${s.local_port}`)
-        )
-      )
-      .flat(2);
-    function findDuplicates(array: any[]) {
-      return array.filter(
-        (currentValue, currentIndex) =>
-          array.indexOf(currentValue) !== currentIndex
-      );
-    }
-    const duplicates = findDuplicates(locations);
-    if (duplicates.length) {
-      setCurrentError('Same <IP>:<Port> used for multiple streams');
-      return;
-    }
     updatePreset({ ...preset, pipelines: pipelines });
     onClose();
   };
