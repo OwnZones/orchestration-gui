@@ -59,6 +59,7 @@ export interface StopProductionStep {
     | 'disconnect_connections'
     | 'remove_pipeline_streams'
     | 'remove_pipeline_multiviews'
+    | 'reset_pipeline'
     | 'unexpected';
   success: boolean;
   message?: string;

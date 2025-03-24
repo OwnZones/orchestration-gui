@@ -24,7 +24,10 @@ import {
   getSourceIdFromSourceName,
   getUuidFromIngestName
 } from '../ateliereLive/ingest';
-import { PipelineStreamSettings } from '../../interfaces/pipeline';
+import {
+  PipelineSettings,
+  PipelineStreamSettings
+} from '../../interfaces/pipeline';
 import {
   connectIngestToPipeline,
   deleteStreamByUuid
@@ -35,6 +38,7 @@ import {
   ResourcesConnectionUUIDResponse,
   ResourcesPipelineResponse,
   ResourcesReceiverNetworkEndpoint,
+  ResourcesRenderingEngineFormat,
   ResourcesSenderNetworkEndpoint
 } from '../../../types/ateliere-live';
 import { getSourcesByIds } from './sources';
@@ -60,8 +64,10 @@ import {
   createPipelineHtmlSource,
   createPipelineMediaSource,
   deleteHtmlFromPipeline,
-  deleteMediaFromPipeline
+  deleteMediaFromPipeline,
+  putPipelineRenderingEngineFormat
 } from '../ateliereLive/pipelines/renderingengine/renderingengine';
+import { error } from 'console';
 
 const isUsed = (pipeline: ResourcesPipelineResponse) => {
   const hasStreams = pipeline.streams.length > 0;
@@ -295,6 +301,34 @@ export async function stopPipelines(pipelineIds: string[]) {
   return pipelineIds;
 }
 
+export async function setPipelinesFormat(pipelines: PipelineSettings[]) {
+  for (const pipeline of pipelines) {
+    const format: ResourcesRenderingEngineFormat = {
+      frame_rate_n: pipeline.frame_rate_n,
+      frame_rate_d: pipeline.frame_rate_d,
+      video_width: pipeline.width,
+      video_height: pipeline.height,
+      sample_rate: pipeline.audio_sampling_frequency
+    };
+
+    Log().info(
+      `Setting format for pipeline '${
+        pipeline.pipeline_name
+      }' to ${JSON.stringify(format)}`
+    );
+
+    await putPipelineRenderingEngineFormat(pipeline.pipeline_id!, format).catch(
+      (error) => {
+        Log().error(
+          `Failed to change format for pipeline '${pipeline.pipeline_id}'`,
+          error
+        );
+        throw `Failed to change format for pipeline '${pipeline.pipeline_id}': ${error}`;
+      }
+    );
+  }
+}
+
 async function disconnectConnections(
   connections:
     | ResourcesReceiverNetworkEndpoint[]
@@ -362,6 +396,14 @@ export async function stopProduction(
       success: true
     } as StopProductionStep
   };
+  let resetPipelineStatus = {
+    ok: true,
+    value: {
+      step: 'reset_pipeline',
+      success: true
+    } as StopProductionStep
+  };
+
   const pipelineIds = production.production_settings.pipelines.map(
     (p) => p.pipeline_id
   );
@@ -531,17 +573,34 @@ export async function stopProduction(
     Log().info(`Pipeline '${id}' stopped`);
   }
 
+  const resetPipelinePromises = pipelineIds.map((pipeline) => {
+    Log().info(`Resetting pipeline: ${pipeline!}`);
+    return resetPipeline(pipeline!);
+  });
+  await Promise.all(resetPipelinePromises).catch((error) => {
+    resetPipelineStatus = {
+      ok: false,
+      value: {
+        step: 'reset_pipeline',
+        success: false,
+        message: `Failed to reset pipelines: ${error}`
+      }
+    };
+  });
+
   if (
     !disconnectConnectionsStatus.ok ||
     !removePipelineStreamsStatus.ok ||
-    !deleteMultiviewsStatus.ok
+    !deleteMultiviewsStatus.ok ||
+    !resetPipelineStatus.ok
   ) {
     return {
       ok: false,
       value: [
         disconnectConnectionsStatus.value,
         removePipelineStreamsStatus.value,
-        deleteMultiviewsStatus.value
+        deleteMultiviewsStatus.value,
+        resetPipelineStatus.value
       ],
       error: 'Failed to stop production properly'
     };
@@ -551,7 +610,8 @@ export async function stopProduction(
     value: [
       disconnectConnectionsStatus.value,
       removePipelineStreamsStatus.value,
-      deleteMultiviewsStatus.value
+      deleteMultiviewsStatus.value,
+      resetPipelineStatus.value
     ]
   };
 }
@@ -660,6 +720,9 @@ export async function startProduction(
     ).catch((error) => {
       throw `Failed to stop pipelines during startup: ${error}`;
     });
+
+    // Set the format that we want to use in the pipeline(s)
+    await setPipelinesFormat(production_settings.pipelines);
 
     // TODO: This will fetch the pipelines once again from Ateliere Live, but we already have them in pipelinesToUse
     const usedPorts = await getCurrentlyUsedPorts(

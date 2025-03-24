@@ -170,8 +170,10 @@ export interface ResourcesControlReceiverStatusResponse {
   received_requests: ResourcesControlRequestCounter[];
   /** The number of responses to requests sent from this Control Receiver, counted per respondent UUID */
   request_responses: ResourcesControlResponseCounter[];
-  /** The number of requests in queue, waiting to be delivered to the Rendering Engine */
+  /** The number of requests in queue, waiting for the right time to be delivered to the Rendering Engine */
   requests_in_queue: number;
+  /** The number of messages (status and request responses) in queue, waiting to be sent */
+  send_message_queue: number;
   /** The number of successfully sent requests from this Control Receiver */
   sent_requests: number;
   /** The number of responses to requests that was successfully sent */
@@ -450,7 +452,7 @@ export interface ResourcesCreateStreamPayload {
    * of an SDI input port on a hardware mixer. This input slot will be used to identify the source from the control
    * panel later, so pressing "cut to camera 5" will cut to the camera on input slot 5. Only one source can be
    * connected to one slot at a time, so if the slot is already used, the request will be denied.
-   * @min 0
+   * @min 1
    * @example 1
    */
   input_slot: number;
@@ -539,6 +541,7 @@ export interface ResourcesHTMLBrowser {
   height: number;
   /**
    * The input slot this HTML browser is allocated to
+   * @min 1
    * @example 1
    */
   input_slot: number;
@@ -620,7 +623,7 @@ export interface ResourcesIngestResponse {
 export interface ResourcesIngestStreamResponse {
   /**
    * The average, minimum and maximum time to encode an audio frame in microseconds.
-   * Based on the last 250 frames.
+   * Based on the latest 250 frames.
    */
   audio_encode_duration: ResourcesMinMaxAverageTimings;
   /**
@@ -707,12 +710,12 @@ export interface ResourcesIngestStreamResponse {
   pipeline_uuid: string;
   /**
    * The average, minimum and maximum processing time of audio frames in this stream measured from the capture time to handover to the network interface.
-   * Based on the last 250 frames.
+   * Based on the latest 250 frames.
    */
   processing_time_audio: ResourcesMinMaxAverageTimings;
   /**
    * The average, minimum and maximum processing time of video frames in this stream measured from the capture time to handover to the network interface.
-   * Based on the last 250 frames.
+   * Based on the latest 250 frames.
    */
   processing_time_video: ResourcesMinMaxAverageTimings;
   /**
@@ -743,7 +746,7 @@ export interface ResourcesIngestStreamResponse {
   stream_uuid: string;
   /**
    * The average, minimum and maximum time to encode a video frame in microseconds.
-   * Based on the last 250 frames.
+   * Based on the latest 250 frames.
    */
   video_encode_duration: ResourcesMinMaxAverageTimings;
   /** The maximum number of video frames that can be kept in queue before it is full */
@@ -773,15 +776,16 @@ export interface ResourcesListeningInterface {
 
 export interface ResourcesMediaPlayer {
   /**
-   * The filename/path of the file to play
-   * @example "/media/news.mp4"
-   */
-  filename: string;
-  /**
    * The input slot this media player is allocated to
+   * @min 1
    * @example 2
    */
   input_slot: number;
+  /**
+   * The filename/path of the currently loaded file to play
+   * @example "/media/news.mp4"
+   */
+  path: string;
 }
 
 export interface ResourcesMinMaxAverageTimings {
@@ -944,7 +948,7 @@ export interface ResourcesMultiviewOutputResponse {
    * @example 1234
    */
   rendered_frames: number;
-  /** The average, minimum and maximum time to render a frame on this multi-view output in microseconds, based on the last 250 frames. */
+  /** The average, minimum and maximum time to render a frame on this multi-view output in microseconds, based on the latest 250 frames. */
   rendering_duration: ResourcesMinMaxAverageTimings;
 }
 
@@ -1562,7 +1566,7 @@ export interface ResourcesPipelineStreamResponse {
   alignment_ms: number;
   /**
    * The average, minimum and maximum time to decode an audio frame in microseconds.
-   * Based on the last 250 frames.
+   * Based on the latest 250 frames.
    */
   audio_decode_duration: ResourcesMinMaxAverageTimings;
   /**
@@ -1580,6 +1584,8 @@ export interface ResourcesPipelineStreamResponse {
    * @example 48000
    */
   audio_sampling_frequency: number;
+  /** The number of video frames that have been decoded but resulted in an error code */
+  broken_decoded_video_frames: number;
   /** True if the video in this stream is converted from narrow range to full color range or false if the color range is kept */
   convert_color_range: boolean;
   /** The number of successfully decoded audio frames */
@@ -1654,27 +1660,27 @@ export interface ResourcesPipelineStreamResponse {
   stream_uuid: string;
   /**
    * The average, minimum and maximum "time to arrival" for audio frames in this stream measured from the capture time in the Ingest to handover from the network
-   * interface in the Pipeline. Based on the last 250 frames.
+   * interface in the Pipeline. Based on the latest 250 frames.
    */
   time_to_arrival_audio: ResourcesMinMaxAverageTimings;
   /**
    * The average, minimum and maximum "time to arrival" for video frames in this stream measured from the capture time in the Ingest to handover from the network
-   * interface in the Pipeline. Based on the last 250 frames.
+   * interface in the Pipeline. Based on the latest 250 frames.
    */
   time_to_arrival_video: ResourcesMinMaxAverageTimings;
   /**
    * The average, minimum and maximum "time to ready for delivery" of audio frames in this stream measured from the capture time in the Ingest to the time when
-   * the frames are put in the delivery queue to the Rendering Engine in the Pipeline. Based on the last 250 frames.
+   * the frames are put in the delivery queue to the Rendering Engine in the Pipeline. Based on the latest 250 frames.
    */
   time_to_ready_audio: ResourcesMinMaxAverageTimings;
   /**
    * The average, minimum and maximum "time to ready for delivery" of video frames in this stream measured from the capture time in the Ingest to the time when
-   * the frames are put in the delivery queue to the Rendering Engine in the Pipeline. Based on the last 250 frames.
+   * the frames are put in the delivery queue to the Rendering Engine in the Pipeline. Based on the latest 250 frames.
    */
   time_to_ready_video: ResourcesMinMaxAverageTimings;
   /**
    * The average, minimum and maximum time to encode a video frame in microseconds.
-   * Based on the last 250 frames.
+   * Based on the latest 250 frames.
    */
   video_decode_duration: ResourcesMinMaxAverageTimings;
   /** The number of video frames currently in queue to the video decoder */
@@ -1706,15 +1712,69 @@ export interface ResourcesReceiverNetworkEndpoint {
    */
   sender_uuid: string;
   /**
-   * The transport time of messages from this connection in microseconds based on the last 20 messages. Measured by comparing the send
+   * The transport time of messages from this connection in microseconds based on the latest 20 messages. Measured by comparing the send
    * timestamp of the messages with the local time when received.
    */
   transport_duration: ResourcesMinMaxAverageTimings;
 }
 
+export interface ResourcesRenderingEngineFormat {
+  /**
+   * The video frame rate denominator
+   * @min 1
+   * @example 1
+   */
+  frame_rate_d?: number;
+  /**
+   * The video frame rate nominator
+   * @min 1
+   * @example 50
+   */
+  frame_rate_n?: number;
+  /**
+   * The audio sample rate
+   * @min 1
+   * @example 48000
+   */
+  sample_rate?: number;
+  /**
+   * The height of the video resolution
+   * @min 1
+   * @example 720
+   */
+  video_height?: number;
+  /**
+   * The width of the video resolution
+   * @min 1
+   * @example 1280
+   */
+  video_width?: number;
+}
+
 export interface ResourcesRenderingEngineResponse {
+  /** The time to complete audio rendering in microseconds, based on the latest 250 frames */
+  audio_rendering_duration: ResourcesMinMaxAverageTimings;
+  /** The time to process the incoming control panel commands in microseconds, based on the latest 250 frames */
+  command_processing_duration: ResourcesMinMaxAverageTimings;
+  /** The number of frames that has failed to render */
+  failed_rendered_frames: number;
+  /** The list of open HTML browsers */
   html: ResourcesHTMLBrowser[];
+  /** The list of open media players */
   media: ResourcesMediaPlayer[];
+  /** The total processing time of a frame in microseconds, based on the latest 250 frames */
+  processing_duration: ResourcesMinMaxAverageTimings;
+  /** The number of frames that has been successfully rendered */
+  rendered_frames: number;
+  /**
+   * The time to complete rendering of both audio and video in microseconds, based on the latest 250 frames. This might be
+   * shorter than the sum of the video and audio time, as the rendering is performed in parallel
+   */
+  rendering_duration: ResourcesMinMaxAverageTimings;
+  /** The number of frames skipped, due to the previous frames taking too long time to complete rendering */
+  skipped_frames: number;
+  /** The time to complete video rendering in microseconds, based on the latest 250 frames */
+  video_rendering_duration: ResourcesMinMaxAverageTimings;
 }
 
 export interface ResourcesRoundTripTimeMs {
@@ -1826,6 +1886,10 @@ export interface ResourcesSourceResponse {
   source_id: number;
   /** Statistics from SRT. Only included for SRT sources. */
   srt?: ResourcesSrt;
+  /** Adjustment of incoming audio timestamps during the latest 250 frames. This field is meant for debugging purposes only and might be removed in future versions. */
+  time_adjustment_audio: ResourcesMinMaxAverageTimings;
+  /** Adjustment of incoming video timestamps during the latest 250 frames. This field is meant for debugging purposes only and might be removed in future versions. */
+  time_adjustment_video: ResourcesMinMaxAverageTimings;
   /**
    * The type of interface used by the source. NDI for NDI sources, BMD for SDI or HDMI sources using a DeckLink card, SRT for SRT sources
    * @example "NDI"
@@ -1874,6 +1938,13 @@ export interface ResourcesSrt {
    * @example "AAC"
    */
   audio_format: 'AAC';
+  /** The number of video frames that have been decoded but resulted in an error code */
+  broken_decoded_video_frames: number;
+  /**
+   * The number of continuity counter errors found in the input MPEG-TS of this SRT media source
+   * @example 34
+   */
+  cc_errors: number;
   /** SRT statistics */
   connection?: ResourcesConnection;
   /** The number of successfully decoded audio frames */

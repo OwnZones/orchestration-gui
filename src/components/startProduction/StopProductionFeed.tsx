@@ -18,6 +18,7 @@ export default function StopProductionFeed({
     remove_pipeline_multiviews: t(
       'stop_production_status.remove_pipeline_multiviews'
     ),
+    reset_pipeline: t('stop_production_status.reset_pipeline'),
     unexpected: t('stop_production_status.unexpected')
   };
   return (

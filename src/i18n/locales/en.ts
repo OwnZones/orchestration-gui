@@ -35,6 +35,7 @@ export const en = {
     disconnect_connections: 'Disconnect connections',
     remove_pipeline_streams: 'Remove streams',
     remove_pipeline_multiviews: 'Remove multiviews',
+    reset_pipeline: 'Reset pipelines',
     unexpected: 'Unexpected error'
   },
   source: {

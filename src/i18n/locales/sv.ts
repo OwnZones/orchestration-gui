@@ -37,6 +37,7 @@ export const sv = {
     disconnect_connections: 'Frånkoppla anslutningar',
     remove_pipeline_streams: 'Ta bort strömmar',
     remove_pipeline_multiviews: 'Ta bort multiviews',
+    reset_pipeline: 'Rensa pipelines',
     unexpected: 'Oväntat fel'
   },
   source: {
