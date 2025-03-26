@@ -1233,7 +1233,7 @@ export async function putMultiviewersOnRunningProduction(
       const views = multiview.layout.views;
 
       if (
-        multiview.multiview_id &&
+        multiview.multiview_id !== undefined &&
         production.production_settings.pipelines[0].pipeline_id
       ) {
         await updateMultiviewForPipeline(
