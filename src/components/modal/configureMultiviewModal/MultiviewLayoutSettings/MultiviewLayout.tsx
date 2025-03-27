@@ -21,8 +21,6 @@ export default function MultiviewLayout({
     >
       {multiviewPresetLayout.layout.views.map((singleView) => {
         const { x, y, width, height, label, id } = singleView;
-        const previewView = singleView.input_slot === 1002 && y === 0;
-        const programView = singleView.input_slot === 1001 && y === 0;
 
         const sourceId = inputList?.find(
           (source) => source.label === label
@@ -39,10 +37,7 @@ export default function MultiviewLayout({
               left: `${x}rem`
             }}
           >
-            {inputList && (previewView || programView) && (
-              <p className="flex items-center">{label}</p>
-            )}
-            {inputList && !previewView && !programView && (
+            {inputList && (
               <Options
                 label={label}
                 options={inputList.map((singleSource) => ({

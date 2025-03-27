@@ -247,16 +247,21 @@ export default function ProductionConfiguration({ params }: PageProps) {
       setConfigurationName(production.name);
       setSelectedPreset(production.production_settings);
       getPresets().then((presets) => {
-        if (!production.production_settings) {
-          setPresets(presets);
-        } else {
-          const presetsExludingProductionSettings = presets.filter(
-            (preset) => preset._id !== production?.production_settings._id
+        if (production.production_settings) {
+          // In case we have some production settings, find the preset that matches those settings
+          // and update that preset with the production settings, keeping default_multiview_reference
+          const updatedPresets = presets.map((preset) =>
+            preset._id === production.production_settings._id
+              ? {
+                  ...preset,
+                  ...production.production_settings
+                }
+              : preset
           );
-          setPresets([
-            ...presetsExludingProductionSettings,
-            production.production_settings
-          ]);
+
+          setPresets(updatedPresets);
+        } else {
+          setPresets(presets);
         }
       });
     });
