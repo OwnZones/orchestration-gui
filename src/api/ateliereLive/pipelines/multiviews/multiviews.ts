@@ -41,28 +41,15 @@ export async function createMultiviewForPipeline(
   const pipeline = productionSettings.pipelines.find((p) =>
     p.multiviews ? p.multiviews?.length > 0 : undefined
   );
-  const multiviewIndexArray = pipeline?.multiviews
-    ? pipeline.multiviews.map((p) => p.for_pipeline_idx)
-    : undefined;
 
-  const multiviewIndex = multiviewIndexArray?.find((p) => p !== undefined);
+  if (pipeline === undefined) {
+    Log().error(`Did not find a pipeline with any multiviews specified`);
+    throw `Did not find a pipeline with any multiviews specified`;
+  }
 
-  if (multiviewIndex === undefined) {
-    Log().error(`Did not find a specified pipeline in multiview settings`);
-    throw `Did not find a specified pipeline in multiview settings`;
-  }
-  if (
-    !productionSettings.pipelines[multiviewIndex].multiviews ||
-    productionSettings.pipelines[multiviewIndex].multiviews?.length === 0
-  ) {
-    Log().error(
-      `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`
-    );
-    throw `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`;
-  }
   const pipelineUUID =
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    productionSettings.pipelines[multiviewIndex].pipeline_id!;
+    pipeline.pipeline_id!;
   const sources = await getSourcesByIds(
     sourceRefs.map((ref) => (ref._id ? ref._id.toString() : ''))
   );
@@ -76,8 +63,7 @@ export async function createMultiviewForPipeline(
   });
   Log().info(`Creating a multiview for pipeline '${pipelineUUID}' from preset`);
 
-  const multiviewsSettings: MultiviewSettings[] =
-    productionSettings.pipelines[multiviewIndex].multiviews ?? [];
+  const multiviewsSettings: MultiviewSettings[] = pipeline.multiviews ?? [];
 
   const createEachMultiviewer = multiviewsSettings.map(
     async (singleMultiviewSettings) => {
@@ -93,8 +79,8 @@ export async function createMultiviewForPipeline(
           ...multiview,
           output: {
             format: multiview.output.format,
-            frame_rate_d: multiview.output.frame_rate_d,
-            frame_rate_n: multiview.output.frame_rate_n,
+            frame_rate_d: pipeline.frame_rate_d,
+            frame_rate_n: pipeline.frame_rate_n,
             local_ip: multiview.output.local_ip,
             local_port: multiview.output.local_port,
             srt_mode: multiview.output.srt_mode,
@@ -110,8 +96,8 @@ export async function createMultiviewForPipeline(
           ...multiview,
           output: {
             format: multiview.output.format,
-            frame_rate_d: multiview.output.frame_rate_d,
-            frame_rate_n: multiview.output.frame_rate_n,
+            frame_rate_d: pipeline.frame_rate_d,
+            frame_rate_n: pipeline.frame_rate_n,
             local_ip: '0.0.0.0',
             local_port: 0,
             remote_ip: multiview.output.remote_ip,
