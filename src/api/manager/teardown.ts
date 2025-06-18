@@ -6,6 +6,7 @@ import {
 import { FlowStep, TeardownStepNames } from '../../interfaces/production';
 import { Result } from '../../interfaces/result';
 import { disconnectReceiver } from '../ateliereLive/controlconnections';
+import { getControlPanels } from '../ateliereLive/controlpanels';
 import {
   deleteSrtSource,
   getIngests,
@@ -167,6 +168,21 @@ export async function teardown(
     addStep('pipeline_control_connections', true);
   } catch (e) {
     addStep('pipeline_control_connections', false, e);
+    return generateResponse(false);
+  }
+
+  // Step 5.5
+  // Delete all remaining connections from control panels
+  try {
+    const controlpanels = await getControlPanels();
+    for (const controlpanel of controlpanels) {
+      for (const outgoing_connection of controlpanel.outgoing_connections) {
+        await disconnectReceiver(outgoing_connection.connection_uuid);
+      }
+    }
+    addStep('controlpanel_control_connections', true);
+  } catch (e) {
+    addStep('controlpanel_control_connections', false, e);
     return generateResponse(false);
   }
 
