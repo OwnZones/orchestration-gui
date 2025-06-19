@@ -284,11 +284,11 @@ export async function stopPipelines(pipelineIds: string[]) {
 
     await removePipelineStreams(id).catch((error) => {
       Log().error(
-        `Failed to remove streams connected to piepline '${id}'`,
+        `Failed to remove streams connected to pipepline '${id}'`,
         error
       );
 
-      throw `Failed to remove streams connected to piepline '${id}': ${error.message}`;
+      throw `Failed to remove streams connected to pipepline '${id}': ${error.message}`;
     });
 
     await deleteAllMultiviewsFromPipeline(id).catch((error) => {
@@ -369,6 +369,28 @@ async function disconnectConnections(
   } catch (e) {
     Log().error(e);
     throw e;
+  }
+}
+
+async function disconnectControlPanels(
+  controlPanelNames: string[],
+  pipelineUUID: string
+) {
+  const controlPanels = await getControlPanels();
+
+  for (const controlPanelName of controlPanelNames) {
+    for (const controlPanel of controlPanels) {
+      if (controlPanel.name == controlPanelName) {
+        for (const outgoing_connection of controlPanel.outgoing_connections) {
+          if (outgoing_connection.receiver_uuid == pipelineUUID) {
+            Log().info(
+              `Removing control connection: ${outgoing_connection.connection_uuid} directly from control panel: ${controlPanel.name}`
+            );
+            await disconnectReceiver(outgoing_connection.connection_uuid);
+          }
+        }
+      }
+    }
   }
 }
 
@@ -483,6 +505,18 @@ export async function stopProduction(
     try {
       const pipeline = await getPipelineCompact(id).catch((error) => {
         Log().error(`Failed to get pipeline '${id}'`, error);
+        // Pipeline seems gone, try to find any control panels that still might have active/reconnecting connections to the pipeline
+        // and remove them.
+        if (
+          production.production_settings.control_connection
+            .control_panel_name != undefined
+        ) {
+          disconnectControlPanels(
+            production.production_settings.control_connection
+              .control_panel_name!,
+            id
+          );
+        }
         throw `Failed to get pipeline '${id}' ${error.message}`;
       });
       const receiver = pipeline.control_receiver;

@@ -678,6 +678,8 @@ export const en = {
     pipeline_multiviewers: 'Delete all pipeline multiviewer outputs',
     pipeline_streams: 'Delete all pipeline streams',
     pipeline_control_connections: 'Delete all pipeline control connections',
+    controlpanel_control_connections:
+      'Delete all control panel control connections',
     ingest_streams: 'Delete all ingest streams',
     ingest_src_sources: 'Delete all ingest SRT sources',
     teardown_check: 'Verify'

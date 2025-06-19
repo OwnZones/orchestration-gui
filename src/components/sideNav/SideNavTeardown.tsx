@@ -103,6 +103,7 @@ const SideNavTeardown: React.FC<SideNavItemBaseProps> = (props) => {
             <div>- {t('teardown.pipeline_output_streams')}</div>
             <div>- {t('teardown.pipeline_multiviewers')}</div>
             <div>- {t('teardown.pipeline_control_connections')}</div>
+            <div>- {t('teardown.controlpanel_control_connections')}</div>
             <div>- {t('teardown.ingest_streams')}</div>
             <div className="mt-4">{t('teardown.optional')}</div>
             <div className="flex flex-row gap-4">

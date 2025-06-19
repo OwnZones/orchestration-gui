@@ -70,6 +70,7 @@ export type TeardownStepNames =
   | 'pipeline_multiviewers'
   | 'pipeline_streams'
   | 'pipeline_control_connections'
+  | 'controlpanel_control_connections'
   | 'reset_pipelines'
   | 'ingest_streams'
   | 'ingest_src_sources'

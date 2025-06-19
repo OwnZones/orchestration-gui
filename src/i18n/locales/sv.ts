@@ -682,6 +682,8 @@ export const sv = {
     pipeline_streams: 'Stänga ner alla pipeline strömmar',
     pipeline_control_connections:
       'Stänga ner alla pipeline control connections',
+    controlpanel_control_connections:
+      'Stänga ner alla control panel control connections',
     ingest_streams: 'Stänga ner alla ingest strömmar',
     ingest_src_sources: 'Stänga ner alla ingest SRT källor',
     teardown_check: 'Verifiering'
