@@ -218,7 +218,8 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
           label={t('preset.video_format')}
           options={[
             { id: 'AVC', label: 'AVC' },
-            { id: 'HEVC', label: 'HEVC' }
+            { id: 'HEVC', label: 'HEVC' },
+            { id: 'None', label: 'Audio only' }
           ]}
           value={
             foundOutput?.settings?.video_format ||
