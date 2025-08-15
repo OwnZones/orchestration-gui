@@ -44,8 +44,8 @@ import {
 import { getSourcesByIds } from './sources';
 import { SourceToPipelineStream } from '../../interfaces/Source';
 import {
-  getAvailablePortsForIngest,
   getCurrentlyUsedPorts,
+  getNextAvailablePortForIngest,
   initDedicatedPorts
 } from '../ateliereLive/utils/fwConfigPorts';
 import { getAudioMapping } from './inventory';
@@ -117,20 +117,14 @@ async function connectIngestSources(
     const audioMapping = newAudioMapping?.length ? newAudioMapping : [[0, 1]];
 
     for (const pipeline of productionSettings.pipelines) {
-      const availablePorts = getAvailablePortsForIngest(
+      const nextAvailablePort = await getNextAvailablePortForIngest(
         source.ingest_name,
         usedPorts
       );
 
-      if (availablePorts.size === 0) {
-        Log().error(`No available ports for ingest '${source.ingest_name}'`);
-        throw `No available ports for ingest '${source.ingest_name}'`;
+      if (nextAvailablePort == -1) {
+        throw `Failed to find an available port to '${source.ingest_name}'-${source.ingest_source_name}`;
       }
-
-      const availablePort = availablePorts.values().next().value || 0;
-      Log().info(
-        `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
-      );
 
       const pipelineSource = pipeline.sources?.find(
         (s) =>
@@ -167,7 +161,7 @@ async function connectIngestSources(
         interfaces: [
           {
             ...pipeline.interfaces[0],
-            port: availablePort
+            port: nextAvailablePort
           }
         ]
       };
@@ -185,7 +179,7 @@ async function connectIngestSources(
           throw `Source '${source.ingest_name}/${ingestUuid}:${source.ingest_source_name}' failed to connect to '${pipeline.pipeline_name}/${pipeline.pipeline_id}': ${error.message}`;
         });
 
-        usedPorts.add(availablePort);
+        usedPorts.add(nextAvailablePort);
         sourceToPipelineStreams.push({
           source_id: source._id.toString(),
           stream_uuid: result.stream_uuid,
@@ -816,25 +810,18 @@ export async function startProduction(
   } catch (error) {
     Log().error('Could not setup control panels');
     Log().error(error);
-    if (typeof error !== 'string') {
-      return {
-        ok: false,
-        value: [
-          { step: 'start', success: true },
-          { step: 'streams', success: true },
-          { step: 'control_panels', success: false }
-        ],
-        error: 'Unknown error occured'
-      };
+    let errorMessage = 'Unknown error occured';
+    if (typeof error === 'string') {
+      errorMessage = error;
     }
     return {
       ok: false,
       value: [
         { step: 'start', success: true },
         { step: 'streams', success: true },
-        { step: 'control_panels', success: false, message: error }
+        { step: 'control_panels', success: false, message: errorMessage }
       ],
-      error: error
+      error: errorMessage
     };
   } // Try to connect control panels and pipeline-to-pipeline connections end
 
@@ -843,36 +830,30 @@ export async function startProduction(
     for (const pipeline of production_settings.pipelines) {
       await createPipelineOutputs(pipeline);
     }
-  } catch (e) {
+  } catch (error) {
     Log().error('Could not setup pipeline outputs');
-    Log().error(e);
+    Log().error(error);
     Log().error('Stopping pipelines');
     await stopPipelines(
       production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
-    ).catch((error) => {
-      throw `Failed to stop pipelines after production start failure: ${error}`;
+    ).catch((stropError) => {
+      throw `Failed to stop pipelines after production start failure: ${stropError}`;
     });
-    if (typeof e !== 'string') {
-      return {
-        ok: false,
-        value: [
-          { step: 'start', success: true },
-          { step: 'streams', success: true },
-          { step: 'control_panels', success: true },
-          { step: 'pipeline_outputs', success: false }
-        ],
-        error: 'Unknown error occured'
-      };
+
+    let errorMessage = 'Unknown error occured';
+    if (typeof error === 'string') {
+      errorMessage = error;
     }
+
     return {
       ok: false,
       value: [
         { step: 'start', success: true },
         { step: 'streams', success: true },
         { step: 'control_panels', success: true },
-        { step: 'pipeline_outputs', success: false, message: e }
+        { step: 'pipeline_outputs', success: false, message: errorMessage }
       ],
-      error: e
+      error: errorMessage
     };
   }
 
@@ -913,22 +894,15 @@ export async function startProduction(
     Log().info(
       `Production '${production.name}' with preset '${production_settings.name}' started`
     );
-  } catch (e) {
+  } catch (error) {
     Log().error('Could not start multiviews');
-    Log().error(e);
-    if (typeof e !== 'string') {
-      return {
-        ok: false,
-        value: [
-          { step: 'start', success: true },
-          { step: 'streams', success: true },
-          { step: 'control_panels', success: true },
-          { step: 'pipeline_outputs', success: false },
-          { step: 'multiviews', success: false }
-        ],
-        error: 'Could not start multiviews'
-      };
+    Log().error(error);
+
+    let errorMessage = 'Could not start multiviews';
+    if (typeof error === 'string') {
+      errorMessage = error;
     }
+
     return {
       ok: false,
       value: [
@@ -936,9 +910,9 @@ export async function startProduction(
         { step: 'streams', success: true },
         { step: 'control_panels', success: true },
         { step: 'pipeline_outputs', success: true },
-        { step: 'multiviews', success: false, message: e }
+        { step: 'multiviews', success: false, message: errorMessage }
       ],
-      error: e
+      error: errorMessage
     };
   } // Try to setup multiviews end
 

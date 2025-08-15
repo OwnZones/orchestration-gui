@@ -1,7 +1,7 @@
 import { getPipelines } from '../pipelines/pipelines';
 import {
-  getAvailablePortsForIngest,
   getCurrentlyUsedPorts,
+  getNextAvailablePortForIngest,
   initDedicatedPorts
 } from './fwConfigPorts';
 
@@ -35,17 +35,20 @@ describe.skip('fwConfigPorts tests', () => {
 
   describe('getAvailableTypePorts', () => {
     test('should return available ingest ports', async () => {
-      const ingestPorts = getAvailablePortsForIngest('cloud_ingest', usedPorts);
+      const ingestPort = getNextAvailablePortForIngest(
+        'cloud_ingest',
+        usedPorts
+      );
 
-      expect(ingestPorts).not.toBeUndefined();
-      expect(ingestPorts.size).toBeGreaterThan(0);
+      expect(ingestPort).not.toBeUndefined();
+      expect(ingestPort).toBeGreaterThan(-1);
     });
 
     test('should return default ingest ports when ingest doesnt exist', async () => {
-      const ingestPorts = getAvailablePortsForIngest('wrong_name', usedPorts);
+      const ingestPort = getNextAvailablePortForIngest('wrong_name', usedPorts);
 
-      expect(ingestPorts).not.toBeUndefined();
-      expect(ingestPorts.size).toBeGreaterThan(0);
+      expect(ingestPort).not.toBeUndefined();
+      expect(ingestPort).toBeGreaterThan(-1);
     });
   });
 });
